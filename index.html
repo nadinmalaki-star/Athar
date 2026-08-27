@@ -3,8 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أثر — Athar</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjAgNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcng9IjE0IiBmaWxsPSIjMDUwNTA1Ii8+CjxyZWN0IHg9IjciIHk9IjQxIiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiByeD0iMiIgZmlsbD0iI0Y1RjNFRCIgb3BhY2l0eT0iMC4zIi8+CjxyZWN0IHg9IjE5IiB5PSIzMyIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiByeD0iMi41IiBmaWxsPSIjRjVGM0VEIiBvcGFjaXR5PSIwLjUiLz4KPHJlY3QgeD0iMzQiIHk9IjIyIiB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHJ4PSIzIiBmaWxsPSIjRkY1QTM2IiBvcGFjaXR5PSIwLjgiLz4KPHJlY3QgeD0iMzUiIHk9IjgiIHdpZHRoPSIxNyIgaGVpZ2h0PSIxNyIgcng9IjMuNiIgZmlsbD0iI0ZGNUEzNiIvPgo8L3N2Zz4K">
+<title>أثر — Athar | Digital Studio</title>
+<meta name="description" content="أثر (Athar) — استوديو رقمي يبني مواقع، تطبيقات ويب، وPWA حقيقية تستمر تشتغل بعد التسليم. Athar is a digital studio building websites, web apps, and PWAs that keep working long after launch.">
+<meta name="theme-color" content="#050505">
+<link rel="canonical" href="https://studioathar.studio/">
+<link rel="alternate" hreflang="ar" href="https://studioathar.studio/">
+<link rel="alternate" hreflang="en" href="https://studioathar.studio/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://studioathar.studio/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Athar — أثر">
+<meta property="og:url" content="https://studioathar.studio/">
+<meta property="og:title" content="أثر — Athar | Digital Studio">
+<meta property="og:description" content="A studio that leaves a mark — real websites, web apps, and PWAs built to keep working after launch.">
+<meta property="og:image" content="https://studioathar.studio/images/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ar_AR">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="أثر — Athar | Digital Studio">
+<meta name="twitter:description" content="A studio that leaves a mark — real websites, web apps, and PWAs built to keep working after launch.">
+<meta name="twitter:image" content="https://studioathar.studio/images/og-cover.jpg">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -72,6 +96,10 @@
   }
   .lang-toggle:hover{ border-color:var(--ember); background:rgba(255,90,54,0.08); }
   @media (max-width:760px){ .nav-en{ display:none; } }
+  .avail-badge{ display:flex; align-items:center; gap:7px; font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--paper-dim); }
+  .avail-dot{ width:6px; height:6px; border-radius:50%; background:#4ADE80; box-shadow:0 0 0 0 rgba(74,222,128,0.6); animation:availPulse 2s ease-out infinite; }
+  @keyframes availPulse{ 0%{ box-shadow:0 0 0 0 rgba(74,222,128,0.55); } 70%{ box-shadow:0 0 0 6px rgba(74,222,128,0); } 100%{ box-shadow:0 0 0 0 rgba(74,222,128,0); } }
+  @media (max-width:760px){ .avail-badge{ display:none; } }
 
   /* ---------- Hero ---------- */
   .hero{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; text-align:center; padding:120px 24px 60px; }
@@ -116,6 +144,13 @@
 
   section{ padding:180px 0; position:relative; }
   .kicker{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--ember); margin-bottom:28px; }
+  .stagger-line{ display:block; opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease; transition-delay:calc(var(--d,0) * 0.15s); }
+  .reveal-line.in .stagger-line{ opacity:1; transform:translateY(0); }
+  .stats-strip{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:34px 0; }
+  .stats-strip .wrap{ display:flex; justify-content:center; gap:60px; flex-wrap:wrap; text-align:center; }
+  .stat-num{ font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(20px,3vw,28px); color:var(--ember); }
+  .stat-label{ font-size:11px; letter-spacing:1px; color:var(--paper-dim); margin-top:6px; }
+  @media (max-width:760px){ .stats-strip .wrap{ gap:34px; } }
 
   /* ---------- Manifesto ---------- */
   .manifesto p{
@@ -171,16 +206,43 @@
     width:100%; max-width:230px; border-radius:14px 14px 0 0;
     box-shadow:0 50px 90px -30px rgba(0,0,0,0.8);
     animation:float 5s ease-in-out infinite;
+    transition:box-shadow .2s ease;
   }
   .artifact-shot.secondary{ max-width:175px; opacity:0.8; margin-bottom:30px; animation-delay:.6s; }
-  @keyframes float{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-14px); } }
+  @keyframes float{
+    0%,100%{ transform:translateY(0) perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); }
+    50%{ transform:translateY(-14px) perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); }
+  }
   @media (prefers-reduced-motion:reduce){ .artifact-shot{ animation:none; } }
+  @media (pointer:fine){ .artifact-shot:hover{ box-shadow:0 55px 100px -25px rgba(255,90,54,0.35); } }
+
+  /* ---------- Custom cursor ---------- */
+  @media (pointer:fine){
+    body{ cursor:none; }
+    a, button, .lang-toggle, .magnet-btn, input, textarea, summary{ cursor:none; }
+  }
+  #cursorDot, #cursorRing{
+    position:fixed; top:0; left:0; pointer-events:none; z-index:60; border-radius:50%;
+    transform:translate(-50%,-50%); opacity:0; transition:opacity .3s ease;
+  }
+  #cursorDot{ width:6px; height:6px; background:var(--ember); }
+  #cursorRing{ width:32px; height:32px; border:1px solid var(--paper-faint); transition:width .2s ease, height .2s ease, border-color .2s ease, opacity .3s ease; }
+  #cursorRing.hover{ width:54px; height:54px; border-color:var(--ember); }
+  @media (pointer:coarse){ #cursorDot, #cursorRing{ display:none; } }
 
   .case-narrative{ display:grid; grid-template-columns:repeat(3,1fr); gap:40px; }
   .case-block .k{ font-family:'Space Mono',monospace; font-size:11px; color:var(--ember); letter-spacing:2px; margin-bottom:16px; }
   .case-block p{ font-size:15px; line-height:2; color:var(--paper-dim); }
   .case-tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:60px; justify-content:center; }
   .case-tag{ font-family:'Space Mono',monospace; font-size:11px; border:1px solid var(--line); padding:7px 16px; border-radius:99px; color:var(--paper-dim); }
+  .stack-badges{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .faq-list{ max-width:760px; margin:0 auto; display:flex; flex-direction:column; }
+  .faq-item{ border-bottom:1px solid var(--line); padding:22px 0; }
+  .faq-item summary{ cursor:pointer; font-family:'Almarai',sans-serif; font-weight:700; font-size:17px; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:16px; }
+  .faq-item summary::-webkit-details-marker{ display:none; }
+  .faq-item summary::after{ content:'+'; font-family:'Space Mono',monospace; font-size:20px; color:var(--ember); flex-shrink:0; transition:transform .25s ease; }
+  .faq-item[open] summary::after{ transform:rotate(45deg); }
+  .faq-item p{ margin-top:14px; font-size:14px; line-height:1.9; color:var(--paper-dim); }
   @media (max-width:760px){ .case-narrative{ grid-template-columns:1fr; } }
 
   /* ---------- Process ghost numbers ---------- */
@@ -238,12 +300,21 @@
   .foot-mark span{ font-family:'Almarai',sans-serif; font-weight:800; font-size:22px; color:var(--paper); }
   footer .l1{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--paper-dim); }
   footer .l2{ font-size:11px; color:var(--paper-dim); margin-top:8px; }
+  .foot-links{ display:flex; align-items:center; justify-content:center; gap:18px; margin-top:22px; }
+  .foot-links a{
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px;
+    color:var(--paper-dim); border:1px solid var(--paper-faint); padding:7px 16px; border-radius:99px;
+    transition:border-color .25s ease, color .25s ease, background .25s ease;
+  }
+  .foot-links a:hover{ border-color:var(--ember); color:var(--paper); background:rgba(255,90,54,0.08); }
 </style>
 </head>
 <body>
 
   <div class="grain"></div>
   <canvas id="trail"></canvas>
+  <div id="cursorRing"></div>
+  <div id="cursorDot"></div>
   <div class="thread-track"></div>
   <div class="thread-fill" id="threadFill"></div>
 
@@ -258,6 +329,7 @@
       </svg>
     </div>
     <div style="display:flex; align-items:center; gap:16px;">
+      <div class="avail-badge"><span class="avail-dot"></span><span data-ar="متاحين لمشاريع جديدة" data-en="Available for new projects">متاحين لمشاريع جديدة</span></div>
       <div class="nav-en mono">ATHAR — 2026</div>
       <button id="langToggle" class="lang-toggle mono" onclick="toggleLang()">EN</button>
     </div>
@@ -282,11 +354,29 @@
   <section class="manifesto">
     <div class="wrap">
       <div class="kicker">MANIFESTO</div>
-      <p class="reveal-line" data-ar-html='إحنا مش وكالة بتنتج مواقع وتنسى. <strong>كل مشروع</strong> بنشتغل عليه لازم يضل شغّال بعد ما نخلص — <strong>هاد الأثر</strong> يلي بنقيس عليه شغلنا.' data-en-html='We are not an agency that ships sites and forgets them. <strong>Every project</strong> we build has to keep working after we are done — <strong>that mark</strong> is how we measure our work.'>
-        إحنا مش وكالة بتنتج مواقع وتنسى.
-        <strong>كل مشروع</strong> بنشتغل عليه لازم يضل شغّال بعد ما نخلص —
-        <strong>هاد الأثر</strong> يلي بنقيس عليه شغلنا.
+      <p class="reveal-line">
+        <span class="stagger-line" style="--d:0" data-ar="إحنا مش وكالة بتنتج مواقع وتنسى." data-en="We are not an agency that ships sites and forgets them.">إحنا مش وكالة بتنتج مواقع وتنسى.</span>
+        <span class="stagger-line" style="--d:1" data-ar-html='<strong>كل مشروع</strong> بنشتغل عليه لازم يضل شغّال بعد ما نخلص —' data-en-html='<strong>Every project</strong> we build has to keep working after we are done —'><strong>كل مشروع</strong> بنشتغل عليه لازم يضل شغّال بعد ما نخلص —</span>
+        <span class="stagger-line" style="--d:2" data-ar-html='<strong>هاد الأثر</strong> يلي بنقيس عليه شغلنا.' data-en-html='<strong>that mark</strong> is how we measure our work.'><strong>هاد الأثر</strong> يلي بنقيس عليه شغلنا.</span>
       </p>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-strip">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="stat-num">2</div>
+        <div class="stat-label" data-ar="مشاريع حقيقية شغالة اليوم" data-en="Real projects live today">مشاريع حقيقية شغالة اليوم</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-num">100%</div>
+        <div class="stat-label" data-ar="كود مكتوب يدويًا، بلا قوالب" data-en="Hand-built code, zero templates">كود مكتوب يدويًا، بلا قوالب</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-num mono">AR / EN</div>
+        <div class="stat-label" data-ar="بنبني ونسلّم باللغتين" data-en="We build and ship in both languages">بنبني ونسلّم باللغتين</div>
+      </div>
     </div>
   </section>
 
@@ -360,6 +450,58 @@
     </div>
   </section>
 
+  <!-- Case study: Nader Pizza -->
+  <section id="work-2">
+    <div class="wrap">
+      <div class="artifact-head reveal">
+        <div class="kicker" style="justify-content:center; display:flex;">CASE STUDY — 02</div>
+        <div class="artifact-title" data-ar-html='من لوحة قائمة، إلى <span class="accent">موقع طلب حقيقي</span>' data-en-html='From a menu board, to a <span class="accent">real ordering site</span>'>من لوحة قائمة، إلى <span class="accent">موقع طلب حقيقي</span></div>
+      </div>
+
+      <div class="vitrine reveal">
+        <img src="images/case-nader-pizza-1.jpg" class="artifact-shot secondary" alt="Nader Pizza — نادر بيتزا" loading="lazy">
+        <img src="images/case-nader-pizza-2.jpg" class="artifact-shot" alt="Nader Pizza menu — قائمة نادر بيتزا" loading="lazy">
+      </div>
+
+      <div class="case-narrative reveal">
+        <div class="case-block">
+          <div class="k mono">THE PROBLEM</div>
+          <p data-ar="مطعم بيتزا حقيقي كانت قائمته بس صورة على فيسبوك — الزباين لازم يتصلوا أو يحكوا مع حدا عشان يطلبوا، بلا طريقة سريعة يتصفحوا فيها الأصناف والأسعار." data-en="A real pizza restaurant whose menu only existed as a photo on Facebook — customers had to call or message just to order, with no fast way to browse items and prices.">مطعم بيتزا حقيقي كانت قائمته بس صورة على فيسبوك — الزباين لازم يتصلوا أو يحكوا مع حدا عشان يطلبوا، بلا طريقة سريعة يتصفحوا فيها الأصناف والأسعار.</p>
+        </div>
+        <div class="case-block">
+          <div class="k mono">THE DECISION</div>
+          <p data-ar="بنينا موقع تصفح وطلب كامل من القائمة الحقيقية للمطعم — أحجام بيتزا، إضافات، سندويشات، ومشروبات — مع سلة طلبات وملاحظات لكل صنف." data-en="We built a full browsing-and-ordering site from the restaurant's real menu — pizza sizes, extras, sandwiches, and drinks — with a cart and per-item notes.">بنينا موقع تصفح وطلب كامل من القائمة الحقيقية للمطعم — أحجام بيتزا، إضافات، سندويشات، ومشروبات — مع سلة طلبات وملاحظات لكل صنف.</p>
+        </div>
+        <div class="case-block">
+          <div class="k mono">THE RESULT</div>
+          <p data-ar="موقع حي وخفيف، يشتغل بشكل رئيسي عالموبايل، وبيحوّل الطلب لرسالة واتساب جاهزة — بلا أي تعقيد تقني على الزبون." data-en="A live, lightweight site built mobile-first that turns an order into a ready WhatsApp message — no technical friction for the customer.">موقع حي وخفيف، يشتغل بشكل رئيسي عالموبايل، وبيحوّل الطلب لرسالة واتساب جاهزة — بلا أي تعقيد تقني على الزبون.</p>
+        </div>
+      </div>
+
+      <div class="case-tags reveal">
+        <span class="case-tag">HTML / CSS / JS</span>
+        <span class="case-tag">CART SYSTEM</span>
+        <span class="case-tag">WHATSAPP CHECKOUT</span>
+        <span class="case-tag">MOBILE-FIRST</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stack -->
+  <section id="stack">
+    <div class="wrap">
+      <div class="kicker reveal" style="justify-content:center; display:flex;">STACK</div>
+      <div class="stack-badges reveal">
+        <span class="case-tag">HTML / CSS / JS</span>
+        <span class="case-tag">React</span>
+        <span class="case-tag">Supabase</span>
+        <span class="case-tag">Vercel</span>
+        <span class="case-tag">PWA</span>
+        <span class="case-tag">EmailJS</span>
+      </div>
+    </div>
+  </section>
+
   <!-- Process -->
   <section id="process">
     <div class="wrap">
@@ -383,6 +525,35 @@
         <div class="ghost-num">04</div>
         <h4 data-ar="نكبر تدريجيًا" data-en="Grow gradually">نكبر تدريجيًا</h4>
         <p data-ar='كل ميزة جديدة تنضاف لأنها مطلوبة فعليًا، مش لأنها "تبدو حلوة" بس.' data-en='Every new feature gets added because it is actually needed, not because it "looks nice".'>كل ميزة جديدة تنضاف لأنها مطلوبة فعليًا، مش لأنها "تبدو حلوة" بس.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="kicker reveal" style="justify-content:center; display:flex;">FAQ</div>
+      <div class="faq-list">
+        <details class="faq-item reveal">
+          <summary data-ar="قديش بياخد الوقت تسليم مشروع؟" data-en="How long does a project take?">قديش بياخد الوقت تسليم مشروع؟</summary>
+          <p data-ar="بيعتمد على الحجم — موقع بسيط ممكن ياخد أسبوع لأسبوعين، وتطبيق ويب متكامل شهر لشهرين. منحدد الجدول الزمني الحقيقي بعد ما نفهم المشروع بالضبط." data-en="It depends on scope — a simple site can take one to two weeks, a full web app one to two months. We set a real timeline once we understand the project.">بيعتمد على الحجم — موقع بسيط ممكن ياخد أسبوع لأسبوعين، وتطبيق ويب متكامل شهر لشهرين. منحدد الجدول الزمني الحقيقي بعد ما نفهم المشروع بالضبط.</p>
+        </details>
+        <details class="faq-item reveal">
+          <summary data-ar="بتشتغلوا مع عملاء برا فلسطين؟" data-en="Do you work with clients outside Palestine?">بتشتغلوا مع عملاء برا فلسطين؟</summary>
+          <p data-ar="إيه أكيد. كل الشغل عن بعد، منحكي عربي أو إنجليزي، ومنرتب أوقات التواصل حسب فرق التوقيت." data-en="Yes, definitely. All work is remote, we communicate in Arabic or English, and we schedule around time zone differences.">إيه أكيد. كل الشغل عن بعد، منحكي عربي أو إنجليزي، ومنرتب أوقات التواصل حسب فرق التوقيت.</p>
+        </details>
+        <details class="faq-item reveal">
+          <summary data-ar="كيف بتحددوا السعر؟" data-en="How do you price a project?">كيف بتحددوا السعر؟</summary>
+          <p data-ar="التسعير حسب المشروع مش بالساعة — منحدد سعر ثابت بعد ما نفهم نطاق الشغل بالضبط، بلا مفاجآت ولا رسوم خفية." data-en="Pricing is project-based, not hourly — we quote a fixed price after scoping the work with you, no surprises or hidden fees.">التسعير حسب المشروع مش بالساعة — منحدد سعر ثابت بعد ما نفهم نطاق الشغل بالضبط، بلا مفاجآت ولا رسوم خفية.</p>
+        </details>
+        <details class="faq-item reveal">
+          <summary data-ar="شو بتستخدموا من تقنيات؟" data-en="What technologies do you use?">شو بتستخدموا من تقنيات؟</summary>
+          <p data-ar="حسب احتياج المشروع — مواقع بسيطة بـHTML/CSS/JS خفيف، وتطبيقات حقيقية بـReact وSupabase منشورة على Vercel." data-en="Depends on what the project needs — simple sites in lightweight HTML/CSS/JS, real apps in React and Supabase, deployed on Vercel.">حسب احتياج المشروع — مواقع بسيطة بـHTML/CSS/JS خفيف، وتطبيقات حقيقية بـReact وSupabase منشورة على Vercel.</p>
+        </details>
+        <details class="faq-item reveal">
+          <summary data-ar="بتقدموا صيانة بعد التسليم؟" data-en="Do you offer support after launch?">بتقدموا صيانة بعد التسليم؟</summary>
+          <p data-ar="إيه — وهاد بالضبط الفرق يلي بنحكي عنه. بنبني مشاريع تضل شغالة، مش بنسلم ونختفي. تواصلوا معنا أي وقت بعد الإطلاق." data-en="Yes — that is the whole point. We build projects meant to keep working, not ship-and-disappear. Reach out anytime after launch.">إيه — وهاد بالضبط الفرق يلي بنحكي عنه. بنبني مشاريع تضل شغالة، مش بنسلم ونختفي. تواصلوا معنا أي وقت بعد الإطلاق.</p>
+        </details>
       </div>
     </div>
   </section>
@@ -420,6 +591,10 @@
       </svg>
     </div>
     <div class="l1 mono">ATHAR — DIGITAL STUDIO</div>
+    <div class="foot-links">
+      <a href="https://www.linkedin.com/company/144764966/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="mailto:studioathar.studio@gmail.com">studioathar.studio@gmail.com</a>
+    </div>
     <div class="l2" data-ar="© 2026 أثر. جميع الحقوق محفوظة." data-en="© 2026 Athar. All rights reserved.">© 2026 أثر. جميع الحقوق محفوظة.</div>
   </footer>
 
@@ -427,32 +602,65 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 (function(){
-  // ---- Language toggle (design-only feature, no fabricated content) ----
+  // ---- Language toggle: swaps text, direction, <html lang>, and persists the choice ----
   var currentLang = 'ar';
-  window.toggleLang = function(){
-    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+
+  function applyLang(lang, skipPersist){
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
     var btn = document.getElementById('langToggle');
-    if (btn) btn.textContent = currentLang === 'ar' ? 'EN' : 'AR';
+    if (btn) btn.textContent = lang === 'ar' ? 'EN' : 'AR';
 
     var plain = document.querySelectorAll('[data-ar]');
     for (var i = 0; i < plain.length; i++) {
       var el = plain[i];
-      var val = el.getAttribute('data-' + currentLang);
+      var val = el.getAttribute('data-' + lang);
       if (val !== null) el.textContent = val;
     }
     var withHtml = document.querySelectorAll('[data-ar-html]');
     for (var j = 0; j < withHtml.length; j++) {
       var el2 = withHtml[j];
-      var val2 = el2.getAttribute('data-' + currentLang + '-html');
+      var val2 = el2.getAttribute('data-' + lang + '-html');
       if (val2 !== null) el2.innerHTML = val2;
     }
     var withPlaceholder = document.querySelectorAll('[data-ar-placeholder]');
     for (var k = 0; k < withPlaceholder.length; k++) {
       var el3 = withPlaceholder[k];
-      var val3 = el3.getAttribute('data-' + currentLang + '-placeholder');
+      var val3 = el3.getAttribute('data-' + lang + '-placeholder');
       if (val3 !== null) el3.setAttribute('placeholder', val3);
     }
+
+    document.title = lang === 'ar' ? 'أثر — Athar | Digital Studio' : 'Athar — أثر | Digital Studio';
+
+    if (!skipPersist) {
+      try { localStorage.setItem('athar_lang', lang); } catch (e) {}
+      var url = new URL(window.location.href);
+      if (lang === 'en') { url.searchParams.set('lang', 'en'); } else { url.searchParams.delete('lang'); }
+      window.history.replaceState({}, '', url);
+    }
+  }
+
+  window.toggleLang = function(){
+    applyLang(currentLang === 'ar' ? 'en' : 'ar');
   };
+
+  // ---- Initial language: URL ?lang= > saved choice > browser language ----
+  (function(){
+    var initial = 'ar';
+    var urlLang = new URL(window.location.href).searchParams.get('lang');
+    var savedLang = null;
+    try { savedLang = localStorage.getItem('athar_lang'); } catch (e) {}
+    if (urlLang === 'en' || urlLang === 'ar') {
+      initial = urlLang;
+    } else if (savedLang === 'en' || savedLang === 'ar') {
+      initial = savedLang;
+    } else if (navigator.language && navigator.language.slice(0, 2).toLowerCase() !== 'ar') {
+      initial = 'en';
+    }
+    if (initial !== 'ar') applyLang(initial, true);
+  })();
 
   // ---- Scroll progress thread ----
   var fill = document.getElementById('threadFill');
@@ -544,6 +752,71 @@
     }
     requestAnimationFrame(draw);
   }
+
+  // ---- Custom cursor (desktop only) ----
+  if (window.matchMedia('(pointer:fine)').matches) {
+    var cDot = document.getElementById('cursorDot');
+    var cRing = document.getElementById('cursorRing');
+    var ringX = 0, ringY = 0, mouseX = 0, mouseY = 0, cursorShown = false;
+
+    document.addEventListener('mousemove', function(e){
+      mouseX = e.clientX; mouseY = e.clientY;
+      if (cDot) { cDot.style.left = mouseX + 'px'; cDot.style.top = mouseY + 'px'; }
+      if (!cursorShown) {
+        cursorShown = true;
+        if (cDot) cDot.style.opacity = 1;
+        if (cRing) cRing.style.opacity = 1;
+      }
+    });
+    document.addEventListener('mouseleave', function(){
+      if (cDot) cDot.style.opacity = 0;
+      if (cRing) cRing.style.opacity = 0;
+      cursorShown = false;
+    });
+
+    function ringLoop(){
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+      if (cRing) { cRing.style.left = ringX + 'px'; cRing.style.top = ringY + 'px'; }
+      requestAnimationFrame(ringLoop);
+    }
+    requestAnimationFrame(ringLoop);
+
+    document.addEventListener('mouseover', function(e){
+      if (cRing && e.target.closest('a, button, .lang-toggle, .magnet-btn, input, textarea, summary')) {
+        cRing.classList.add('hover');
+      }
+    });
+    document.addEventListener('mouseout', function(e){
+      if (cRing && e.target.closest('a, button, .lang-toggle, .magnet-btn, input, textarea, summary')) {
+        cRing.classList.remove('hover');
+      }
+    });
+  }
+
+  // ---- Tilt on case-study screenshots (desktop only) ----
+  if (window.matchMedia('(pointer:fine)').matches) {
+    var shots = document.querySelectorAll('.artifact-shot');
+    for (var si = 0; si < shots.length; si++) {
+      (function(shot){
+        shot.addEventListener('mousemove', function(e){
+          var r = shot.getBoundingClientRect();
+          var px = (e.clientX - r.left) / r.width - 0.5;
+          var py = (e.clientY - r.top) / r.height - 0.5;
+          shot.style.setProperty('--ry', (px * 16) + 'deg');
+          shot.style.setProperty('--rx', (py * -16) + 'deg');
+        });
+        shot.addEventListener('mouseleave', function(){
+          shot.style.setProperty('--rx', '0deg');
+          shot.style.setProperty('--ry', '0deg');
+        });
+      })(shots[si]);
+    }
+  }
+
+  // ---- Console easter egg ----
+  console.log('%c أثر — Athar ', 'background:#050505;color:#FF5A36;font-weight:bold;font-size:14px;padding:8px 14px;border-radius:4px;');
+  console.log('%cشايف الكود؟ يلا نبني شي سوا — studioathar.studio@gmail.com', 'color:#F5F3ED;font-family:monospace;font-size:12px;');
 
   // ---- Magnetic button (works on any .magnet-btn, e.g. the submit button) ----
   var magnetBtns = document.querySelectorAll('.magnet-btn');
