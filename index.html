@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>أثر — Athar</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjAgNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcng9IjE0IiBmaWxsPSIjMDUwNTA1Ii8+CjxyZWN0IHg9IjciIHk9IjQxIiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiByeD0iMiIgZmlsbD0iI0Y1RjNFRCIgb3BhY2l0eT0iMC4zIi8+CjxyZWN0IHg9IjE5IiB5PSIzMyIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiByeD0iMi41IiBmaWxsPSIjRjVGM0VEIiBvcGFjaXR5PSIwLjUiLz4KPHJlY3QgeD0iMzQiIHk9IjIyIiB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHJ4PSIzIiBmaWxsPSIjRkY1QTM2IiBvcGFjaXR5PSIwLjgiLz4KPHJlY3QgeD0iMzUiIHk9IjgiIHdpZHRoPSIxNyIgaGVpZ2h0PSIxNyIgcng9IjMuNiIgZmlsbD0iI0ZGNUEzNiIvPgo8L3N2Zz4K">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -60,7 +61,8 @@
 
   /* ---------- Nav ---------- */
   nav{ position:fixed; top:0; left:0; right:0; z-index:50; padding:28px 40px; display:flex; justify-content:space-between; align-items:center; mix-blend-mode:difference; }
-  .nav-mark{ font-family:'Almarai',sans-serif; font-weight:800; font-size:20px; }
+  .nav-mark{ display:flex; align-items:center; gap:10px; font-family:'Almarai',sans-serif; font-weight:800; font-size:20px; }
+  .brand-icon{ display:block; height:14px; width:auto; }
   .nav-en{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--paper); opacity:0.7; }
   .lang-toggle{
     font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px;
@@ -224,9 +226,11 @@
   .contact-status.err{ color:var(--ember-hot); }
 
   footer{ border-top:1px solid var(--line); padding:50px 0 40px; text-align:center; }
-  .foot-mark{ width:34px; height:34px; margin:0 auto 18px; opacity:0.7; }
-  footer .l1{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--paper-faint); }
-  footer .l2{ font-size:11px; color:var(--paper-faint); opacity:0.5; margin-top:8px; }
+  .foot-mark{ display:flex; align-items:center; justify-content:center; gap:10px; margin:0 auto 18px; }
+  .foot-mark svg{ height:16px; width:auto; }
+  .foot-mark span{ font-family:'Almarai',sans-serif; font-weight:800; font-size:22px; color:var(--paper); }
+  footer .l1{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--paper-dim); }
+  footer .l2{ font-size:11px; color:var(--paper-dim); margin-top:8px; }
 </style>
 </head>
 <body>
@@ -237,7 +241,15 @@
   <div class="thread-fill" id="threadFill"></div>
 
   <nav>
-    <div class="nav-mark" data-ar="أثر" data-en="Athar">أثر</div>
+    <div class="nav-mark">
+      <span data-ar="أثر" data-en="Athar">أثر</span>
+      <svg class="brand-icon" viewBox="0 0 100 36" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="15" width="7" height="7" rx="1.8" fill="#F5F3ED" opacity="0.25"/>
+        <rect x="21" y="12.5" width="10" height="10" rx="2.4" fill="#F5F3ED" opacity="0.45"/>
+        <rect x="44" y="9" width="13.5" height="13.5" rx="3" fill="#FF5A36" opacity="0.72"/>
+        <rect x="71" y="5" width="18" height="18" rx="4" fill="#FF5A36"/>
+      </svg>
+    </div>
     <div style="display:flex; align-items:center; gap:16px;">
       <div class="nav-en mono">ATHAR — 2026</div>
       <button id="langToggle" class="lang-toggle mono" onclick="toggleLang()">EN</button>
@@ -384,11 +396,15 @@
   </section>
 
   <footer>
-    <svg class="foot-mark" viewBox="0 0 120 120" fill="none">
-      <path d="M38 86 C38 60, 42 30, 62 22" stroke="#F5F3ED" stroke-width="10" stroke-linecap="round" fill="none"/>
-      <path d="M62 22 C74 17, 84 22, 84 34" stroke="#F5F3ED" stroke-width="10" stroke-linecap="round" fill="none"/>
-      <path d="M84 34 C88 44, 90 58, 84 70" stroke="#FF5A36" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.9"/>
-    </svg>
+    <div class="foot-mark">
+      <span data-ar="أثر" data-en="Athar">أثر</span>
+      <svg viewBox="0 0 100 36" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="15" width="7" height="7" rx="1.8" fill="#F5F3ED" opacity="0.25"/>
+        <rect x="21" y="12.5" width="10" height="10" rx="2.4" fill="#F5F3ED" opacity="0.45"/>
+        <rect x="44" y="9" width="13.5" height="13.5" rx="3" fill="#FF5A36" opacity="0.72"/>
+        <rect x="71" y="5" width="18" height="18" rx="4" fill="#FF5A36"/>
+      </svg>
+    </div>
     <div class="l1 mono">ATHAR — DIGITAL STUDIO</div>
     <div class="l2" data-ar="© 2026 أثر. جميع الحقوق محفوظة." data-en="© 2026 Athar. All rights reserved.">© 2026 أثر. جميع الحقوق محفوظة.</div>
   </footer>
@@ -563,8 +579,9 @@
         submitBtn.disabled = false;
         if (result.error) {
           statusEl.className = 'contact-status err';
-          statusEl.textContent = 'DEBUG: ' + result.error.message + (result.error.code ? ' (code: ' + result.error.code + ')' : '');
-          console.error('Supabase insert error:', result.error);
+          statusEl.textContent = currentLang === 'ar'
+            ? 'صار خطأ، حاولي مرة تانية بعد شوي.'
+            : 'Something went wrong, please try again.';
         } else {
           statusEl.className = 'contact-status ok';
           statusEl.textContent = currentLang === 'ar'
