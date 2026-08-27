@@ -424,6 +424,7 @@
   </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 (function(){
   // ---- Language toggle (design-only feature, no fabricated content) ----
@@ -566,6 +567,14 @@
   var SUPABASE_URL = 'https://csodtfvmoplgsjedtast.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzb2R0ZnZtb3BsZ3NqZWR0YXN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2OTMyNjEsImV4cCI6MjEwMzI2OTI2MX0.kYIClW522wrkYMyyGRwgSc_gwhYQCM4tfwCogpX6gl4';
 
+  // ---- EmailJS: sends a notification email to studioathar.studio@gmail.com ----
+  var EMAILJS_SERVICE_ID = 'service_mb1104l';
+  var EMAILJS_TEMPLATE_ID = 'template_7u8i64e';
+  var EMAILJS_PUBLIC_KEY = 'VTVIEkqRiZZqRmkOr';
+  if (window.emailjs) {
+    window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+
   var contactForm = document.getElementById('contactForm');
   if (contactForm && window.supabase && window.supabase.createClient) {
     var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -602,6 +611,17 @@
             ? 'وصلنا طلبك! رح نتواصل معك قريبًا.'
             : 'Got it! We will get back to you soon.';
           contactForm.reset();
+
+          if (window.emailjs) {
+            window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+              name: nameVal,
+              email: emailVal,
+              message: detailsVal,
+              time: new Date().toLocaleString('ar-EG')
+            }).catch(function(err){
+              console.error('EmailJS error:', err);
+            });
+          }
         }
       });
     });
