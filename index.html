@@ -555,7 +555,7 @@
       statusEl.className = 'contact-status';
       statusEl.textContent = currentLang === 'ar' ? 'جاري الإرسال...' : 'Sending...';
 
-      sb.from('contacts').insert([{
+      sb.from('projects_inquiries').insert([{
         name: nameVal,
         email: emailVal,
         project_details: detailsVal
@@ -563,9 +563,8 @@
         submitBtn.disabled = false;
         if (result.error) {
           statusEl.className = 'contact-status err';
-          statusEl.textContent = currentLang === 'ar'
-            ? 'صار خطأ، حاولي مرة تانية بعد شوي.'
-            : 'Something went wrong, please try again.';
+          statusEl.textContent = 'DEBUG: ' + result.error.message + (result.error.code ? ' (code: ' + result.error.code + ')' : '');
+          console.error('Supabase insert error:', result.error);
         } else {
           statusEl.className = 'contact-status ok';
           statusEl.textContent = currentLang === 'ar'
