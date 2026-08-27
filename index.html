@@ -137,7 +137,7 @@
   .index-num{ font-family:'Space Mono',monospace; font-size:13px; color:var(--paper-faint); width:44px; flex-shrink:0; }
   .index-name{ font-family:'Almarai',sans-serif; font-weight:800; font-size:clamp(28px,4vw,52px); transition:color .4s ease, transform .4s ease; }
   .index-row:hover .index-name{ color:var(--ember); transform:translateX(-10px); }
-  .index-desc{ font-size:14px; color:var(--paper-faint); max-width:280px; text-align:left; flex-shrink:0; }
+  .index-desc{ font-size:14px; color:var(--paper-dim); max-width:280px; text-align:left; flex-shrink:0; }
   .index-glow{
     position:absolute; top:50%; right:-80px; width:320px; height:320px; border-radius:50%;
     background:radial-gradient(circle, rgba(255,90,54,0.16), transparent 70%);
@@ -190,7 +190,7 @@
     -webkit-text-stroke:1px var(--line); z-index:0; user-select:none; line-height:1;
   }
   .process-row h4{ font-family:'Almarai',sans-serif; font-weight:700; font-size:19px; width:190px; flex-shrink:0; position:relative; z-index:1; }
-  .process-row p{ color:var(--paper-faint); font-size:14.5px; line-height:1.9; position:relative; z-index:1; max-width:480px; }
+  .process-row p{ color:var(--paper-dim); font-size:14.5px; line-height:1.9; position:relative; z-index:1; max-width:480px; }
   @media (max-width:760px){ .ghost-num{ display:none; } .process-row{ flex-direction:column; gap:10px; } .process-row h4{ width:auto; } }
 
   /* ---------- Closing ---------- */
@@ -377,7 +377,7 @@
         <input type="text" id="cfName" placeholder="اسمك" data-ar-placeholder="اسمك" data-en-placeholder="Your name" required>
         <input type="email" id="cfEmail" placeholder="بريدك الإلكتروني" data-ar-placeholder="بريدك الإلكتروني" data-en-placeholder="Your email" required>
         <textarea id="cfDetails" placeholder="احكيلنا عن فكرتك أو مشروعك..." data-ar-placeholder="احكيلنا عن فكرتك أو مشروعك..." data-en-placeholder="Tell us about your idea or project..." required></textarea>
-        <button type="submit" class="magnet-btn" id="cfSubmit" data-ar="ابعت الطلب ↙" data-en="Send request ↙">ابعتي الطلب ↙</button>
+        <button type="submit" class="magnet-btn" id="cfSubmit" data-ar="ابعت الطلب ↙" data-en="Send request ↙">ابعت الطلب ↙</button>
         <div class="contact-status" id="cfStatus"></div>
       </form>
     </div>
