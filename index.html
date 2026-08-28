@@ -209,8 +209,11 @@
     transition:box-shadow .2s ease;
   }
   .artifact-shot.secondary{ max-width:175px; opacity:0.8; margin-bottom:30px; animation-delay:.6s; }
-  #work-2 .artifact-shot{ max-width:280px; }
-  #work-2 .artifact-shot.secondary{ max-width:280px; opacity:1; margin-bottom:0; }
+  .artifact-shot-wide{
+    width:100%; max-width:820px; border-radius:14px;
+    box-shadow:0 50px 90px -30px rgba(0,0,0,0.8);
+  }
+  @media (pointer:fine){ .artifact-shot-wide:hover{ box-shadow:0 55px 100px -25px rgba(255,90,54,0.35); } }
   @keyframes float{
     0%,100%{ transform:translateY(0) perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); }
     50%{ transform:translateY(-14px) perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); }
@@ -461,8 +464,7 @@
       </div>
 
       <div class="vitrine reveal">
-        <img src="images/case-nader-pizza-1.jpg" class="artifact-shot secondary" alt="Nader Pizza homepage — الصفحة الرئيسية لموقع نادر بيتزا" loading="lazy">
-        <img src="images/case-nader-pizza-2.jpg" class="artifact-shot" alt="Nader Pizza menu page — صفحة قائمة نادر بيتزا" loading="lazy">
+        <img src="images/case-nader-pizza-wide.jpg" class="artifact-shot-wide" alt="Nader Pizza homepage — الصفحة الرئيسية لموقع نادر بيتزا" loading="lazy">
       </div>
 
       <div class="case-narrative reveal">
