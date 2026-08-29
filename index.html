@@ -254,16 +254,15 @@
   @media (max-width:760px){ .case-narrative{ grid-template-columns:1fr; } }
 
   /* ---------- Process ghost numbers ---------- */
-  .process-row{ display:flex; align-items:baseline; gap:36px; padding:38px 0; border-bottom:1px solid var(--line); position:relative; }
+  .process-row{ display:flex; align-items:center; gap:28px; padding:38px 0; border-bottom:1px solid var(--line); }
   .process-row:first-child{ border-top:1px solid var(--line); }
   .ghost-num{
-    position:absolute; right:0; top:50%; transform:translateY(-50%);
-    font-family:'Almarai',sans-serif; font-weight:800; font-size:110px; color:transparent;
-    -webkit-text-stroke:1px var(--line); z-index:0; user-select:none; line-height:1;
+    font-family:'Almarai',sans-serif; font-weight:800; font-size:52px; color:transparent;
+    -webkit-text-stroke:1px var(--line); user-select:none; line-height:1; flex-shrink:0; width:76px;
   }
-  .process-row h4{ font-family:'Almarai',sans-serif; font-weight:700; font-size:19px; width:190px; flex-shrink:0; position:relative; z-index:1; }
-  .process-row p{ color:var(--paper-dim); font-size:14.5px; line-height:1.9; position:relative; z-index:1; max-width:480px; }
-  @media (max-width:760px){ .ghost-num{ display:none; } .process-row{ flex-direction:column; gap:10px; } .process-row h4{ width:auto; } }
+  .process-row h4{ font-family:'Almarai',sans-serif; font-weight:700; font-size:19px; width:190px; flex-shrink:0; }
+  .process-row p{ color:var(--paper-dim); font-size:14.5px; line-height:1.9; max-width:480px; }
+  @media (max-width:760px){ .process-row{ flex-direction:column; gap:10px; align-items:flex-start; } .process-row h4{ width:auto; } .ghost-num{ width:auto; font-size:36px; } }
 
   /* ---------- Closing ---------- */
   .closing{ text-align:center; padding:220px 0 160px; }
@@ -561,12 +560,12 @@
 
       <div class="case-narrative reveal">
         <div class="case-block">
-          <div class="k mono">THE PROBLEM</div>
-          <p data-ar="استوديو رقمي ببني مواقع لعملائه، بس موقعه الخاص كان محلي وعربي بس — بلا حضور عالمي حقيقي." data-en="A digital studio that builds sites for clients, but its own site was local and Arabic-only — no real global presence.">استوديو رقمي ببني مواقع لعملائه، بس موقعه الخاص كان محلي وعربي بس — بلا حضور عالمي حقيقي.</p>
+          <div class="k mono">THE DECISION</div>
+          <p data-ar="قررنا نبني موقعنا بنفس المعايير يلي منلتزم فيها لعملائنا — مش أقل." data-en="We decided to hold our own site to the exact same standard we build for clients — not less.">قررنا نبني موقعنا بنفس المعايير يلي منلتزم فيها لعملائنا — مش أقل.</p>
         </div>
         <div class="case-block">
-          <div class="k mono">THE SOLUTION</div>
-          <p data-ar="أعدنا بناء الموقع ليصير ثنائي اللغة فعليًا — مش بس ترجمة نص — مع SEO حقيقي وهوية جاهزة عالميًا." data-en="Rebuilt it to be genuinely bilingual — not just translated text — with real SEO and a globally-ready identity.">أعدنا بناء الموقع ليصير ثنائي اللغة فعليًا — مش بس ترجمة نص — مع SEO حقيقي وهوية جاهزة عالميًا.</p>
+          <div class="k mono">THE APPROACH</div>
+          <p data-ar="بنيناه ثنائي اللغة فعليًا — مش بس ترجمة نص — مع SEO حقيقي وهوية جاهزة عالميًا." data-en="Built it genuinely bilingual — not just translated text — with real SEO and a globally-ready identity.">بنيناه ثنائي اللغة فعليًا — مش بس ترجمة نص — مع SEO حقيقي وهوية جاهزة عالميًا.</p>
         </div>
         <div class="case-block">
           <div class="k mono">WHAT WE BUILT</div>
