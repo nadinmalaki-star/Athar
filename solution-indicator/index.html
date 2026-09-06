@@ -856,6 +856,19 @@ document.getElementById('btnSubmitLead').addEventListener('click', async ()=>{
 });
 document.getElementById('btnCloseSuccess').addEventListener('click', closeLeadModal);
 
+// لغة الصفحة عند الدخول: من ?lang= بالرابط (نفس اتفاقية موقع أثر الرئيسي)
+// إن وجدت — عشان لو المستخدم-ة جاية من رابط أثر وهي عم تتصفح بالإنجليزي،
+// الفهرس يفتح إنجليزي مباشرة بدل ما يرجعها عربي.
+(function(){
+  const urlLang = new URL(window.location.href).searchParams.get('lang');
+  if (urlLang === 'en' || urlLang === 'ar') {
+    LANG = urlLang;
+    document.querySelectorAll('#langSwitch button').forEach(b=>{
+      b.classList.toggle('active', b.getAttribute('data-lang') === LANG);
+    });
+  }
+})();
+
 document.querySelectorAll('#langSwitch button').forEach(btn=>{
   btn.addEventListener('click', async ()=>{
     LANG = btn.getAttribute('data-lang');
