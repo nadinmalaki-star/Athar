@@ -141,6 +141,7 @@ button{font-family:inherit; cursor:pointer;}
   display:flex; align-items:center; gap:14px; padding:16px 18px; border:1.5px solid var(--border-dark);
   border-radius:var(--radius-sm); background:var(--surface-dark); font-size:14.5px; font-weight:600; color:rgba(245,243,237,.82);
   transition:border-color .15s, background .15s, transform .1s;
+  width:100%; text-align:inherit;
 }
 .opt:hover{border-color:var(--ember); background:var(--surface-dark-strong); transform:translateX(-2px);}
 [dir="rtl"] .opt:hover{transform:translateX(2px);}
@@ -407,16 +408,20 @@ button{font-family:inherit; cursor:pointer;}
       <h4 data-i18n="modalTitle">خطوة أخيرة</h4>
       <p class="desc" data-i18n="modalDesc">اتركلنا بياناتك وفريقنا رح يتواصل معك لتحديد موعد جلسة Discovery.</p>
       <div class="field">
-        <label data-i18n="fieldName">الاسم</label>
+        <label for="leadName" data-i18n="fieldName">الاسم</label>
         <input type="text" id="leadName">
       </div>
       <div class="field">
-        <label data-i18n="fieldContact">البريد الإلكتروني أو الهاتف</label>
+        <label for="leadContact" data-i18n="fieldContact">البريد الإلكتروني أو الهاتف</label>
         <input type="text" id="leadContact">
       </div>
       <div class="field">
-        <label data-i18n="fieldCompany">اسم الشركة (اختياري)</label>
+        <label for="leadCompany" data-i18n="fieldCompany">اسم الشركة (اختياري)</label>
         <input type="text" id="leadCompany">
+      </div>
+      <div class="hp-field" aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;">
+        <label for="leadWebsite">Website</label>
+        <input type="text" id="leadWebsite" name="website" tabindex="-1" autocomplete="off">
       </div>
       <label class="consent-row">
         <input type="checkbox" id="leadConsent">
@@ -630,10 +635,12 @@ function renderQuestion(){
     const isMulti = q.answer_type==='Multi';
     const list = document.createElement('div'); list.className='q-options';
     q.options.forEach((opt,i)=>{
-      const row = document.createElement('div');
+      const row = document.createElement('button');
+      row.type = 'button';
       row.className = 'opt'+(isMulti?' multi':'');
       const selected = isMulti ? (Array.isArray(current)&&current.includes(opt)) : (current===opt);
       if(selected) row.classList.add('selected');
+      row.setAttribute('aria-pressed', selected ? 'true' : 'false');
       const label = LANG==='ar' && q.options_ar ? q.options_ar[i] : opt;
       row.innerHTML = `<span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="opt-label">${label}</span>`;
       row.addEventListener('click', ()=>{
@@ -828,6 +835,8 @@ document.getElementById('btnRestart').addEventListener('click', ()=>{
   showScreen('intro');
 });
 document.getElementById('btnSubmitLead').addEventListener('click', async ()=>{
+  const honeypot = document.getElementById('leadWebsite');
+  if(honeypot && honeypot.value) return;
   const name = document.getElementById('leadName').value.trim();
   const contact = document.getElementById('leadContact').value.trim();
   const company = document.getElementById('leadCompany').value.trim();
