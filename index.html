@@ -110,6 +110,12 @@
   }
   .lang-toggle:hover{ border-color:var(--ember); background:rgba(255,90,54,0.08); }
   @media (max-width:760px){ .nav-en{ display:none; } }
+  .nav-indicator-link{
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px;
+    color:var(--paper); border:1px solid var(--paper-faint); padding:6px 14px; border-radius:99px;
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .nav-indicator-link:hover{ border-color:var(--ember); background:rgba(255,90,54,0.08); }
   .avail-badge{ display:flex; align-items:center; gap:7px; font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--paper-dim); }
   .avail-dot{ width:6px; height:6px; border-radius:50%; background:#4ADE80; box-shadow:0 0 0 0 rgba(74,222,128,0.6); animation:availPulse 2s ease-out infinite; }
   @keyframes availPulse{ 0%{ box-shadow:0 0 0 0 rgba(74,222,128,0.55); } 70%{ box-shadow:0 0 0 6px rgba(74,222,128,0); } 100%{ box-shadow:0 0 0 0 rgba(74,222,128,0); } }
@@ -377,6 +383,7 @@
       </svg>
     </div>
     <div style="display:flex; align-items:center; gap:16px;">
+      <a href="/solution-indicator/" class="nav-indicator-link" data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</a>
       <div class="avail-badge"><span class="avail-dot"></span><span data-ar="متاحين لمشاريع جديدة" data-en="Available for new projects">متاحين لمشاريع جديدة</span></div>
       <div class="nav-en mono">ATHAR — 2026</div>
       <button id="langToggle" class="lang-toggle mono" onclick="toggleLang()">EN</button>

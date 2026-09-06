@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مؤشر الحلول — Athar Solution Indicator</title>
+<meta name="description" content="أداة تشخيص مجانية وسريعة من أثر — جاوب-ي على كام سؤال عن مشروعك أو بزنسك، وطلّع-ي توصية بأنسب حل رقمي إلك.">
+<link rel="canonical" href="https://studioathar.studio/solution-indicator/">
+<meta name="theme-color" content="#050505">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Athar — أثر">
+<meta property="og:url" content="https://studioathar.studio/solution-indicator/">
+<meta property="og:title" content="مؤشر الحلول — Athar Solution Indicator">
+<meta property="og:description" content="أداة تشخيص مجانية وسريعة من أثر — جاوب-ي على كام سؤال، وطلّع-ي توصية بأنسب حل رقمي إلك.">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============ DESIGN TOKENS ============ */
+:root{
+  --void:#050505; --void-2:#0f0e0d; --paper:#F5F3ED; --paper-dim:#c9c3b3;
+  --ink:#17140f; --ink-soft:#4a4234; --ink-faint:#8a8170;
+  --ember:#FF5A36; --ember-dark:#c73f22; --ember-light:#ff8a68; --ember-glow:rgba(255,90,54,.14);
+  --line:#e6e0d2; --line-dark:rgba(245,243,237,.12);
+  --card:#ffffff; --card-alt:#faf8f3;
+  --surface-dark:rgba(255,255,255,.04); --surface-dark-strong:rgba(255,255,255,.07);
+  --border-dark:rgba(245,243,237,.16); --border-dark-strong:rgba(245,243,237,.28);
+  --text-dim:rgba(245,243,237,.68); --text-dimmer:rgba(245,243,237,.5);
+  --ok:#1a7a4c; --ok-dark-bg:#3ddc84; --warn:#b45309; --warn-dark-bg:#ffb454; --danger:#c0392b;
+  --radius:14px; --radius-sm:8px;
+  --shadow:0 20px 45px -25px rgba(23,20,15,.35);
+  --font-display:'Almarai',sans-serif; --font-body:'IBM Plex Sans Arabic',sans-serif; --font-mono:'Space Mono',monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0; padding:0;}
+body{
+  font-family:var(--font-body); background:var(--paper); color:var(--ink);
+  min-height:100vh; overflow-x:hidden;
+}
+[dir="ltr"] body{ font-family: var(--font-body), sans-serif; }
+a{color:inherit;}
+button{font-family:inherit; cursor:pointer;}
+.mono{font-family:var(--font-mono);}
+.display{font-family:var(--font-display);}
+.hidden{display:none !important;}
+
+/* ============ LAYOUT SHELLS ============ */
+#app{min-height:100vh; display:flex; flex-direction:column;}
+.screen{flex:1; display:flex; flex-direction:column; animation:fadeIn .45s ease;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+/* ============ LANG SWITCH ============ */
+.lang-switch{
+  position:fixed; top:18px; inset-inline-end:18px; z-index:50;
+  display:flex; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2);
+  border-radius:999px; padding:3px; font-family:var(--font-mono); font-size:11px;
+}
+.lang-switch button{
+  border:0; background:transparent; padding:6px 12px; border-radius:999px; color:inherit; opacity:.55;
+  letter-spacing:1px; font-weight:700;
+}
+.lang-switch button.active{background:var(--ember); color:#fff; opacity:1;}
+
+.brand-fixed{position:fixed; top:18px; inset-inline-start:18px; z-index:50; height:26px; width:auto;}
+.brand-logo-intro{display:block; height:40px; width:auto; margin:0 auto 22px; position:relative; z-index:1;}
+
+/* ============ INTRO ============ */
+.intro{
+  background:var(--void); color:var(--paper); flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:80px 24px; position:relative; overflow:hidden;
+}
+.intro::before{
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(700px 400px at 50% 0%, rgba(255,90,54,.16), transparent 65%);
+}
+.intro-badge{
+  font-family:var(--font-mono); font-size:12.5px; font-weight:700; letter-spacing:2.5px; color:var(--ember-light);
+  border:1px solid rgba(255,90,54,.4); background:rgba(255,90,54,.1); padding:8px 18px; border-radius:999px;
+  margin-bottom:32px; position:relative; z-index:1;
+}
+.intro h1{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(30px,5vw,52px); line-height:1.4;
+  max-width:780px; margin:0 0 20px; position:relative; z-index:1;
+}
+.intro h1 span{
+  background:linear-gradient(90deg,var(--ember),var(--ember-light));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.intro p{
+  font-size:16px; color:var(--text-dim); max-width:520px; line-height:2; margin:0 0 40px; position:relative; z-index:1;
+}
+.btn-primary{
+  background:linear-gradient(90deg,var(--ember),var(--ember-light)); color:#050505; border:0; padding:17px 36px; border-radius:999px;
+  font-weight:800; font-size:16px; display:inline-flex; align-items:center; gap:10px;
+  box-shadow:0 16px 34px -14px rgba(255,90,54,.55); transition:transform .2s, filter .2s;
+  position:relative; z-index:1;
+}
+.btn-primary:hover{transform:translateY(-2px); filter:brightness(1.06);}
+[dir="rtl"] .btn-primary svg{transform:scaleX(-1);}
+.btn-primary:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+.btn-ghost{
+  background:transparent; border:1.5px solid rgba(245,243,237,.3); color:var(--paper);
+  padding:15px 30px; border-radius:999px; font-weight:700; font-size:15px; transition:background .2s, border-color .2s;
+}
+.btn-ghost:hover{background:rgba(245,243,237,.08); border-color:rgba(245,243,237,.5);}
+.intro-trust{
+  display:flex; gap:28px; margin-top:44px; font-family:var(--font-mono); font-size:14px; font-weight:700;
+  color:var(--text-dim); letter-spacing:.5px; position:relative; z-index:1; flex-wrap:wrap; justify-content:center;
+}
+.intro-trust span::before{content:'· '; opacity:.6;}
+.intro-trust span:first-child::before{content:'';}
+
+/* ============ ASSESSMENT ============ */
+.assess{flex:1; display:flex; flex-direction:column; background:var(--void); color:var(--paper); position:relative; overflow:hidden;}
+.assess::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(560px 300px at 100% 0%, rgba(255,90,54,.14), transparent 65%);
+}
+.progress-wrap{height:3px; background:var(--border-dark); position:relative; z-index:1;}
+.progress-bar{height:100%; background:linear-gradient(90deg,var(--ember),var(--ember-light)); transition:width .4s ease; width:0%;}
+.assess-top{
+  display:flex; align-items:center; padding:20px 28px; padding-inline-start:104px; position:relative; z-index:1;
+  font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--text-dim);
+}
+#qCounter{direction:ltr; unicode-bidi:isolate;}
+.assess-body{
+  flex:1; display:flex; align-items:center; justify-content:center; padding:20px 24px 60px; position:relative; z-index:1;
+}
+.q-card{width:100%; max-width:640px;}
+.q-stage{
+  font-family:var(--font-mono); font-size:12.5px; font-weight:700; letter-spacing:1.5px; color:var(--ember-light); margin-bottom:18px;
+  display:inline-flex; align-items:center; gap:8px; background:rgba(255,90,54,.12); border:1px solid rgba(255,90,54,.32);
+  padding:6px 15px; border-radius:999px;
+}
+.q-text{font-family:var(--font-display); font-weight:800; font-size:clamp(22px,3vw,30px); line-height:1.5; margin:0 0 8px; color:var(--paper);}
+.q-hint{font-size:13.5px; color:var(--text-dim); margin-bottom:28px;}
+.q-options{display:flex; flex-direction:column; gap:10px;}
+.opt{
+  display:flex; align-items:center; gap:14px; padding:16px 18px; border:1.5px solid var(--border-dark);
+  border-radius:var(--radius-sm); background:var(--surface-dark); font-size:14.5px; font-weight:600; color:rgba(245,243,237,.82);
+  transition:border-color .15s, background .15s, transform .1s;
+}
+.opt:hover{border-color:var(--ember); background:var(--surface-dark-strong); transform:translateX(-2px);}
+[dir="rtl"] .opt:hover{transform:translateX(2px);}
+.opt.selected{border-color:var(--ember); background:rgba(255,90,54,.16); color:var(--paper);}
+.opt .mark{
+  flex:none; width:20px; height:20px; border:1.5px solid var(--border-dark-strong); border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+.opt.multi .mark{border-radius:5px;}
+.opt.selected .mark{background:var(--ember); border-color:var(--ember);}
+.opt .mark svg{width:11px; height:11px; opacity:0; transition:opacity .1s;}
+.opt.selected .mark svg{opacity:1;}
+.opt-label{unicode-bidi:plaintext;}
+.q-freetext{
+  width:100%; min-height:120px; border:1.5px solid var(--border-dark); border-radius:var(--radius-sm);
+  padding:16px; font-family:inherit; font-size:14.5px; resize:vertical; background:var(--surface-dark); color:var(--paper);
+}
+.q-freetext:focus{outline:none; border-color:var(--ember);}
+.assess-nav{display:flex; gap:12px; align-items:center; margin-top:32px;}
+.btn-back{
+  flex:1; background:transparent; border:1.5px solid rgba(245,243,237,.3); color:var(--paper);
+  font-size:13.5px; font-weight:700; padding:14px 20px; border-radius:999px; transition:background .2s, border-color .2s;
+}
+.btn-back:hover{background:rgba(245,243,237,.08); border-color:rgba(245,243,237,.5);}
+.btn-next{
+  flex:2; background:linear-gradient(90deg,var(--ember),var(--ember-light)); color:#050505; border:0; padding:14px 32px; border-radius:999px;
+  font-weight:800; font-size:14.5px; transition:filter .2s, transform .2s;
+}
+.btn-next:hover:not(:disabled){filter:brightness(1.06); transform:translateY(-1px);}
+.btn-next:disabled{opacity:.35; cursor:not-allowed;}
+
+/* ============ RESULT ============ */
+.result{flex:1; background:var(--void); color:var(--paper); padding:0 0 80px;}
+.result-hero{
+  background:var(--void); color:var(--paper); padding:64px 24px 56px; text-align:center; position:relative; overflow:hidden;
+}
+.result-hero::before{content:''; position:absolute; inset:0; background:radial-gradient(600px 300px at 50% 0%, rgba(255,90,54,.2), transparent 65%);}
+.result-complete-badge{
+  display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12.5px; font-weight:700; letter-spacing:1.5px;
+  background:rgba(255,90,54,.12); border:1px solid rgba(255,90,54,.35); color:var(--ember-light);
+  padding:8px 18px; border-radius:999px; margin-bottom:20px; position:relative;
+}
+.result-eyebrow{font-family:var(--font-mono); font-size:12.5px; font-weight:700; letter-spacing:2px; color:var(--ember-light); margin-bottom:16px; position:relative;}
+.result-title{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(26px,4vw,40px); margin:0 0 10px; position:relative;
+  color:var(--paper);
+}
+.result-sub{color:var(--text-dim); font-size:14.5px; max-width:520px; margin:0 auto; position:relative; line-height:1.9;}
+.confidence-note{
+  display:inline-flex; align-items:center; gap:8px; margin-top:22px; font-size:12.5px; color:var(--paper);
+  background:rgba(245,243,237,.08); border:1px solid rgba(245,243,237,.2); padding:8px 16px; border-radius:999px;
+  position:relative;
+}
+
+.athar-footer{margin-top:56px; padding:36px 24px 0; border-top:1px solid var(--border-dark); text-align:center;}
+.footer-brand{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:14px;}
+.footer-word{font-family:var(--font-display); font-weight:800; font-size:20px; color:var(--paper);}
+.footer-dots{display:flex; align-items:center; gap:4px;}
+.footer-dots i{display:block; border-radius:2px;}
+.footer-dots i:nth-child(1){width:4px; height:4px; border-radius:50%; background:#5c5c5c;}
+.footer-dots i:nth-child(2){width:4px; height:4px; border-radius:50%; background:#7a7a7a;}
+.footer-dots i:nth-child(3){width:8px; height:8px; background:#c1432a;}
+.footer-dots i:nth-child(4){width:11px; height:11px; background:var(--ember);}
+.footer-caption{font-family:var(--font-mono); font-size:12px; letter-spacing:3px; color:var(--text-dimmer); margin-bottom:6px;}
+.footer-tagline{font-family:var(--font-mono); font-size:12px; letter-spacing:2px; color:var(--text-dim); margin-bottom:20px; unicode-bidi:plaintext;}
+.footer-copy{font-size:11px; color:var(--text-dimmer); padding-bottom:24px;}
+.result-body{max-width:880px; margin:0 auto; padding:44px 24px 0;}
+.result-section{margin-bottom:36px;}
+.result-section h3{font-family:var(--font-display); font-size:17.5px; font-weight:800; margin:0 0 16px; display:flex; align-items:center; gap:10px; color:var(--paper);}
+.result-section h3 .n{font-family:var(--font-mono); color:var(--ember-light); font-size:13px;}
+
+.svc-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px;}
+.svc-pill{
+  background:var(--surface-dark); border:1.5px solid var(--border-dark); border-radius:var(--radius-sm); padding:14px 16px;
+  display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:600; color:rgba(245,243,237,.85);
+}
+.svc-pill.primary{border-color:var(--ember); background:rgba(255,90,54,.14); color:var(--paper);}
+.svc-pill .dot{width:8px; height:8px; border-radius:50%; background:var(--text-dimmer); flex:none;}
+.svc-pill.primary .dot{background:var(--ember);}
+
+.dim-list{display:flex; flex-direction:column; gap:16px;}
+.dim-row{display:flex; align-items:center; gap:16px;}
+.dim-label{width:150px; flex:none; font-size:13px; font-weight:700; color:var(--text-dim);}
+.dim-track{flex:1; height:8px; background:var(--border-dark); border-radius:99px; overflow:hidden;}
+.dim-fill{height:100%; background:linear-gradient(90deg,var(--ember),var(--ember-light)); border-radius:99px; transition:width .6s ease;}
+.dim-val{width:70px; flex:none; text-align:end; font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--text-dim);}
+
+.discovery-banner{
+  border-radius:var(--radius); padding:20px 24px; display:flex; gap:16px; align-items:flex-start;
+  border:1.5px solid var(--border-dark); background:var(--surface-dark);
+}
+.discovery-banner.required{background:rgba(255,90,54,.1); border-color:rgba(255,90,54,.35);}
+.discovery-banner.recommended{background:rgba(255,180,84,.1); border-color:rgba(255,180,84,.32);}
+.discovery-banner.not_required{background:rgba(61,220,132,.1); border-color:rgba(61,220,132,.3);}
+.discovery-banner b{display:block; margin-bottom:4px; font-size:14px; color:var(--paper);}
+.discovery-banner p{margin:0; font-size:13.5px; color:var(--text-dim); line-height:1.8;}
+
+.invest-card{
+  background:var(--surface-dark); border:1.5px solid var(--border-dark); color:var(--paper); border-radius:var(--radius); padding:30px 28px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+}
+.invest-label{font-family:var(--font-mono); font-size:14px; font-weight:700; letter-spacing:1px; color:var(--text-dim); margin-bottom:8px;}
+.invest-value{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(24px,3vw,34px); direction:ltr; unicode-bidi:isolate;
+  background:linear-gradient(90deg,var(--paper),var(--ember-light)); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.invest-note{font-size:14px; color:var(--text-dim); max-width:260px; line-height:1.7;}
+.budget-gap-note{
+  margin-top:14px; padding:14px 18px; border-radius:var(--radius-sm); background:rgba(255,180,84,.1); border:1.5px solid rgba(255,180,84,.32);
+  font-size:13.5px; color:var(--warn-dark-bg); line-height:1.8;
+}
+
+.cta-row{display:flex; gap:14px; margin-top:40px; flex-wrap:wrap; justify-content:center;}
+
+/* Lead modal */
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(5,5,5,.55); display:flex; align-items:center; justify-content:center;
+  padding:20px; z-index:100;
+}
+.modal{background:#fff; border-radius:var(--radius); padding:32px; max-width:440px; width:100%; box-shadow:var(--shadow);}
+.modal h4{font-family:var(--font-display); font-size:19px; font-weight:800; margin:0 0 8px;}
+.modal p.desc{font-size:13px; color:var(--ink-faint); margin:0 0 22px; line-height:1.8;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:6px;}
+.field input{
+  width:100%; border:1.5px solid var(--line); border-radius:8px; padding:12px 14px; font-family:inherit; font-size:14px;
+}
+.field input:focus{outline:none; border-color:var(--ember);}
+.consent-row{display:flex; align-items:flex-start; gap:10px; margin:18px 0; font-size:12.5px; color:var(--ink-soft); line-height:1.7;}
+.consent-row input{margin-top:3px;}
+.modal-actions{display:flex; gap:10px; margin-top:8px;}
+.btn-close{background:none; border:0; color:var(--ink-faint); font-size:13px; font-weight:700; padding:12px;}
+.success-box{text-align:center; padding:10px 0;}
+.success-box .icon{width:56px; height:56px; border-radius:50%; background:#e9f7ee; color:var(--ok); display:flex; align-items:center; justify-content:center; margin:0 auto 18px;}
+
+@media (max-width:640px){
+  .dim-label{width:110px; font-size:12px;}
+  .invest-card{flex-direction:column; align-items:flex-start; text-align:start;}
+}
+</style>
+</head>
+<body>
+
+<div class="lang-switch" id="langSwitch">
+  <button data-lang="ar" class="active">AR</button>
+  <button data-lang="en">EN</button>
+</div>
+
+<img class="brand-fixed" id="brandFixed" src="assets/logo-icon.png" alt="Athar">
+
+<div id="app">
+
+  <!-- ===== INTRO ===== -->
+  <section class="screen intro" id="screen-intro">
+    <img class="brand-logo-intro" id="brandLogoIntro" src="assets/logo-ar.png" alt="Athar">
+    <div class="intro-badge mono" data-i18n="badge">SOLUTION INDICATOR</div>
+    <h1 data-i18n="introTitle">احنا منساعدك تعرف بالضبط <span>شو محتاج مشروعك الرقمي</span></h1>
+    <p data-i18n="introBody">تقييم قصير وذكي بيحلل احتياجك الفعلي، وبيطلعلك توصية بالحل المناسب مع تقدير استثمار أولي — قبل حتى ما تحكي معنا.</p>
+    <button class="btn-primary" id="btnStart">
+      <span data-i18n="startBtn">ابدأ التقييم</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="intro-trust">
+      <span data-i18n="trust1">٥ دقايق تقريبًا</span>
+      <span data-i18n="trust2">مجاني بالكامل</span>
+      <span data-i18n="trust3">بدون أي التزام</span>
+    </div>
+  </section>
+
+  <!-- ===== ASSESSMENT ===== -->
+  <section class="screen assess hidden" id="screen-assess">
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="assess-top">
+      <span id="qCounter">1 / 38</span>
+    </div>
+    <div class="assess-body">
+      <div class="q-card">
+        <span class="q-stage" id="qStage"></span>
+        <h2 class="q-text" id="qText"></h2>
+        <div class="q-hint" id="qHint"></div>
+        <div id="qOptionsWrap"></div>
+        <div class="assess-nav">
+          <button class="btn-back" id="btnBack" data-i18n="backBtn">‹ رجوع</button>
+          <button class="btn-next" id="btnNext" data-i18n="nextBtn">التالي</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RESULT ===== -->
+  <section class="screen result hidden" id="screen-result">
+    <div class="result-hero">
+      <div class="result-complete-badge mono">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 12.5 10 16.5l8-9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span data-i18n="resultCompleteBadge">التقييم مكتمل</span>
+      </div>
+      <div class="result-eyebrow mono" data-i18n="resultEyebrow">الحل الرقمي المقترح</div>
+      <h2 class="result-title" id="resultSolutionName"></h2>
+      <p class="result-sub" id="resultSolutionUse"></p>
+      <div class="confidence-note hidden" id="confidenceNote"></div>
+    </div>
+
+    <div class="result-body">
+      <div class="result-section">
+        <h3><span class="n">01</span> <span data-i18n="coreServicesTitle">الخدمات الأساسية</span></h3>
+        <div class="svc-grid" id="coreServicesGrid"></div>
+      </div>
+
+      <div class="result-section hidden" id="supportingSection">
+        <h3><span class="n">02</span> <span data-i18n="supportingServicesTitle">خدمات مساندة</span></h3>
+        <div class="svc-grid" id="supportingServicesGrid"></div>
+      </div>
+
+      <div class="result-section">
+        <h3><span class="n">03</span> <span data-i18n="dimensionsTitle">تحليل المشروع</span></h3>
+        <div class="dim-list" id="dimList"></div>
+      </div>
+
+      <div class="result-section">
+        <div class="discovery-banner" id="discoveryBanner">
+          <div>
+            <b id="discoveryTitle"></b>
+            <p id="discoveryText"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-section">
+        <div class="invest-card">
+          <div>
+            <div class="invest-label mono" data-i18n="investLabel">الاستثمار التقديري</div>
+            <div class="invest-value" id="investValue"></div>
+          </div>
+          <div class="invest-note" data-i18n="investNote">تقدير أولي غير نهائي — السعر الدقيق يُحدد بعد جلسة Discovery وتوضيح النطاق الكامل.</div>
+        </div>
+        <div class="budget-gap-note hidden" id="budgetGapNote"></div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn-primary" id="btnBookDiscovery" style="background:var(--ember);">
+          <span data-i18n="bookBtn">احجز جلسة Discovery</span>
+        </button>
+        <button class="btn-ghost" id="btnRestart" data-i18n="restartBtn">إعادة التقييم</button>
+      </div>
+
+      <div class="athar-footer">
+        <div class="footer-brand">
+          <span class="footer-word" data-i18n="footerWord">أثر</span>
+          <span class="footer-dots"><i></i><i></i><i></i><i></i></span>
+        </div>
+        <div class="footer-caption">ATHAR — DIGITAL PRODUCT STUDIO</div>
+        <div class="footer-tagline" data-i18n="footerTagline">مواقع · تطبيقات ويب · MVPs</div>
+        <div class="footer-copy" data-i18n="footerCopy">© 2026 أثر. جميع الحقوق محفوظة.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== LEAD MODAL ===== -->
+<div class="modal-backdrop hidden" id="leadModal">
+  <div class="modal">
+    <div id="modalForm">
+      <h4 data-i18n="modalTitle">خطوة أخيرة</h4>
+      <p class="desc" data-i18n="modalDesc">اتركلنا بياناتك وفريقنا رح يتواصل معك لتحديد موعد جلسة Discovery.</p>
+      <div class="field">
+        <label data-i18n="fieldName">الاسم</label>
+        <input type="text" id="leadName">
+      </div>
+      <div class="field">
+        <label data-i18n="fieldContact">البريد الإلكتروني أو الهاتف</label>
+        <input type="text" id="leadContact">
+      </div>
+      <div class="field">
+        <label data-i18n="fieldCompany">اسم الشركة (اختياري)</label>
+        <input type="text" id="leadCompany">
+      </div>
+      <label class="consent-row">
+        <input type="checkbox" id="leadConsent">
+        <span data-i18n="consentText">أوافق على حفظ بيانات هذا التقييم من قبل أثر للتواصل والمتابعة بخصوص مشروعي.</span>
+      </label>
+      <div class="modal-actions">
+        <button class="btn-next" id="btnSubmitLead" style="flex:1;" data-i18n="submitBtn">إرسال</button>
+        <button class="btn-close" id="btnCloseModal" data-i18n="cancelBtn">إلغاء</button>
+      </div>
+    </div>
+    <div id="modalSuccess" class="success-box hidden">
+      <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h4 data-i18n="successTitle">تم الإرسال بنجاح</h4>
+      <p class="desc" data-i18n="successDesc">وصلتنا بياناتك، وفريق أثر رح يتواصل معك قريبًا لتحديد موعد جلسة Discovery.</p>
+      <button class="btn-next" id="btnCloseSuccess" style="width:100%;" data-i18n="closeBtn">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<script id="indicator-data" type="application/json">{"questions":[{"id":"Q01","stage":"Business","text_ar":"ما الهدف الأساسي من المشروع؟","answer_type":"Multi","options":["Presence","Leads","Online Sales","Customer Service","Internal Operations","Reduce Manual Work","Connect Systems","Analytics","New Digital Product"],"branch_note":"لا يوجد","dimension":"Business Need","affected_services":["WEB","ECOM","PORTAL","SYSTEM","AUTO","API","DATA","MOBILE","UIUX"],"notes":"يسمح بأكثر من اختيار","answer_codes":{"Leads":"LEADS","Connect Systems":"CONNECT_SYSTEMS","New Digital Product":"DIGITAL_PRODUCT","Presence":"PRESENCE","Customer Service":"CUSTOMER_SERVICE","Online Sales":"ONLINE_SALES","Analytics":"ANALYTICS","Reduce Manual Work":"REDUCE_MANUAL","Internal Operations":"INTERNAL_OPS"},"text_en":"What is the main goal of the project?","options_ar":["حضور رقمي","جذب عملاء محتملين","بيع أونلاين","خدمة العملاء","عمليات داخلية","تقليل العمل اليدوي","ربط الأنظمة","تحليلات","منتج رقمي جديد"]},{"id":"Q02","stage":"Business","text_ar":"ما نوع نشاط الشركة؟","answer_type":"Single","options":["Professional Services","Retail","E-commerce","Financial Services","Healthcare","Education","Technology","Manufacturing","Other"],"branch_note":"لا يوجد","dimension":"Context","affected_services":["لا direct score"],"notes":"للسياق والـrisk","text_en":"What type of business do you run?","options_ar":["خدمات مهنية","تجارة تجزئة","تجارة إلكترونية","خدمات مالية","قطاع صحي","تعليم","تقنية","تصنيع","أخرى"]},{"id":"Q03","stage":"Business","text_ar":"حجم الشركة؟","answer_type":"Single","options":["Individual","Micro","Small","Medium","Enterprise"],"branch_note":"لا يوجد","dimension":"Scale","affected_services":["Pricing Tier"],"notes":"يحدد Local/Corporate candidate ولا يحسم وحده","text_en":"What is your company's size?","options_ar":["فرد","مشروع صغير جدًا","شركة صغيرة","شركة متوسطة","مؤسسة كبيرة"]},{"id":"Q04","stage":"Scale","text_ar":"كم عدد العملاء/المستخدمين المتوقعين للحل؟","answer_type":"Single","options":["<100","100-500","500-5,000","5,000-50,000","50,000+","Unknown"],"branch_note":"لا يوجد","dimension":"Scale","affected_services":["CLOUD","SYSTEM","PORTAL","APP","DASH"],"notes":"يقيس الاستخدام الحالي المتوقع","answer_codes":{"5,000-50,000":"U50000","50,000+":"U50000P","500-5,000":"U5000","100-500":"U500"},"text_en":"How many customers/users do you expect to use the solution?","options_ar":["أقل من 100","100–500","500–5,000","5,000–50,000","أكثر من 50,000","غير معروف"]},{"id":"Q05","stage":"Scale","text_ar":"هل تتوقعون نموًا أو توسعًا كبيرًا؟","answer_type":"Single","options":["No","Medium","High","Multiple Branches","Multiple Markets"],"branch_note":"لا يوجد","dimension":"Scale","affected_services":["CLOUD","API","SYSTEM"],"notes":"يقيس Future Scale","answer_codes":{"Medium":"MEDIUM","Multiple Markets":"MARKETS","High":"HIGH","Multiple Branches":"BRANCHES"},"text_en":"Do you expect significant growth or expansion?","options_ar":["لا","متوسط","كبير","فروع متعددة","أسواق متعددة"]},{"id":"Q06","stage":"Current State","text_ar":"هل لديكم موقع حاليًا؟","answer_type":"Single","options":["No","Basic","Active","Needs Major Improvement"],"branch_note":"حسب الإجابة","dimension":"Business Need","affected_services":["WEB","UIUX"],"notes":"إذا No ننتقل لتجربة الويب الأساسية","text_en":"Do you currently have a website?","options_ar":["لا يوجد","بسيط","فعّال وقيد الاستخدام","يحتاج تطوير كبير"]},{"id":"Q07","stage":"Current State","text_ar":"هل لديكم تطبيق حاليًا؟","answer_type":"Single","options":["No","Yes","Planned"],"branch_note":"إذا Yes/Planned → Q08","dimension":"Business Need","affected_services":["IOS","ANDROID","CROSS","APP_MAINT"],"notes":null,"text_en":"Do you currently have a mobile app?","options_ar":["لا","نعم","مخطط له"]},{"id":"Q08","stage":"Current State","text_ar":"التطبيق للعميل أم للموظفين أم الاثنين؟","answer_type":"Single","options":["Customers","Employees","Both"],"branch_note":"لا","dimension":"Users & Access","affected_services":["IOS","ANDROID","CROSS","PORTAL","SYSTEM"],"notes":"يظهر فقط عند الحاجة","text_en":"Is the app for customers, employees, or both?","options_ar":["للعملاء","للموظفين","للاثنين"]},{"id":"Q09","stage":"Customer","text_ar":"كيف يتعامل العميل معكم حاليًا؟","answer_type":"Multi","options":["Website","Phone","WhatsApp","Email","Social Media","Branch","Mobile App","Other"],"branch_note":"لا","dimension":"Business Need","affected_services":["WEB","PORTAL","AUTO"],"notes":"عدد القنوات يعطي CX complexity","text_en":"How do customers currently interact with you?","options_ar":["الموقع الإلكتروني","الهاتف","واتساب","البريد الإلكتروني","التواصل الاجتماعي","الفرع","تطبيق الجوال","أخرى"]},{"id":"Q10","stage":"Customer","text_ar":"هل العميل يحتاج يعمل أشياء بنفسه؟","answer_type":"Multi","options":["View Info","Submit Requests","Track Requests","Manage Account/Data","Multiple Actions"],"branch_note":"إذا Manage/Requests → Q11","dimension":"Business Need","affected_services":["PORTAL","WEB","AUTH","SYSTEM"],"notes":"Self-service evidence","answer_codes":{"Submit Requests":"SUBMIT_REQUESTS","Manage Account/Data":"MANAGE_ACCOUNT","Multiple Actions":"MULTIPLE_ACTIONS","Track Requests":"TRACK_REQUESTS"},"text_en":"Does the customer need to do things themselves (self-service)?","options_ar":["الاطلاع على معلومات","تقديم طلبات","متابعة طلبات","إدارة الحساب/البيانات","إجراءات متعددة"]},{"id":"Q11","stage":"Customer","text_ar":"هل يحتاج العميل تسجيل دخول؟","answer_type":"Single","options":["No","Yes - Customers","Yes - Employees","Yes - Both","Not Sure"],"branch_note":"إذا Yes → Q12","dimension":"Users & Access","affected_services":["PORTAL","SYSTEM","AUTH"],"notes":null,"answer_codes":{"Yes - Both":"BOTH","Not Sure":"NOT_SURE","Yes - Employees":"EMPLOYEES","Yes - Customers":"CUSTOMERS"},"text_en":"Does the customer need to log in?","options_ar":["لا","نعم - للعملاء","نعم - للموظفين","نعم - للاثنين","غير متأكد"]},{"id":"Q12","stage":"Users","text_ar":"هل توجد صلاحيات مختلفة؟","answer_type":"Single","options":["No","2 Roles","3-5 Roles","6+ Roles","Not Sure"],"branch_note":"لا","dimension":"Users & Access","affected_services":["AUTH","SYSTEM","DASH","PORTAL"],"notes":null,"answer_codes":{"2 Roles":"R2","6+ Roles":"R6P","3-5 Roles":"R35"},"text_en":"Are there different permission levels / roles?","options_ar":["لا","صلاحيتان","3-5 صلاحيات","6 صلاحيات فأكثر","غير متأكد"]},{"id":"Q13","stage":"Data","text_ar":"هل كل مستخدم يرى بيانات خاصة به؟","answer_type":"Single","options":["No","Yes"],"branch_note":"إذا Yes → Q14","dimension":"Users & Access","affected_services":["PORTAL","AUTH","SYSTEM"],"notes":null,"answer_codes":{"Yes":"YES"},"text_en":"Does each user see their own private data?","options_ar":["لا","نعم"]},{"id":"Q14","stage":"Data","text_ar":"ما نوع البيانات؟","answer_type":"Multi","options":["Profiles","Orders","Requests","Documents","Transactions","Financial","Operational","Analytics","Other"],"branch_note":"إذا Financial/Sensitive → Security gate","dimension":"Business Need","affected_services":["PORTAL","SYSTEM","DATA","SEC","AUTH"],"notes":null,"text_en":"What type of data is involved?","options_ar":["ملفات شخصية","طلبات","طلبات خدمة","مستندات","معاملات","بيانات مالية","بيانات تشغيلية","بيانات تحليلية","أخرى"]},{"id":"Q15","stage":"Workflow","text_ar":"هل العملية تمر بأكثر من خطوة؟","answer_type":"Single","options":["No","2 Steps","3-5 Steps","6+ Steps"],"branch_note":"إذا 3+ → Q16","dimension":"Complexity","affected_services":["SYSTEM","AUTO","DASH"],"notes":null,"answer_codes":{"6+ Steps":"6P","2 Steps":"2","3-5 Steps":"35"},"text_en":"Does the process involve more than one step?","options_ar":["لا","خطوتان","3-5 خطوات","6 خطوات فأكثر"]},{"id":"Q16","stage":"Workflow","text_ar":"هل توجد موافقات أو انتقال بين موظفين؟","answer_type":"Single","options":["No","Yes"],"branch_note":"لا","dimension":"Complexity","affected_services":["SYSTEM","AUTH","AUTO","DASH"],"notes":null,"answer_codes":{"Yes":"YES"},"text_en":"Are there approvals or handoffs between employees?","options_ar":["لا","نعم"]},{"id":"Q17","stage":"Manual Work","text_ar":"هل يوجد شغل يدوي متكرر؟","answer_type":"Single","options":["No","A little","Medium","A lot","Critical"],"branch_note":"إذا Yes → Q18","dimension":"Complexity","affected_services":["AUTO","SYSTEM","API"],"notes":null,"answer_codes":{"Medium":"MEDIUM","Critical":"CRITICAL","A little":"LITTLE","A lot":"A_LOT"},"text_en":"Is there repetitive manual work?","options_ar":["لا يوجد","قليل","متوسط","كثير","حرج"]},{"id":"Q18","stage":"Manual Work","text_ar":"ما نوع العمل اليدوي؟","answer_type":"Multi","options":["Data Entry","Excel Updates","Manual Emails","Manual Calls","Copy/Paste","Manual Reports","Order Processing","Approvals","Other"],"branch_note":"لا","dimension":"Complexity","affected_services":["AUTO","DATA","API","SYSTEM"],"notes":"Evidence للـautomation","answer_codes":{"Manual Reports":"MANUAL_REPORTS","Copy/Paste":"COPY_PASTE","Data Entry":"DATA_ENTRY"},"text_en":"What type of manual work?","options_ar":["إدخال بيانات","تحديث ملفات إكسل","إيميلات يدوية","اتصالات يدوية","نسخ ولصق","تقارير يدوية","معالجة طلبات","موافقات","أخرى"]},{"id":"Q19","stage":"Systems","text_ar":"ما الأنظمة الموجودة؟","answer_type":"Multi","options":["None","Excel/Sheets","CRM","ERP","Accounting","Core System","Custom System","Website","Mobile App","Other"],"branch_note":"إذا 2+ → Q20","dimension":"Integration","affected_services":["API","AUTO","SYSTEM","DATA"],"notes":null,"answer_codes":{"ERP":"ERP","Core System":"CORE","CRM":"CRM","Excel/Sheets":"EXCEL","Custom System":"CUSTOM","Accounting":"ACCOUNTING"},"text_en":"What systems do you currently use?","options_ar":["لا يوجد","إكسل / شيتات","نظام CRM","نظام ERP","نظام محاسبة","نظام أساسي","نظام مخصص","موقع إلكتروني","تطبيق جوال","أخرى"]},{"id":"Q20","stage":"Integration","text_ar":"هل الأنظمة تتبادل البيانات؟","answer_type":"Single","options":["No","Yes","Partially","Don't Know"],"branch_note":"إذا Yes/Partially → Q21","dimension":"Integration","affected_services":["API","AUTO"],"notes":"Don't Know يخفض Confidence ويطلق Discovery opportunity","answer_codes":{"Don't Know":"DONT_KNOW","Yes":"YES","Partially":"PARTIAL"},"text_en":"Do these systems exchange data with each other?","options_ar":["لا","نعم","جزئيًا","لا أعرف"]},{"id":"Q21","stage":"Integration","text_ar":"كم تكامل تتوقعون؟","answer_type":"Single","options":["None","1","2-3","4-6","7+","Not Sure"],"branch_note":"لا","dimension":"Integration","affected_services":["API","AUTO"],"notes":"Potential count فقط","answer_codes":{"1":"ONE","2-3":"TWO_THREE","4-6":"FOUR_SIX","Not Sure":"NOT_SURE","7+":"SEVEN_PLUS"},"text_en":"How many integrations do you expect?","options_ar":["لا يوجد","1","2-3","4-6","7 فأكثر","غير متأكد"]},{"id":"Q22","stage":"Integration","text_ar":"مع ماذا يحتاج النظام أن يتكامل؟","answer_type":"Multi","options":["CRM","ERP","Accounting","Payment","Email","SMS","WhatsApp","Government","Banking/Financial","Core System","Other"],"branch_note":"لا","dimension":"Integration","affected_services":["API","AUTO"],"notes":"لا نفترض API جاهز","text_en":"What does the system need to integrate with?","options_ar":["CRM","ERP","المحاسبة","الدفع الإلكتروني","البريد الإلكتروني","رسائل SMS","واتساب","جهات حكومية","بنوك/مالية","نظام أساسي","أخرى"]},{"id":"Q23","stage":"Notifications","text_ar":"أي إشعارات تحتاجون؟","answer_type":"Multi","options":["None","Email","SMS","WhatsApp","Push","Multiple"],"branch_note":"لا","dimension":"Integration","affected_services":["AUTO","API","APP"],"notes":"Sent يظهر لاحقًا في التنفيذ","text_en":"What notifications do you need?","options_ar":["لا يوجد","بريد إلكتروني","رسائل SMS","واتساب","إشعارات فورية","متعددة"]},{"id":"Q24","stage":"Analytics","text_ar":"هل تحتاج الإدارة/الفريق مؤشرات مستمرة؟","answer_type":"Single","options":["No","Management","Operations","Both"],"branch_note":"إذا Yes → Q25","dimension":"Business Need","affected_services":["DASH","DATA"],"notes":null,"answer_codes":{"Management":"MANAGEMENT","Operations":"OPERATIONS","Both":"BOTH"},"text_en":"Does management/the team need ongoing indicators (KPIs)?","options_ar":["لا","للإدارة","للعمليات","للاثنين"]},{"id":"Q25","stage":"Analytics","text_ar":"هل تحتاجون تقارير دورية تفصيلية؟","answer_type":"Single","options":["No","Basic","Advanced"],"branch_note":"لا","dimension":"Business Need","affected_services":["DATA","DASH"],"notes":"Dashboard ≠ Report","answer_codes":{"Advanced":"ADVANCED","Basic":"BASIC"},"text_en":"Do you need detailed periodic reports?","options_ar":["لا","أساسية","متقدمة"]},{"id":"Q26","stage":"Commerce","text_ar":"هل يوجد بيع منتجات/خدمات أونلاين؟","answer_type":"Single","options":["No","Yes","Planned"],"branch_note":"إذا Yes/Planned → Q27","dimension":"Business Need","affected_services":["ECOM","WEB","API","AUTO"],"notes":null,"answer_codes":{"Planned":"PLANNED","Yes":"YES"},"text_en":"Do you sell products/services online?","options_ar":["لا","نعم","مخطط له"]},{"id":"Q27","stage":"Commerce","text_ar":"ما المطلوب للبيع أونلاين؟","answer_type":"Multi","options":["Products","Cart","Checkout","Online Payment","Orders","Delivery","Customer Accounts","Inventory","Multiple Branches"],"branch_note":"لا","dimension":"Complexity","affected_services":["ECOM","API","AUTO","AUTH"],"notes":null,"answer_codes":{"Online Payment":"PAYMENT","Delivery":"DELIVERY","Multiple Branches":"BRANCHES","Orders":"ORDERS","Inventory":"INVENTORY","Customer Accounts":"ACCOUNTS"},"text_en":"What's needed to sell online?","options_ar":["منتجات","سلة شراء","إتمام الشراء","دفع إلكتروني","طلبات","توصيل","حسابات عملاء","إدارة مخزون","فروع متعددة"]},{"id":"Q28","stage":"AI","text_ar":"هل لديكم Use Case واضح للذكاء الاصطناعي؟","answer_type":"Single","options":["No","Yes","Not Sure"],"branch_note":"إذا Yes → Q29","dimension":"Business Need","affected_services":["AI","DATA","AUTO"],"notes":"No use case = opportunity only","answer_codes":{"Yes":"YES","Not Sure":"NOT_SURE"},"text_en":"Do you have a clear AI use case?","options_ar":["لا","نعم","غير متأكد"]},{"id":"Q29","stage":"AI","text_ar":"ما استخدام AI المطلوب؟","answer_type":"Multi","options":["Customer Support","Chatbot","Document Processing","Classification","Prediction","Recommendations","Content Assistance","Internal Assistant","Other"],"branch_note":"لا","dimension":"Business Need","affected_services":["AI","DATA","AUTO","API"],"notes":null,"answer_codes":{"Document Processing":"DOCUMENT_PROCESSING","Chatbot":"CHATBOT","Recommendations":"RECOMMENDATIONS","Customer Support":"CUSTOMER_SUPPORT","Prediction":"PREDICTION"},"text_en":"What AI use is required?","options_ar":["دعم العملاء","روبوت محادثة","معالجة مستندات","تصنيف بيانات","تنبؤ","توصيات","مساعدة بإنتاج محتوى","مساعد داخلي","أخرى"]},{"id":"Q30","stage":"Scale","text_ar":"هل الحل داخلي، للعملاء، أم الاثنين؟","answer_type":"Single","options":["Public","Customers","Internal","Both"],"branch_note":"لا","dimension":"Users & Access","affected_services":["WEB","PORTAL","SYSTEM","DASH"],"notes":null,"text_en":"Is the solution internal, for customers, or both?","options_ar":["عام","للعملاء","داخلي","للاثنين"]},{"id":"Q31","stage":"Security","text_ar":"هل يتعامل الحل مع بيانات حساسة؟","answer_type":"Single","options":["No","Personal","Confidential","Financial","Highly Sensitive","Not Sure"],"branch_note":"لا","dimension":"Risk","affected_services":["AUTH","SEC","DISCOVERY"],"notes":"Financial/Highly Sensitive = discovery required","answer_codes":{"Financial":"FINANCIAL","Highly Sensitive":"HIGHLY_SENSITIVE","Not Sure":"NOT_SURE","Personal":"PERSONAL","Confidential":"CONFIDENTIAL"},"text_en":"Does the solution handle sensitive data?","options_ar":["لا","بيانات شخصية","بيانات سرية","بيانات مالية","حساسة جدًا","غير متأكد"]},{"id":"Q32","stage":"Priority","text_ar":"ما أهمية المشروع للعمل؟","answer_type":"Single","options":["Nice to Have","Important","Business Critical","Mission Critical"],"branch_note":"لا","dimension":"Priority","affected_services":["DISCOVERY","QA","SEC"],"notes":"لا يحدد الخدمة وحده","answer_codes":{"Business Critical":"BUSINESS_CRITICAL","Mission Critical":"MISSION_CRITICAL","Important":"IMPORTANT"},"text_en":"How important is this project to your business?","options_ar":["إضافة جيدة","مهم","حرج للأعمال","حرج جدًا"]},{"id":"Q33","stage":"Mobile","text_ar":"هل يحتاج المشروع تطبيقًا مستقلًا أم يكفي موقع متجاوب؟","answer_type":"Single","options":["No, responsive enough","Yes - Customers","Yes - Employees","Yes - Both","Not Sure"],"branch_note":"إذا Yes/Not Sure → mobile path","dimension":"Business Need","affected_services":["MOBILE","PORTAL","SYSTEM","AUTH"],"notes":"هذا السؤال هو مصدر الحقيقة لتوصية التطبيق؛ Q07 يظل لوضع التطبيق الحالي.","answer_codes":{"Yes - Customers":"CUSTOMERS","Yes - Employees":"EMPLOYEES","Yes - Both":"BOTH","No, responsive enough":"RESPONSIVE","Not Sure":"NOT_SURE"},"text_en":"Does the project need a standalone app, or is a responsive website enough?","options_ar":["لا، موقع متجاوب كافي","نعم - للعملاء","نعم - للموظفين","نعم - للاثنين","غير متأكد"]},{"id":"Q34","stage":"Qualification","text_ar":"ما الميزانية الاستثمارية التقريبية للمشروع؟","answer_type":"Single","options":["Under $1,000","$1,000–5,000","$5,000–10,000","$10,000–25,000","$25,000+","Not Sure"],"branch_note":"لا","dimension":"Commercial Context","affected_services":["Pricing","Lead Score"],"notes":"لا تغيّر توصية الحل وحدها؛ تستخدم للتأهيل والتوقع السعري","text_en":"What is the approximate investment budget for the project?","options_ar":["أقل من $1,000","$1,000–5,000","$5,000–10,000","$10,000–25,000","أكثر من $25,000","غير متأكد"]},{"id":"Q35","stage":"Qualification","text_ar":"متى تريدون إطلاق المشروع؟","answer_type":"Single","options":["ASAP","1–3 Months","3–6 Months","6–12 Months","Flexible","Not Sure"],"branch_note":"لا","dimension":"Priority","affected_services":["Lead Score","Planning"],"notes":null,"text_en":"When do you want to launch the project?","options_ar":["بأسرع وقت","1-3 أشهر","3-6 أشهر","6-12 شهر","مرن","غير متأكد"]},{"id":"Q36","stage":"Free Text","text_ar":"احكِ لنا عن مشروعك أو المشكلة التي تريد حلها بكلماتك","answer_type":"Free Text","options":[],"branch_note":"لا","dimension":"Business Need","affected_services":["AI (V2)","Lead Context"],"notes":"في V1 يتم حفظ النص فقط؛ لا يدخل AI في القرار","text_en":"Tell us about your project or the problem you want to solve, in your own words","options_ar":[]},{"id":"Q37","stage":"Consent","text_ar":"هل توافق على حفظ بيانات التقييم للتواصل والمتابعة؟","answer_type":"Single","options":["Yes","No"],"branch_note":"لا","dimension":"Privacy","affected_services":["Lead Capture"],"notes":"مطلوب قبل تخزين بيانات التواصل/التقييم","text_en":"Do you agree to save your assessment data for contact and follow-up?","options_ar":["نعم","لا"]},{"id":"Q38","stage":"Client Profile","text_ar":"هل أنتم فرد/مشروع محلي أم شركة/مؤسسة؟","answer_type":"Single","options":["Individual/Local Business","Company/Institution","Enterprise"],"branch_note":"لا","dimension":"Commercial Context","affected_services":["Pricing Tier"],"notes":"يفضل استخدامه مع Q03 وQ02 وليس وحده","text_en":"Are you an individual/local business, or a company/institution?","options_ar":["فرد / مشروع محلي","شركة / مؤسسة","مؤسسة كبيرة"]}],"dimension_labels":{"BUSINESS_NEED":{"ar":"الحاجة الفعلية","en":"Business Need"},"COMPLEXITY":{"ar":"التعقيد","en":"Complexity"},"INTEGRATION":{"ar":"التكامل","en":"Integration"},"USERS_ACCESS":{"ar":"المستخدمين والصلاحيات","en":"Users & Access"},"SCALE":{"ar":"الحجم والنطاق","en":"Scale"}}}</script>
+<script>
+const DATA = JSON.parse(document.getElementById('indicator-data').textContent);
+
+/* ============================================================
+   I18N — UI chrome strings only. Question text/options come from DATA.
+============================================================ */
+const I18N = {
+  ar: {
+    badge:'SOLUTION INDICATOR',
+    introTitle_pre:'احنا منساعدك تعرف بالضبط ', introTitle_span:'شو محتاج مشروعك الرقمي',
+    introBody:'تقييم قصير وذكي بيحلل احتياجك الفعلي، وبيطلعلك توصية بالحل المناسب مع تقدير استثمار أولي — قبل حتى ما تحكي معنا.',
+    startBtn:'ابدأ التقييم', trust1:'٥ دقايق تقريبًا', trust2:'مجاني بالكامل', trust3:'بدون أي التزام',
+    backBtn:'‹ رجوع', nextBtn:'التالي', finishBtn:'شوف النتيجة',
+    resultCompleteBadge:'التقييم مكتمل',
+    loadingResult:'جاري تحضير النتيجة...',
+    resultEyebrow:'الحل الرقمي المقترح',
+    coreServicesTitle:'الخدمات الأساسية', supportingServicesTitle:'خدمات مساندة', dimensionsTitle:'تحليل المشروع',
+    investLabel:'الاستثمار التقديري', investNote:'تقدير أولي غير نهائي — السعر الدقيق يُحدد بعد توضيح النطاق الكامل معك.',
+    budgetGapNote:'⚠ الميزانية التقريبية اللي حددتها أقل من نطاق التقدير الحالي. هاد ما يعني إنه ما في حل — بالتواصل المباشر ممكن نناقش نطاق أصغر أو تنفيذ على مراحل يتناسب مع ميزانيتك.',
+    bookBtn:'احجز جلسة Discovery', restartBtn:'إعادة التقييم',
+    modalTitle:'خطوة أخيرة', modalDesc:'اتركلنا بياناتك وفريقنا رح يتواصل معك لتحديد موعد جلسة Discovery.',
+    fieldName:'الاسم', fieldContact:'البريد الإلكتروني أو الهاتف', fieldCompany:'اسم الشركة (اختياري)',
+    consentText:'أوافق على حفظ بيانات هذا التقييم من قبل أثر للتواصل والمتابعة بخصوص مشروعي.',
+    submitBtn:'إرسال', cancelBtn:'إلغاء',
+    successTitle:'تم الإرسال بنجاح', successDesc:'وصلتنا بياناتك، وفريق أثر رح يتواصل معك قريبًا لتحديد موعد جلسة Discovery.', closeBtn:'إغلاق',
+    multiHint:'يمكن اختيار أكثر من إجابة', singleHint:'',
+    confidenceLow:'بعض إجاباتك كانت غير مؤكدة — هاي النتيجة تحتاج تأكيد إضافي بجلسة Discovery.',
+    discoveryLevels:{ REQUIRED:{t:'جلسة Discovery مطلوبة', d:'مشروعك فيه تعقيد أو حساسية بيانات تحتاج فهم أعمق قبل أي سعر نهائي — لازم نبدأ بجلسة Discovery.'},
+      RECOMMENDED:{t:'جلسة Discovery موصى فيها', d:'ممكن نعطيك تقدير أولي، بس جلسة Discovery رح تساعد نحدد التفاصيل الدقيقة ونطلعلك سعر ثابت.'},
+      NOT_REQUIRED:{t:'ما في داعي لـDiscovery حاليًا', d:'مشروعك واضح بما يكفي نعطيك نطاق سعري مباشر — وبعدين نكمل التفاصيل سوا.'} },
+    priceScopeBased:'يتحدد بعد جلسة Discovery',
+    stageNames:{Business:'الأعمال', Scale:'الحجم', 'Current State':'الوضع الحالي', Customer:'العملاء', Users:'المستخدمين', Data:'البيانات', Workflow:'سير العمل', 'Manual Work':'العمل اليدوي', Systems:'الأنظمة', Integration:'التكامل', Notifications:'الإشعارات', Analytics:'التحليلات', Commerce:'التجارة الإلكترونية', AI:'الذكاء الاصطناعي', Security:'الأمان', Priority:'الأولوية', Mobile:'الجوال', Qualification:'التأهيل', 'Free Text':'وصف حر', Consent:'الموافقة', 'Client Profile':'ملف العميل'},
+    footerWord:'أثر', footerTagline:'مواقع · تطبيقات ويب · MVPs', footerCopy:'© 2026 أثر. جميع الحقوق محفوظة.',
+  },
+  en: {
+    badge:'SOLUTION INDICATOR',
+    introTitle_pre:"We'll help you find out exactly ", introTitle_span:'what your digital project needs',
+    introBody:'A short, smart assessment that reads your real needs and gives you a recommended solution with an initial investment estimate — before we even talk.',
+    startBtn:'Start Assessment', trust1:'~5 minutes', trust2:'Completely free', trust3:'No commitment',
+    backBtn:'‹ Back', nextBtn:'Next', finishBtn:'See Result',
+    resultCompleteBadge:'Assessment Complete',
+    loadingResult:'Preparing your result...',
+    resultEyebrow:'Recommended Digital Solution',
+    coreServicesTitle:'Core Services', supportingServicesTitle:'Supporting Services', dimensionsTitle:'Project Breakdown',
+    investLabel:'Estimated Investment', investNote:'An initial, non-final estimate — the exact price is set after we clarify the full scope with you.',
+    budgetGapNote:"⚠ The approximate budget you selected is below the current estimate range. That doesn't mean it's out of reach — talking directly we can discuss a smaller scope or a phased build that fits your budget.",
+    bookBtn:'Book a Discovery Session', restartBtn:'Restart Assessment',
+    modalTitle:'One last step', modalDesc:"Leave your details and Athar's team will reach out to schedule your Discovery session.",
+    fieldName:'Name', fieldContact:'Email or phone', fieldCompany:'Company name (optional)',
+    consentText:'I agree that Athar may store this assessment to contact me and follow up about my project.',
+    submitBtn:'Submit', cancelBtn:'Cancel',
+    successTitle:'Submitted successfully', successDesc:"We've received your details — Athar's team will reach out soon to schedule the Discovery session.", closeBtn:'Close',
+    multiHint:'You can select more than one', singleHint:'',
+    confidenceLow:'Some of your answers were uncertain — this result needs further confirmation in a Discovery session.',
+    discoveryLevels:{ REQUIRED:{t:'Discovery session required', d:'Your project has enough complexity or data sensitivity that we need a deeper understanding before any final price — we should start with a Discovery session.'},
+      RECOMMENDED:{t:'Discovery session recommended', d:"We can give you an initial estimate, but a Discovery session will help nail the details and get you a fixed price."},
+      NOT_REQUIRED:{t:'No Discovery needed for now', d:"Your project is clear enough for a direct price range — we can fill in the details together next."} },
+    priceScopeBased:'Determined after a Discovery session',
+    stageNames:{Business:'Business', Scale:'Scale', 'Current State':'Current State', Customer:'Customer', Users:'Users', Data:'Data', Workflow:'Workflow', 'Manual Work':'Manual Work', Systems:'Systems', Integration:'Integration', Notifications:'Notifications', Analytics:'Analytics', Commerce:'Commerce', AI:'AI', Security:'Security', Priority:'Priority', Mobile:'Mobile', Qualification:'Qualification', 'Free Text':'Free Text', Consent:'Consent', 'Client Profile':'Client Profile'},
+    footerWord:'Athar', footerTagline:'Websites · Web Apps · MVPs', footerCopy:'© 2026 Athar. All rights reserved.',
+  }
+};
+
+let LANG = 'ar';
+
+/* ============================================================
+   SUPABASE — scoring/pricing/recommendation now run server-side only
+   (Edge Functions). See ../../docs/ARCHITECTURE.md.
+============================================================ */
+const SUPABASE_URL = 'https://iewrpxkcdkybfflvmsuo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlld3JweGtjZGt5YmZmbHZtc3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjgyNjUsImV4cCI6MjEwMzk0NDI2NX0.8b_C0AouD-oZDcBzUpaN-o2smDcC7SutCeKusS6I-Sg';
+
+async function callEdgeFunction(name, payload){
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'apikey': SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify(payload),
+  });
+  const json = await res.json().catch(()=>null);
+  if(!res.ok || !json){
+    throw new Error(json && json.error ? json.error : `request_failed_${res.status}`);
+  }
+  return json;
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+const QUEUE_ORDER = DATA.questions.map(q=>q.id);
+const QMAP = {}; DATA.questions.forEach(q=>QMAP[q.id]=q);
+
+let state = null;
+function freshState(){
+  return {
+    idx:0,
+    answers:{},
+    answeredCount:0,
+    history:[],
+    assessmentId:null,
+    lastResult:null,
+  };
+}
+
+/* conditional skip rules derived from the question-pool branch notes */
+function shouldSkip(qid, answers){
+  const a = answers;
+  switch(qid){
+    case 'Q08': return !(a.Q07==='Yes' || a.Q07==='Planned');
+    case 'Q11': { const v=a.Q10||[]; return !(v.includes('Submit Requests')||v.includes('Track Requests')||v.includes('Manage Account/Data')||v.includes('Multiple Actions')); }
+    case 'Q12': return !(a.Q11 && a.Q11.indexOf('Yes')===0);
+    case 'Q14': return a.Q13!=='Yes';
+    case 'Q16': return !(a.Q15==='3-5 Steps'||a.Q15==='6+ Steps');
+    case 'Q18': return !(a.Q17 && a.Q17!=='No');
+    case 'Q20': return !(Array.isArray(a.Q19) && a.Q19.length>=2);
+    case 'Q21': return !(a.Q20==='Yes'||a.Q20==='Partially');
+    case 'Q22': return !(a.Q21 && a.Q21!=='None');
+    case 'Q25': return !(a.Q24 && a.Q24!=='No');
+    case 'Q27': return !(a.Q26==='Yes'||a.Q26==='Planned');
+    case 'Q29': return a.Q28!=='Yes';
+    default: return false;
+  }
+}
+
+function nextQuestionIndex(fromIdx, answers){
+  for(let i=fromIdx;i<QUEUE_ORDER.length;i++){
+    if(!shouldSkip(QUEUE_ORDER[i], answers)) return i;
+  }
+  return QUEUE_ORDER.length;
+}
+function prevQuestionIndex(fromIdx, answers){
+  for(let i=fromIdx-1;i>=0;i--){
+    if(!shouldSkip(QUEUE_ORDER[i], answers)) return i;
+  }
+  return -1;
+}
+
+/* ============================================================
+   RENDERING
+============================================================ */
+const $ = sel => document.querySelector(sel);
+function t(key){ return I18N[LANG][key]; }
+
+function applyI18nStatic(){
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG==='ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(I18N[LANG][key]!==undefined) el.textContent = I18N[LANG][key];
+  });
+  $('#screen-intro h1').innerHTML = `${I18N[LANG].introTitle_pre}<span>${I18N[LANG].introTitle_span}</span>`;
+  document.getElementById('langSwitch').classList.toggle('on-light', currentScreenIsLight());
+  $('#brandLogoIntro').src = LANG==='ar' ? 'assets/logo-ar.png' : 'assets/logo-en.png';
+}
+function currentScreenIsLight(){
+  return false;
+}
+
+function showScreen(name){
+  ['intro','assess','result'].forEach(s=>{
+    $('#screen-'+s).classList.toggle('hidden', s!==name);
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderQuestion(){
+  const qid = QUEUE_ORDER[state.idx];
+  const q = QMAP[qid];
+  const total = QUEUE_ORDER.length;
+  $('#qCounter').textContent = `${state.history.length+1} / ${total}`;
+  $('#qStage').textContent = t('stageNames')[q.stage] || q.stage;
+  $('#qText').textContent = LANG==='ar' ? q.text_ar : q.text_en;
+  $('#qHint').textContent = q.answer_type==='Multi' ? t('multiHint') : '';
+  $('#progressBar').style.width = Math.round((state.history.length/total)*100)+'%';
+
+  const wrap = $('#qOptionsWrap');
+  wrap.innerHTML = '';
+  const current = state.answers[qid];
+
+  if(q.answer_type==='Free Text'){
+    const ta = document.createElement('textarea');
+    ta.className='q-freetext';
+    ta.value = current || '';
+    ta.placeholder = LANG==='ar' ? 'اكتب هون...' : 'Type here...';
+    ta.addEventListener('input', ()=>{ state.answers[qid]=ta.value; updateNextState(qid); });
+    wrap.appendChild(ta);
+  } else {
+    const isMulti = q.answer_type==='Multi';
+    const list = document.createElement('div'); list.className='q-options';
+    q.options.forEach((opt,i)=>{
+      const row = document.createElement('div');
+      row.className = 'opt'+(isMulti?' multi':'');
+      const selected = isMulti ? (Array.isArray(current)&&current.includes(opt)) : (current===opt);
+      if(selected) row.classList.add('selected');
+      const label = LANG==='ar' && q.options_ar ? q.options_ar[i] : opt;
+      row.innerHTML = `<span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="opt-label">${label}</span>`;
+      row.addEventListener('click', ()=>{
+        if(isMulti){
+          let arr = Array.isArray(state.answers[qid]) ? state.answers[qid].slice() : [];
+          if(arr.includes(opt)) arr = arr.filter(x=>x!==opt); else arr.push(opt);
+          state.answers[qid] = arr;
+        } else {
+          state.answers[qid] = opt;
+        }
+        renderQuestion();
+      });
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+  }
+
+  $('#btnBack').style.visibility = state.history.length===0 ? 'hidden' : 'visible';
+  const isLast = nextQuestionIndex(state.idx+1, state.answers) >= QUEUE_ORDER.length;
+  $('#btnNext').textContent = isLast ? t('finishBtn') : t('nextBtn');
+  updateNextState(qid);
+}
+
+function updateNextState(qid){
+  const q = QMAP[qid];
+  const v = state.answers[qid];
+  let valid = false;
+  if(q.answer_type==='Multi') valid = Array.isArray(v) && v.length>0;
+  else if(q.answer_type==='Free Text') valid = true; // optional
+  else valid = !!v;
+  $('#btnNext').disabled = !valid;
+}
+
+function goNext(){
+  const qid = QUEUE_ORDER[state.idx];
+  state.answeredCount++;
+  state.history.push(qid);
+  const ni = nextQuestionIndex(state.idx+1, state.answers);
+  if(ni>=QUEUE_ORDER.length){
+    finishAssessment();
+  } else {
+    state.idx = ni;
+    renderQuestion();
+  }
+}
+function goBack(){
+  const pi = prevQuestionIndex(state.idx, state.answers);
+  if(pi<0) return;
+  state.idx = pi;
+  state.history.pop();
+  renderQuestion();
+}
+
+async function finishAssessment(){
+  showScreen('result');
+  $('#resultSolutionName').textContent = t('loadingResult');
+  $('#resultSolutionUse').textContent = '';
+  try{
+    const json = await callEdgeFunction('submit-assessment', { answers: state.answers, lang: LANG });
+    state.assessmentId = json.assessmentId;
+    state.lastResult = json.result;
+    renderResult(json.result);
+  } catch(err){
+    console.error(err);
+    alert(LANG==='ar'
+      ? 'تعذر إرسال التقييم، تأكدي من الاتصال بالإنترنت وحاولي مرة تانية.'
+      : 'Could not submit the assessment — check your connection and try again.');
+    showScreen('assess');
+  }
+}
+
+function renderResult(result){
+  const {buckets, solutionType, dims, discovery, confidence, invest} = result;
+  $('#resultSolutionName').textContent = solutionType.name;
+  $('#resultSolutionUse').textContent = solutionType.primary_use;
+
+  const confEl = $('#confidenceNote');
+  if(confidence<70){
+    confEl.classList.remove('hidden');
+    confEl.textContent = '⚠ ' + t('confidenceLow');
+  } else {
+    confEl.classList.add('hidden');
+  }
+
+  const coreGrid = $('#coreServicesGrid'); coreGrid.innerHTML='';
+  buckets.primary.forEach(({name})=>{
+    coreGrid.innerHTML += `<div class="svc-pill primary"><span class="dot"></span>${name}</div>`;
+  });
+  const suppGrid = $('#supportingServicesGrid'); suppGrid.innerHTML='';
+  if(buckets.supporting.length){
+    $('#supportingSection').classList.remove('hidden');
+    buckets.supporting.forEach(({name})=>{ suppGrid.innerHTML += `<div class="svc-pill"><span class="dot"></span>${name}</div>`; });
+  } else {
+    $('#supportingSection').classList.add('hidden');
+  }
+
+  const dimList = $('#dimList'); dimList.innerHTML='';
+  const dl = DATA.dimension_labels;
+  ['BUSINESS_NEED','COMPLEXITY','INTEGRATION','USERS_ACCESS','SCALE'].forEach(dim=>{
+    const val = Math.round(dims[dim]||0);
+    const label = dl[dim] ? dl[dim][LANG] : dim;
+    dimList.innerHTML += `<div class="dim-row"><div class="dim-label">${label}</div><div class="dim-track"><div class="dim-fill" style="width:${val}%"></div></div><div class="dim-val mono">${val}%</div></div>`;
+  });
+
+  const dLevel = t('discoveryLevels')[discovery];
+  const banner = $('#discoveryBanner');
+  banner.className = 'discovery-banner ' + discovery.toLowerCase();
+  $('#discoveryTitle').textContent = dLevel.t;
+  $('#discoveryText').textContent = dLevel.d;
+
+  // Business decision (2026-09-04): the raw rate-card sum across suggested services is not
+  // yet a trustworthy client-facing number -- it can double-count overlapping services and
+  // bundles Phase-1/Phase-2 work together. Until the commercial scope rules (Approved
+  // Commercial Scope vs. Raw Potential Scope) are settled, never show a dollar figure here;
+  // always point to Discovery instead. The real computed range is still stored on the
+  // assessment for internal/Admin use (Raw Potential) -- only this client-facing render is
+  // suppressed. Flip this back to `invest.any` once the commercial logic is approved.
+  const SHOW_CLIENT_PRICE_RANGE = false;
+  const investEl = $('#investValue');
+  if(SHOW_CLIENT_PRICE_RANGE && invest.any){
+    investEl.textContent = `$${invest.min.toLocaleString()} – $${invest.max.toLocaleString()}`;
+  } else {
+    investEl.textContent = t('priceScopeBased');
+  }
+
+  const gapEl = $('#budgetGapNote');
+  if(result.budgetGap){
+    gapEl.classList.remove('hidden');
+    gapEl.innerHTML = '';
+    const p1 = document.createElement('p');
+    p1.textContent = t('budgetGapNote');
+    p1.style.margin = '0 0 8px';
+    gapEl.appendChild(p1);
+
+    const sug = result.budgetSuggestion;
+    if(sug && sug.invest.any){
+      const names = [...sug.scope.primary, ...sug.scope.supporting].map(s=>s.name).join(LANG==='ar' ? '، ' : ', ');
+      // Same business decision as investEl above: no raw rate-card dollar figure shown to
+      // the client yet -- point to Discovery instead of a computed price string.
+      const priceStr = `$${sug.invest.min.toLocaleString()}–$${sug.invest.max.toLocaleString()}`;
+      const p2 = document.createElement('p');
+      p2.style.cssText = 'margin:0; font-weight:700; color:var(--warn-dark-bg);';
+      if(SHOW_CLIENT_PRICE_RANGE){
+        p2.innerHTML = sug.fits
+          ? (LANG==='ar'
+              ? `✅ يقدر يتناسب مع ميزانيتك: <b>${names}</b> بمرحلة أولى (Start) — بتقدير <bdi style="direction:ltr;">${priceStr}</bdi>.`
+              : `✅ Fits your budget: <b>${names}</b> as a Start-phase build — around <bdi style="direction:ltr;">${priceStr}</bdi>.`)
+          : (LANG==='ar'
+              ? `أقرب نطاق ممكن حاليًا: <b>${names}</b> بس بمرحلة أولى (Start) — بتقدير <bdi style="direction:ltr;">${priceStr}</bdi>، وهاد لسا فوق ميزانيتك المذكورة شوي — يستاهل نحكي فيه مباشرة معك لنشوف مين ممكن نعدّل بالنطاق.`
+              : `The closest we can get right now: <b>${names}</b> only, as a Start-phase build — around <bdi style="direction:ltr;">${priceStr}</bdi>, still a bit above your stated budget — worth talking directly so we can see what scope adjustments could help.`);
+      } else {
+        p2.innerHTML = sug.fits
+          ? (LANG==='ar'
+              ? `✅ يقدر يتناسب مع ميزانيتك: <b>${names}</b> بمرحلة أولى (Start) — بنأكد التفاصيل والتكلفة الدقيقة بجلسة Discovery.`
+              : `✅ Fits your budget: <b>${names}</b> as a Start-phase build — we'll confirm the exact details and cost in a Discovery session.`)
+          : (LANG==='ar'
+              ? `أقرب نطاق ممكن حاليًا: <b>${names}</b> بس بمرحلة أولى (Start) — وهاد لسا ممكن يكون فوق ميزانيتك المذكورة شوي، يستاهل نحكي فيه مباشرة معك لنشوف مين ممكن نعدّل بالنطاق.`
+              : `The closest we can get right now: <b>${names}</b> only, as a Start-phase build — this may still be a bit above your stated budget, worth talking directly so we can see what scope adjustments could help.`);
+      }
+      gapEl.appendChild(p2);
+    }
+  } else {
+    gapEl.classList.add('hidden');
+  }
+}
+
+/* ============================================================
+   LEAD MODAL
+============================================================ */
+function openLeadModal(){
+  $('#leadModal').classList.remove('hidden');
+  $('#modalForm').classList.remove('hidden');
+  $('#modalSuccess').classList.add('hidden');
+}
+function closeLeadModal(){ $('#leadModal').classList.add('hidden'); }
+
+/* ============================================================
+   WIRE UP
+============================================================ */
+document.getElementById('btnStart').addEventListener('click', ()=>{
+  state = freshState();
+  state.idx = nextQuestionIndex(0, state.answers);
+  showScreen('assess');
+  renderQuestion();
+});
+document.getElementById('btnNext').addEventListener('click', goNext);
+document.getElementById('btnBack').addEventListener('click', goBack);
+document.getElementById('btnBookDiscovery').addEventListener('click', openLeadModal);
+document.getElementById('btnCloseModal').addEventListener('click', closeLeadModal);
+document.getElementById('btnRestart').addEventListener('click', ()=>{
+  state = freshState();
+  showScreen('intro');
+});
+document.getElementById('btnSubmitLead').addEventListener('click', async ()=>{
+  const name = document.getElementById('leadName').value.trim();
+  const contact = document.getElementById('leadContact').value.trim();
+  const company = document.getElementById('leadCompany').value.trim();
+  const consent = document.getElementById('leadConsent').checked;
+  if(!name || !contact || !consent){
+    alert(LANG==='ar' ? 'الرجاء تعبئة الاسم والتواصل والموافقة على الحفظ.' : 'Please fill in name, contact, and consent.');
+    return;
+  }
+  const btn = document.getElementById('btnSubmitLead');
+  btn.disabled = true;
+  try{
+    await callEdgeFunction('submit-lead', {
+      name, contact, company, lang: LANG, consent,
+      answers: state.answers, result: state.lastResult, assessmentId: state.assessmentId,
+    });
+    $('#modalForm').classList.add('hidden');
+    $('#modalSuccess').classList.remove('hidden');
+  } catch(err){
+    console.error(err);
+    alert(LANG==='ar'
+      ? 'تعذر إرسال بياناتك، تأكدي من الاتصال بالإنترنت وحاولي مرة تانية.'
+      : 'Could not submit your details — check your connection and try again.');
+  } finally {
+    btn.disabled = false;
+  }
+});
+document.getElementById('btnCloseSuccess').addEventListener('click', closeLeadModal);
+
+document.querySelectorAll('#langSwitch button').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    LANG = btn.getAttribute('data-lang');
+    document.querySelectorAll('#langSwitch button').forEach(b=>b.classList.toggle('active', b===btn));
+    applyI18nStatic();
+    if(state && !$('#screen-assess').classList.contains('hidden')) renderQuestion();
+    if(state && !$('#screen-result').classList.contains('hidden') && state.assessmentId){
+      // Re-translate service/solution names for the new language — this is a stateless
+      // recompute (compute-result), not submit-assessment, so switching language never
+      // creates a duplicate row in the database.
+      try{
+        const json = await callEdgeFunction('compute-result', { answers: state.answers, lang: LANG });
+        state.lastResult = json;
+        renderResult(json);
+      } catch(err){ console.error(err); }
+    }
+  });
+});
+
+applyI18nStatic();
+</script>
+</body>
+</html>
