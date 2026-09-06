@@ -769,6 +769,9 @@
 
     document.title = lang === 'ar' ? 'أثر — Athar | Digital Studio' : 'Athar — أثر | Digital Studio';
 
+    var indicatorLink = document.querySelector('.nav-indicator-link');
+    if (indicatorLink) indicatorLink.href = lang === 'en' ? '/solution-indicator/?lang=en' : '/solution-indicator/';
+
     if (!skipPersist) {
       try { localStorage.setItem('athar_lang', lang); } catch (e) {}
       var url = new URL(window.location.href);
