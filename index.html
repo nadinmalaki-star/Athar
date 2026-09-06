@@ -733,11 +733,12 @@
     <div class="l2" data-ar="© 2026 أثر. جميع الحقوق محفوظة." data-en="© 2026 Athar. All rights reserved.">© 2026 أثر. جميع الحقوق محفوظة.</div>
   </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 (function(){
   // ---- Language toggle: swaps text, direction, <html lang>, and persists the choice ----
+  // Runs before the Supabase/EmailJS CDN scripts below (used only by the contact form,
+  // much later) so the correct language shows immediately instead of waiting on
+  // unrelated third-party scripts to finish loading over the network.
   var currentLang = 'ar';
 
   function applyLang(lang, skipPersist){
@@ -799,7 +800,13 @@
     }
     if (initial !== 'ar') applyLang(initial, true);
   })();
+})();
+</script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+(function(){
   // ---- Scroll progress thread ----
   var fill = document.getElementById('threadFill');
   function onScroll(){
@@ -1011,7 +1018,7 @@
 
       submitBtn.disabled = true;
       statusEl.className = 'contact-status';
-      statusEl.textContent = currentLang === 'ar' ? 'جاري الإرسال...' : 'Sending...';
+      statusEl.textContent = document.documentElement.lang === 'ar' ? 'جاري الإرسال...' : 'Sending...';
 
       sb.from('projects_inquiries').insert([{
         name: nameVal,
@@ -1021,12 +1028,12 @@
         submitBtn.disabled = false;
         if (result.error) {
           statusEl.className = 'contact-status err';
-          statusEl.textContent = currentLang === 'ar'
+          statusEl.textContent = document.documentElement.lang === 'ar'
             ? 'صار خطأ، حاولي مرة تانية بعد شوي.'
             : 'Something went wrong, please try again.';
         } else {
           statusEl.className = 'contact-status ok';
-          statusEl.textContent = currentLang === 'ar'
+          statusEl.textContent = document.documentElement.lang === 'ar'
             ? 'وصلنا طلبك! رح نتواصل معك قريبًا.'
             : 'Got it! We will get back to you soon.';
           contactForm.reset();
