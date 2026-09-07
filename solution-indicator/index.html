@@ -545,6 +545,67 @@ async function callEdgeFunction(name, payload){
 }
 
 /* ============================================================
+   FIRST-PARTY FUNNEL TRACKING (no PII, no cookies)
+   - session_id lives in sessionStorage only: it disappears when the tab
+     closes, so it's a per-visit correlation id, never a persistent
+     cross-session identifier.
+   - No IP, no user-agent, nothing beyond URL-level attribution is sent.
+   - Fire-and-forget: a tracking failure must never affect the real flow.
+============================================================ */
+const TRACKING_URL = `${SUPABASE_URL}/rest/v1/tracking_events`;
+
+function trackingSessionId(){
+  try{
+    let sid = sessionStorage.getItem('athar_sid');
+    if(!sid){ sid = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random()); sessionStorage.setItem('athar_sid', sid); }
+    return sid;
+  }catch(e){ return 'no-storage'; }
+}
+function trackingAttribution(){
+  try{
+    const cached = sessionStorage.getItem('athar_attr');
+    if(cached) return JSON.parse(cached);
+  }catch(e){}
+  const params = new URLSearchParams(window.location.search);
+  const attr = {
+    utm_source: params.get('utm_source') || null,
+    utm_medium: params.get('utm_medium') || null,
+    utm_campaign: params.get('utm_campaign') || null,
+    referrer: document.referrer || null,
+    landing_page: window.location.pathname,
+  };
+  try{ sessionStorage.setItem('athar_attr', JSON.stringify(attr)); }catch(e){}
+  return attr;
+}
+function trackEvent(eventType, extra){
+  try{
+    const attr = trackingAttribution();
+    const payload = Object.assign({
+      event_type: eventType,
+      session_id: trackingSessionId(),
+      page: window.location.pathname,
+      lang: LANG,
+      utm_source: attr.utm_source,
+      utm_medium: attr.utm_medium,
+      utm_campaign: attr.utm_campaign,
+      referrer: attr.referrer,
+      landing_page: attr.landing_page,
+    }, extra || {});
+    fetch(TRACKING_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(()=>{});
+  }catch(e){ /* tracking must never break the app */ }
+}
+
+/* ============================================================
    STATE
 ============================================================ */
 const QUEUE_ORDER = DATA.questions.map(q=>q.id);
@@ -717,6 +778,7 @@ async function finishAssessment(){
     const json = await callEdgeFunction('submit-assessment', { answers: state.answers, lang: LANG });
     state.assessmentId = json.assessmentId;
     state.lastResult = json.result;
+    trackEvent('indicator_complete', { assessment_id: state.assessmentId });
     renderResult(json.result);
   } catch(err){
     console.error(err);
@@ -826,6 +888,7 @@ function renderResult(result){
    LEAD MODAL
 ============================================================ */
 function openLeadModal(){
+  trackEvent('discovery_modal_open', { assessment_id: (state && state.assessmentId) || null });
   $('#leadModal').classList.remove('hidden');
   $('#modalForm').classList.remove('hidden');
   $('#modalSuccess').classList.add('hidden');
@@ -836,6 +899,7 @@ function closeLeadModal(){ $('#leadModal').classList.add('hidden'); }
    WIRE UP
 ============================================================ */
 document.getElementById('btnStart').addEventListener('click', ()=>{
+  trackEvent('indicator_start');
   state = freshState();
   state.idx = nextQuestionIndex(0, state.answers);
   showScreen('assess');
@@ -867,6 +931,7 @@ document.getElementById('btnSubmitLead').addEventListener('click', async ()=>{
       name, contact, company, lang: LANG, consent,
       answers: state.answers, result: state.lastResult, assessmentId: state.assessmentId,
     });
+    trackEvent('discovery_submit', { assessment_id: state.assessmentId || null });
     $('#modalForm').classList.add('hidden');
     $('#modalSuccess').classList.remove('hidden');
   } catch(err){
@@ -891,6 +956,7 @@ document.getElementById('btnCloseSuccess').addEventListener('click', closeLeadMo
       b.classList.toggle('active', b.getAttribute('data-lang') === LANG);
     });
   }
+  trackEvent('indicator_page_view');
 })();
 
 document.querySelectorAll('#langSwitch button').forEach(btn=>{

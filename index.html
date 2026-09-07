@@ -803,6 +803,82 @@
 })();
 </script>
 
+<script>
+(function(){
+  // ---- First-party funnel tracking (no PII, no cookies) ----
+  // Deliberately a DIFFERENT Supabase project than the contact form below:
+  // this is the Solution Indicator's project, so site-side and Indicator-side
+  // events land in the same table for one funnel view in Admin. This anon
+  // key is public by design (protected by RLS, not secrecy) and — same as
+  // every anon key used anywhere in this app — can only INSERT rows; RLS has
+  // no anon SELECT/UPDATE/DELETE policy on any table in that project, so it
+  // cannot read or modify anything.
+  var TRACKING_SUPABASE_URL = 'https://iewrpxkcdkybfflvmsuo.supabase.co';
+  var TRACKING_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlld3JweGtjZGt5YmZmbHZtc3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjgyNjUsImV4cCI6MjEwMzk0NDI2NX0.8b_C0AouD-oZDcBzUpaN-o2smDcC7SutCeKusS6I-Sg';
+  var TRACKING_URL = TRACKING_SUPABASE_URL + '/rest/v1/tracking_events';
+
+  function trackingSessionId(){
+    try{
+      var sid = sessionStorage.getItem('athar_sid');
+      if(!sid){ sid = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()); sessionStorage.setItem('athar_sid', sid); }
+      return sid;
+    }catch(e){ return 'no-storage'; }
+  }
+  function trackingAttribution(){
+    try{
+      var cached = sessionStorage.getItem('athar_attr');
+      if(cached) return JSON.parse(cached);
+    }catch(e){}
+    var params = new URLSearchParams(window.location.search);
+    var attr = {
+      utm_source: params.get('utm_source') || null,
+      utm_medium: params.get('utm_medium') || null,
+      utm_campaign: params.get('utm_campaign') || null,
+      referrer: document.referrer || null,
+      landing_page: window.location.pathname,
+    };
+    try{ sessionStorage.setItem('athar_attr', JSON.stringify(attr)); }catch(e){}
+    return attr;
+  }
+  window.trackEvent = function(eventType, extra){
+    try{
+      var attr = trackingAttribution();
+      var payload = Object.assign({
+        event_type: eventType,
+        session_id: trackingSessionId(),
+        page: window.location.pathname,
+        lang: document.documentElement.lang || 'ar',
+        utm_source: attr.utm_source,
+        utm_medium: attr.utm_medium,
+        utm_campaign: attr.utm_campaign,
+        referrer: attr.referrer,
+        landing_page: attr.landing_page,
+      }, extra || {});
+      fetch(TRACKING_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': TRACKING_SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + TRACKING_SUPABASE_ANON_KEY,
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch(function(){});
+    }catch(e){ /* tracking must never break the site */ }
+  };
+
+  window.trackEvent('site_page_view');
+
+  var indicatorCta = document.querySelector('.nav-indicator-link');
+  if (indicatorCta) {
+    indicatorCta.addEventListener('click', function(){
+      window.trackEvent('indicator_cta_click');
+    });
+  }
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
