@@ -52,6 +52,7 @@ export interface Booking {
   scheduled_at: string;
   original_scheduled_at: string;
   reschedule_count: number;
+  note: string | null;
   created_at: string;
   updated_at: string;
 }

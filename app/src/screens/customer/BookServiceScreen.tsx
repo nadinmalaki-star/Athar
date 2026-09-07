@@ -5,6 +5,7 @@ import type { SalonsStackParamList } from '../../navigation/types';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/Button';
+import { TextField } from '../../components/TextField';
 import { colors, spacing, radii, fontSizes } from '../../theme';
 
 type Props = NativeStackScreenProps<SalonsStackParamList, 'BookService'>;
@@ -27,6 +28,7 @@ export function BookServiceScreen({ route, navigation }: Props) {
   const days = useMemo(() => nextDays(7), []);
   const [selectedDay, setSelectedDay] = useState(days[0]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   async function confirm() {
@@ -41,6 +43,7 @@ export function BookServiceScreen({ route, navigation }: Props) {
       customer_id: session.user.id,
       service_id: serviceId,
       scheduled_at: scheduledAt.toISOString(),
+      note: note.trim() || null,
     });
     setSubmitting(false);
 
@@ -88,6 +91,16 @@ export function BookServiceScreen({ route, navigation }: Props) {
         })}
       </View>
 
+      <TextField
+        label="ملاحظة (اختياري)"
+        placeholder="مثلاً: بدي اللون أحمر، أو عندي حساسية من..."
+        value={note}
+        onChangeText={setNote}
+        multiline
+        numberOfLines={3}
+        style={styles.noteInput}
+      />
+
       <Button label="تأكيد الحجز" onPress={confirm} loading={submitting} disabled={!selectedTime} />
     </ScrollView>
   );
@@ -133,4 +146,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   timeChipActive: { backgroundColor: colors.emberBg, borderColor: colors.emberBorder, color: colors.ember, fontWeight: '700' },
+  noteInput: { minHeight: 80, textAlignVertical: 'top' },
 });
