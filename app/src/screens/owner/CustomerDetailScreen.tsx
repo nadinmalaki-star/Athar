@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { OwnerStackParamList } from '../../navigation/types';
+import type { CustomersStackParamList } from '../../navigation/types';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import type { CustomerFingerprint, InteractionEvent } from '../../lib/database.types';
@@ -9,7 +9,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { relativeTimeAr, summaryFor, eventLabel } from '../../domain/fingerprintCopy';
 import { colors, spacing, radii, fontSizes } from '../../theme';
 
-type Props = NativeStackScreenProps<OwnerStackParamList, 'CustomerDetail'>;
+type Props = NativeStackScreenProps<CustomersStackParamList, 'CustomerDetail'>;
 
 export function CustomerDetailScreen({ route, navigation }: Props) {
   const { customerId, customerName } = route.params;

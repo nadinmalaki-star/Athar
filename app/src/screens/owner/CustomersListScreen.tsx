@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { OwnerStackParamList } from '../../navigation/types';
+import type { CustomersStackParamList } from '../../navigation/types';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import type { CustomerFingerprint, FingerprintStatus } from '../../lib/database.types';
@@ -9,7 +9,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { relativeTimeAr, shortReason } from '../../domain/fingerprintCopy';
 import { colors, spacing, radii, fontSizes, statusMeta } from '../../theme';
 
-type Props = NativeStackScreenProps<OwnerStackParamList, 'CustomersList'>;
+type Props = NativeStackScreenProps<CustomersStackParamList, 'CustomersList'>;
 
 interface Row extends CustomerFingerprint {
   full_name: string;

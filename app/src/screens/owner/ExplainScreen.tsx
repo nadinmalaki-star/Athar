@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { OwnerStackParamList } from '../../navigation/types';
+import type { CustomersStackParamList } from '../../navigation/types';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import type { CustomerFingerprint, FingerprintStatus } from '../../lib/database.types';
@@ -9,7 +9,7 @@ import { Button } from '../../components/Button';
 import { rulesFor } from '../../domain/fingerprintCopy';
 import { colors, spacing, radii, fontSizes, statusMeta } from '../../theme';
 
-type Props = NativeStackScreenProps<OwnerStackParamList, 'Explain'>;
+type Props = NativeStackScreenProps<CustomersStackParamList, 'Explain'>;
 
 const OVERRIDE_OPTIONS: { label: string; value: FingerprintStatus | 'clear' }[] = [
   { label: 'صح، هاد التصنيف مضبوط', value: 'clear' },

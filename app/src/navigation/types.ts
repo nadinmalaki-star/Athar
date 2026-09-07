@@ -5,10 +5,15 @@ export type AuthStackParamList = {
   SignUpCustomer: undefined;
 };
 
-export type OwnerStackParamList = {
+export type CustomersStackParamList = {
   CustomersList: undefined;
   CustomerDetail: { customerId: string; customerName: string };
   Explain: { customerId: string; customerName: string };
+};
+
+export type OwnerTabParamList = {
+  CustomersTab: undefined;
+  CalendarTab: undefined;
 };
 
 export type SalonsStackParamList = {
