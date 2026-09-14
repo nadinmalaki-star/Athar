@@ -9,5 +9,12 @@
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/clue/abu-mazen",
+      "destination": "https://athar-clue-engine.vercel.app/clue/abu-mazen-small-detail",
+      "permanent": false
+    }
   ]
 }
