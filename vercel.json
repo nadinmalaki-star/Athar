@@ -15,6 +15,16 @@
       "source": "/clue/abu-mazen",
       "destination": "https://athar-clue-engine.vercel.app/clue/abu-mazen-small-detail",
       "permanent": false
+    },
+    {
+      "source": "/clue/nativity-bells",
+      "destination": "https://athar-clue-engine.vercel.app/clue/nativity-bells",
+      "permanent": false
+    },
+    {
+      "source": "/clue/ararat-hotel",
+      "destination": "https://athar-clue-engine.vercel.app/clue/ararat-hotel",
+      "permanent": false
     }
   ]
 }
