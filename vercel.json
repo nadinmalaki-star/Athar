@@ -25,6 +25,36 @@
       "source": "/clue/ararat-hotel",
       "destination": "https://athar-clue-engine.vercel.app/clue/ararat-hotel",
       "permanent": false
+    },
+    {
+      "source": "/clue/nativity-bells-v2",
+      "destination": "https://athar-clue-engine.vercel.app/clue/nativity-bells-clue-import-2",
+      "permanent": false
+    },
+    {
+      "source": "/clue/ararat-hotel-v2",
+      "destination": "https://athar-clue-engine.vercel.app/clue/ararat-hotel-clue-import-fixed-v3",
+      "permanent": false
+    },
+    {
+      "source": "/clue/emobility",
+      "destination": "https://athar-clue-engine.vercel.app/clue/athar-emobility-digital-clue-v2-verified-fixed-final-client-facing-ready",
+      "permanent": false
+    },
+    {
+      "source": "/clue/gac-aion",
+      "destination": "https://athar-clue-engine.vercel.app/clue/athar-gac-digital-clue-v2-verified-fixed-final-client-facing-ready",
+      "permanent": false
+    },
+    {
+      "source": "/clue/im-motors",
+      "destination": "https://athar-clue-engine.vercel.app/clue/athar-im-digital-clue-v2-verified-fixed-final-client-facing-ready",
+      "permanent": false
+    },
+    {
+      "source": "/clue/smart",
+      "destination": "https://athar-clue-engine.vercel.app/clue/athar-smart-digital-clue-v2-verified-fixed-final-client-facing-ready",
+      "permanent": false
     }
   ]
 }
