@@ -13,12 +13,8 @@
   ],
   "rewrites": [
     {
-      "source": "/clue/saad-maslamani",
-      "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani"
-    },
-    {
-      "source": "/clue/saad-maslamani/",
-      "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani"
+      "source": "/clue/saad-maslamani/:path*",
+      "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani/:path*"
     },
     {
       "source": "/app/:path*",
