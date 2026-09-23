@@ -11,8 +11,39 @@
       ]
     }
   ],
+  "rewrites": [
+    {
+      "source": "/clue/saad-maslamani",
+      "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani"
+    },
+    {
+      "source": "/clue/saad-maslamani/",
+      "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani"
+    },
+    {
+      "source": "/app/:path*",
+      "has": [
+        {
+          "type": "header",
+          "key": "referer",
+          "value": { "re": "^https://studioathar\\.studio/clue/saad-maslamani/?" }
+        }
+      ],
+      "destination": "https://athar-clue-engine.vercel.app/app/:path*"
+    },
+    {
+      "source": "/clue-engine/:path*",
+      "has": [
+        {
+          "type": "header",
+          "key": "referer",
+          "value": { "re": "^https://studioathar\\.studio/clue/saad-maslamani/?" }
+        }
+      ],
+      "destination": "https://athar-clue-engine.vercel.app/clue-engine/:path*"
+    }
+  ],
   "redirects": [
-    { "source": "/clue/saad-maslamani", "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani", "permanent": false },
     { "source": "/clue/abu-mazen", "destination": "https://athar-clue-engine.vercel.app/clue/abu-mazen-small-detail", "permanent": false },
     { "source": "/clue/nativity-bells", "destination": "https://athar-clue-engine.vercel.app/clue/nativity-bells", "permanent": false },
     { "source": "/clue/ararat-hotel", "destination": "https://athar-clue-engine.vercel.app/clue/ararat-hotel", "permanent": false },
