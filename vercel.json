@@ -11,8 +11,8 @@
     }
   ],
   "rewrites": [
-    { "source": "/clue/saad-maslamani", "destination": "/clue/saad-maslamani/index.html" },
-    { "source": "/clue/saad-maslamani/", "destination": "/clue/saad-maslamani/index.html" }
+    { "source": "/clue/saad-maslamani", "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani" },
+    { "source": "/clue/saad-maslamani/", "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani" }
   ],
   "redirects": [
     { "source": "/clue/abu-mazen", "destination": "https://athar-clue-engine.vercel.app/clue/abu-mazen-small-detail", "permanent": false },
