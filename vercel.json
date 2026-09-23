@@ -10,46 +10,17 @@
       ]
     }
   ],
+  "rewrites": [
+    { "source": "/clue/saad-maslamani", "destination": "/clue/saad-maslamani/index.html" },
+    { "source": "/clue/saad-maslamani/", "destination": "/clue/saad-maslamani/index.html" }
+  ],
   "redirects": [
-    {
-      "source": "/clue/saad-maslamani/",
-      "destination": "/clue/saad-maslamani",
-      "permanent": false
-    },
-    {
-      "source": "/clue/abu-mazen",
-      "destination": "https://athar-clue-engine.vercel.app/clue/abu-mazen-small-detail",
-      "permanent": false
-    },
-    {
-      "source": "/clue/nativity-bells",
-      "destination": "https://athar-clue-engine.vercel.app/clue/nativity-bells",
-      "permanent": false
-    },
-    {
-      "source": "/clue/ararat-hotel",
-      "destination": "https://athar-clue-engine.vercel.app/clue/ararat-hotel",
-      "permanent": false
-    },
-    {
-      "source": "/clue/emobility",
-      "destination": "https://athar-clue-engine.vercel.app/clue/athar-emobility-digital-clue-v2-verified-fixed-final-client-facing-ready",
-      "permanent": false
-    },
-    {
-      "source": "/clue/gac-aion",
-      "destination": "https://athar-clue-engine.vercel.app/clue/athar-gac-digital-clue-v2-verified-fixed-final-client-facing-ready",
-      "permanent": false
-    },
-    {
-      "source": "/clue/im-motors",
-      "destination": "https://athar-clue-engine.vercel.app/clue/athar-im-digital-clue-v2-verified-fixed-final-client-facing-ready",
-      "permanent": false
-    },
-    {
-      "source": "/clue/smart",
-      "destination": "https://athar-clue-engine.vercel.app/clue/athar-smart-digital-clue-v2-verified-fixed-final-client-facing-ready",
-      "permanent": false
-    }
+    { "source": "/clue/abu-mazen", "destination": "https://athar-clue-engine.vercel.app/clue/abu-mazen-small-detail", "permanent": false },
+    { "source": "/clue/nativity-bells", "destination": "https://athar-clue-engine.vercel.app/clue/nativity-bells", "permanent": false },
+    { "source": "/clue/ararat-hotel", "destination": "https://athar-clue-engine.vercel.app/clue/ararat-hotel", "permanent": false },
+    { "source": "/clue/emobility", "destination": "https://athar-clue-engine.vercel.app/clue/athar-emobility-digital-clue-v2-verified-fixed-final-client-facing-ready", "permanent": false },
+    { "source": "/clue/gac-aion", "destination": "https://athar-clue-engine.vercel.app/clue/athar-gac-digital-clue-v2-verified-fixed-final-client-facing-ready", "permanent": false },
+    { "source": "/clue/im-motors", "destination": "https://athar-clue-engine.vercel.app/clue/athar-im-digital-clue-v2-verified-fixed-final-client-facing-ready", "permanent": false },
+    { "source": "/clue/smart", "destination": "https://athar-clue-engine.vercel.app/clue/athar-smart-digital-clue-v2-verified-fixed-final-client-facing-ready", "permanent": false }
   ]
 }
