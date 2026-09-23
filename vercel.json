@@ -12,6 +12,11 @@
   ],
   "redirects": [
     {
+      "source": "/clue/saad-maslamani/",
+      "destination": "/clue/saad-maslamani",
+      "permanent": false
+    },
+    {
       "source": "/clue/abu-mazen",
       "destination": "https://athar-clue-engine.vercel.app/clue/abu-mazen-small-detail",
       "permanent": false
