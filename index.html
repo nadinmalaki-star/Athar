@@ -739,6 +739,14 @@
 
 <script>
 (function(){
+  // ---- Local development guard ----
+  // On a local dev host nothing leaves the machine: tracking events are not
+  // sent and the contact form uses in-page stand-ins instead of Supabase and
+  // EmailJS (see the form script). Production hosts are unaffected.
+  var ATHAR_LOCAL_DEV = window.location.protocol === 'file:' ||
+    /^(localhost|127\.0\.0\.1|::1|\[::1\])$/.test(window.location.hostname);
+  window.ATHAR_LOCAL_DEV = ATHAR_LOCAL_DEV;
+
   // ---- First-party funnel tracking (no PII, no cookies) ----
   // Deliberately a DIFFERENT Supabase project than the contact form below:
   // this is the Solution Indicator's project, so site-side and Indicator-side
@@ -788,6 +796,7 @@
         referrer: attr.referrer,
         landing_page: attr.landing_page,
       }, extra || {});
+      if (ATHAR_LOCAL_DEV) { console.debug('[athar dev] tracking not sent:', payload); return; }
       fetch(TRACKING_URL, {
         method: 'POST',
         headers: {
@@ -833,6 +842,7 @@
   // DOMContentLoaded and again at submit time (covers a late or failed load).
   var sb = null;
   function getSupabase(){
+    if (window.ATHAR_LOCAL_DEV) return devSupabase();
     if (!sb && window.supabase && window.supabase.createClient) {
       try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch (e) { sb = null; }
     }
@@ -840,6 +850,7 @@
   }
   var emailjsReady = false;
   function getEmailjs(){
+    if (window.ATHAR_LOCAL_DEV) return devEmailjs;
     if (!emailjsReady && window.emailjs) {
       window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
       emailjsReady = true;
@@ -847,6 +858,23 @@
     return emailjsReady ? window.emailjs : null;
   }
   document.addEventListener('DOMContentLoaded', function(){ getSupabase(); getEmailjs(); });
+
+  // Local-dev stand-ins: same call shapes as the real clients, no network.
+  // window.__atharDevForm = 'error' | 'reject' | 'unavailable' exercises the
+  // failure paths; anything else simulates a successful submission.
+  function devSupabase(){
+    var mode = window.__atharDevForm;
+    if (mode === 'unavailable') return null;
+    return { from: function(table){ return { insert: function(rows){
+      console.debug('[athar dev] form not submitted:', table, rows);
+      if (mode === 'reject') return Promise.reject(new Error('dev: simulated network failure'));
+      return Promise.resolve(mode === 'error' ? { error: { message: 'dev: simulated error' } } : { error: null });
+    } }; } };
+  }
+  var devEmailjs = { send: function(service, template, params){
+    console.debug('[athar dev] email not sent:', service, template, params);
+    return Promise.resolve({ status: 200 });
+  } };
 
   var contactForm = document.getElementById('contactForm');
   if (contactForm) {
