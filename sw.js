@@ -8,7 +8,16 @@
 //     they always go straight to the network, never cached.
 //   - Non-GET requests (the contact form's Supabase insert is a POST) are
 //     never intercepted either, so nothing about form submission changes.
-const CACHE_NAME = 'athar-static-v1';
+//
+// Versioning convention (static assets are served cache-first below):
+//   - Bump CACHE_NAME on every release that changes any cached same-origin
+//     file in place (images, icons, manifest, anything precached). Activation
+//     then deletes every older cache, including files the site no longer uses.
+//   - Future Signal modules and vendored libraries must live under immutable,
+//     versioned paths, e.g. /signal/v1/core.js or /vendor/three/r<rev>/…
+//     A published versioned path never changes content; a change ships under
+//     a new version folder, so cache-first can never serve a stale module.
+const CACHE_NAME = 'athar-static-v2';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -61,8 +70,11 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          // Only successful pages become the offline fallback, never a 404/500.
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
           return response;
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
