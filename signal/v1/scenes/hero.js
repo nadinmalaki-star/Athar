@@ -1,7 +1,10 @@
 /*
  * Scene: hero — "the meaningful signal inside complexity"
- * Phase 5 · Milestone 2: SIGNAL INTEGRATION on the approved spatial blockout
- * (everything except the Signal keeps neutral blockout materials).
+ * Phase 5 · Milestone 3: MATERIALS + LIGHTING on the approved composition.
+ * A small material family: precision black metal (the foreground), one
+ * lightly smoked optical plane, neutral technical lines; Ember only on the
+ * Signal and its meaningful intersections. One soft key, a faint rim, near-
+ * zero ambient. No refraction, bloom, post-processing or environment maps.
  *
  * Camera is pixel-aligned to the hero section: elements are authored in the
  * section's CSS-pixel layout, then pushed into depth. Three readable layers
@@ -86,13 +89,18 @@ export function create(ctx) {
   function place(sx, sy, z) { const k = (D - z) / D; return [(sx - W / 2) * k, (H / 2 - sy) * k, z]; }
 
   function materials() {
-    // BLOCKOUT: flat, neutral, unlit. Final materials come in Milestone 3.
     return {
-      lines:    ctx.track(new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false })),
-      occluder: ctx.track(new THREE.MeshBasicMaterial({ color: 0x1a1a1d })),                 // opaque: truly in front
-      occEdge:  ctx.track(new THREE.LineBasicMaterial({ color: 0x5f5e5a })),
-      glass:    ctx.track(new THREE.MeshBasicMaterial({ color: 0x9a9995, transparent: true, opacity: 0.06, depthWrite: false })),
-      edge:     ctx.track(new THREE.LineBasicMaterial({ color: 0xb8b6b0, transparent: true, opacity: 0.4, depthWrite: false })),
+      // technical lines: soft graphite / charcoal, alpha carries the depth fade
+      lines:     ctx.track(new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false })),
+      // precision black metal: black anodized, semi-matte, no chrome (opaque: it truly occludes)
+      metal:     ctx.track(new THREE.MeshStandardMaterial({ color: 0x1c1c21, roughness: 0.5, metalness: 0.35, vertexColors: true })),
+      metalEdge: ctx.track(new THREE.LineBasicMaterial({ color: 0x2b2b30 })),
+      metalLit:  ctx.track(new THREE.LineBasicMaterial({ color: 0xa7a59f, transparent: true, opacity: 0.5, depthWrite: false })),
+      // optical glass: lightly smoked, clean edge, minimal reflection — no refraction in the Hero
+      glass:     ctx.track(new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: 0.18, metalness: 0.0, transparent: true, opacity: 0.2, depthWrite: false })),
+      edge:      ctx.track(new THREE.LineBasicMaterial({ color: 0xdedbd3, transparent: true, opacity: 0.42, depthWrite: false })),
+      // Ember at the Signal's meaningful intersections (re-emergence points)
+      mark:      ctx.track(new THREE.MeshBasicMaterial({ color: 0xff5a36, transparent: true, opacity: 0.5, depthWrite: false })),
       // THE SIGNAL: a thin light trace (no bloom, no halo). Soft edges are
       // computed across the ribbon; strength follows the approved ramp and
       // the discovery state. Depth-tested, so foreground geometry hides it.
@@ -111,7 +119,7 @@ export function create(ctx) {
             p.z = z2;
             // hidden end becomes readable, emerging end firms up; never fully resolved
             float lift = uT * (0.24 * (1.0 - smoothstep(0.35, 0.8, aU)) + 0.12 * smoothstep(0.5, 1.0, aU));
-            vA = mix(min(aBase + lift, 0.94), aBase, aLit);
+            vA = mix(min((aBase + lift) * 1.12, 0.96), aBase, aLit);
             vAcross = aAcross;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
           }`,
@@ -159,7 +167,31 @@ export function create(ctx) {
     scene.add(m); built.push(m); return m;
   }
 
-  // A physical panel: an opaque quad (+ outline) centred on a screen rect, with slight yaw.
+  // A precision slab: thin black-metal box centred on a screen rect, slight yaw.
+  // Read through its lit thickness and one restrained highlight on the edge the
+  // key light catches — not by being bright.
+  function addSlab(x, y, w, h, z, yaw, thick) {
+    const g = new THREE.BoxGeometry(1, 1, 1);
+    // soft key falloff baked per vertex: the upper edge catches the light, the base settles
+    const pos = g.attributes.position, col = [];
+    for (let i = 0; i < pos.count; i++) { const v = 0.6 + 0.4 * (pos.getY(i) + 0.5); col.push(v, v, v); }
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    const m = new THREE.Mesh(g, mats.metal);
+    const c = place(x + w / 2, y + h / 2, z), k = (D - z) / D;
+    m.position.set(c[0], c[1], c[2]); m.scale.set(w * k, h * k, thick); m.rotation.y = yaw || 0;
+    scene.add(m); built.push(m);
+    const e = new THREE.LineSegments(new THREE.EdgesGeometry(g), mats.metalEdge);
+    e.position.copy(m.position); e.scale.copy(m.scale); e.rotation.copy(m.rotation);
+    scene.add(e); built.push(e);
+    const hl = new THREE.BufferGeometry();         // top-front edge: where the key light lands
+    hl.setAttribute('position', new THREE.Float32BufferAttribute([-0.5, 0.5, 0.5, 0.5, 0.5, 0.5], 3));
+    const l = new THREE.LineSegments(hl, mats.metalLit);
+    l.position.copy(m.position); l.scale.copy(m.scale); l.rotation.copy(m.rotation);
+    scene.add(l); built.push(l);
+    return m;
+  }
+
+  // A thin panel (quad) centred on a screen rect, with slight yaw.
   function addPanel(x, y, w, h, z, yaw, material, withEdge) {
     const g = new THREE.PlaneGeometry(1, 1);
     const m = new THREE.Mesh(g, material);
@@ -168,7 +200,7 @@ export function create(ctx) {
     scene.add(m); built.push(m);
     if (withEdge) {
       const eg = new THREE.EdgesGeometry(g);
-      const e = new THREE.LineSegments(eg, mats.occEdge);
+      const e = new THREE.LineSegments(eg, mats.metalEdge);
       e.position.copy(m.position); e.scale.copy(m.scale); e.rotation.copy(m.rotation);
       e.position.z += 0.5;
       scene.add(e); built.push(e);
@@ -217,7 +249,7 @@ export function create(ctx) {
     }
     const L = path.lit.map(toPx);                   // brightest where the glass reveals it
     segs.push({ a: [L[0][0], L[0][1], -40], b: [L[1][0], L[1][1], -34], ua: along(L[0][0]), ub: along(L[1][0]), base: [0.95, 0.95], lit: true });
-    addRibbon(segs, mobile ? 2.0 : 2.2, mats.signal);
+    addRibbon(segs, mobile ? 2.2 : 2.4, mats.signal);
 
     // ================= 3. FOREGROUND — what the Signal is hidden behind =================
     const H0 = P.hidden[P.hidden.length - 1], M0 = P.mid[0], M1 = P.mid[P.mid.length - 1], E0 = P.emerging[0];
@@ -228,12 +260,12 @@ export function create(ctx) {
       const reach = (gx1 - gx0) * 0.35;             // also swallows the tail of the hidden segment
       const x = rtl ? gx0 - 10 : gx0 - reach, w = (gx1 - gx0) + reach + 10;
       const h = mobile ? 40 : 92, y = (H0[1] + M0[1]) / 2 - h * (mobile ? 0.5 : 0.55);   // desktop: ~28% shallower than 1.1
-      occl.push({ x, y, w, h, z: Z.occluder1, yaw: (mobile ? 0.08 : 0.07) * dir, lineY: (H0[1] + M0[1]) / 2 });   // a precision interruption, barely turned
+      occl.push({ x, y, w, h, z: Z.occluder1, yaw: (mobile ? 0.08 : 0.07) * dir, lineY: (H0[1] + M0[1]) / 2, thick: mobile ? 8 : 20 });   // a precision interruption, barely turned
     }
     if (!mobile && counts.planes >= 2) {   // occluder 2: a narrow precision fin across the second break
       const gx0 = Math.min(M1[0], E0[0]), gx1 = Math.max(M1[0], E0[0]);
       const w = Math.max(10, gx1 - gx0 + 6), h = 104;
-      occl.push({ x: gx0 - 3, y: (M1[1] + E0[1]) / 2 - h * 0.55, w, h, z: Z.occluder2, yaw: -0.1 * dir, lineY: (M1[1] + E0[1]) / 2 });
+      occl.push({ x: gx0 - 3, y: (M1[1] + E0[1]) / 2 - h * 0.55, w, h, z: Z.occluder2, yaw: -0.1 * dir, lineY: (M1[1] + E0[1]) / 2, thick: 14 });
     }
     // Foreground never reaches into the typography. A panel that would, moves UP
     // (keeping its size) so its lower edge ends just below the Signal line: the
@@ -247,12 +279,28 @@ export function create(ctx) {
       }
       bottom = Math.max(bottom, o.lineY + (mobile ? 6 : 9));
       o.y = bottom - o.h;
-      addPanel(o.x, o.y, o.w, o.h, o.z, o.yaw, mats.occluder, true);
+      addSlab(o.x, o.y, o.w, o.h, o.z, o.yaw, o.thick);
     }
 
+    // Ember only where it means something: the Signal's re-emergence points
+    // (past the first interruption, past the fin, into the glass).
+    // Each mark sits just past the interruption's edge, on the line itself.
+    const past = (p, q, px) => { const t = Math.min(1, px / (Math.abs(q[0] - p[0]) || 1)); return [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]; };
+    const marks = [past(M0, P.mid[1], mobile ? 12 : 16)];
+    if (!mobile) marks.push(past(E0, P.emerging[1], 9), L[0]);
+    // a short registration tick across the line (reads as an intersection, not a dot)
+    const mk = [], mw = 1.5, mh = mobile ? 7 : 9, mz = Z.signal.mid[0] + 20;
+    for (const [mx, my] of marks) {
+      const q0 = place(mx - mw / 2, my - mh / 2, mz), q1 = place(mx + mw / 2, my - mh / 2, mz), q2 = place(mx - mw / 2, my + mh / 2, mz), q3 = place(mx + mw / 2, my + mh / 2, mz);
+      mk.push(...q0, ...q2, ...q1, ...q1, ...q2, ...q3);   // CCW facing the camera
+    }
+    const mg = new THREE.BufferGeometry(); mg.setAttribute('position', new THREE.Float32BufferAttribute(mk, 3));
+    const mm = new THREE.Mesh(mg, mats.mark); scene.add(mm); built.push(mm);
+
     // optical plane on the DOM glass sliver (translucent; the Signal is revealed through it)
+    const lite = mobile || c.tier === 'C';           // phones / low tier: no transparent layer
     if (glassR) {
-      addPanel(glassR.x, glassR.y, glassR.w, glassR.h, -40, 0, mats.glass, false);
+      if (!lite) addPanel(glassR.x, glassR.y, glassR.w, glassR.h, -40, 0, mats.glass, false);
       const gx = rtl ? glassR.x + glassR.w : glassR.x;
       addLines([...place(gx, glassR.y, -40), ...place(gx, glassR.y + glassR.h, -40)], mats.edge);
     }
@@ -267,7 +315,7 @@ export function create(ctx) {
     const S = [], SC = []; let tries = 0, n = 0;
     const tone = (z) => {                           // depth fading: rear quiet, front firmer
       const t = Math.min(1, Math.max(0, (z - Z.field[0]) / (Z.front[1] - Z.field[0])));
-      return [0.55 + 0.1 * t, 0.2 + 0.5 * t];         // [grey level, alpha]
+      return [0.44 + 0.14 * t, 0.16 + 0.44 * t];      // [grey level, alpha]: soft graphite, rear quiet
     };
     while (n < counts.strands && tries++ < 6000) {
       const t = Math.pow(rnd(), 1.7);               // bias toward the hidden end
@@ -310,7 +358,7 @@ export function create(ctx) {
       corner(-hw, hh, 1, -1); corner(hw, -hh, -1, 1);
       if (rnd() < 0.5) corner(hw, hh, -1, -1);
       const segs = F.length / 3 - FC.length / 4;
-      for (let s = 0; s < segs; s++) FC.push(0.5, 0.5, 0.49, 0.3);
+      for (let s = 0; s < segs; s++) FC.push(0.36, 0.36, 0.35, 0.24);   // charcoal, quieter than everything else
       made++;
     }
     addLines(F, mats.lines, FC);
@@ -326,6 +374,7 @@ export function create(ctx) {
     // (fin at z -18, emerging start at z -55): the Hero never fully resolves the Signal
     mats.signal.uniforms.uForward.value = discovery * 30;
     mats.lines.opacity = 1 - 0.35 * discovery;                 // the complexity quietens, it does not vanish
+    mats.mark.opacity = 0.45 + 0.45 * discovery;               // intersections sharpen as the Signal is found
   }
 
   function setCamera() {
@@ -344,6 +393,10 @@ export function create(ctx) {
   return {
     init() {
       scene = new THREE.Scene();
+      // Minimal light: one soft key from upper-left, a faint rim, near-zero ambient.
+      const key = new THREE.DirectionalLight(0xf2f0ea, 2.6); key.position.set(-0.45, 0.85, 0.6);
+      const rim = new THREE.DirectionalLight(0xe9e7e1, 0.5); rim.position.set(0.7, 0.2, -0.6);
+      scene.add(key, rim, new THREE.AmbientLight(0xffffff, 0.06));
       camera = new THREE.PerspectiveCamera(30, 1, 1, 6000);
       mats = materials();
     },
