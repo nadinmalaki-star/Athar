@@ -428,8 +428,9 @@
   .sig-hero{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
   [dir="rtl"] .sig-hero{ transform:scaleX(-1); }
   .sig-hero .frag{ stroke:var(--paper-mute); stroke-opacity:.55; }
-  .sig-hero .trace{ stroke:var(--ember); stroke-opacity:.42; }
-  .sig-hero .trace-lit{ stroke:var(--ember); stroke-opacity:.9; }
+  .sig-hero .trace-lit, .sig-hero-m .trace-lit{ stroke:var(--ember); stroke-opacity:.9; }
+  .sig-hero-m{ display:none; }
+  .sig-hero-m .frag{ stroke:var(--paper-mute); stroke-opacity:.55; }
 
   /* Understanding: the Signal crosses the optical planes and comes out clean */
   .sig-u{ color:var(--ember); }
@@ -549,6 +550,9 @@
     .hero-guide-v{ inset-inline-start:18%; bottom:auto; height:58svh; }
     .hero-guide-h{ top:calc(58svh * 0.26); }
     .hero-eyebrow{ font-size:9.5px; letter-spacing:3px; }
+    .sig-hero{ display:none; }
+    .sig-hero-m{ display:block; width:100%; height:40px; margin-bottom:18px; }
+    [dir="rtl"] .sig-hero-m{ transform:scaleX(-1); }
     .hero-headline{ grid-column:1 / -1; font-size:clamp(36px, 10.8vw, 50px); line-height:1.05; }
     html[lang="ar"] .hero-headline{ font-size:clamp(38px, 11.4vw, 52px); line-height:1.3; }
     .hero-lower{ flex-direction:column; align-items:flex-start; gap:30px; }
@@ -653,12 +657,42 @@
         <g class="frag" fill="none" stroke-width="1" vector-effect="non-scaling-stroke">
           <path d="M9 44H13M21 63L26 62M34 18L37 17M48 55H52M71 66L75 65M83 20H86M90 58L93 59" vector-effect="non-scaling-stroke"/>
         </g>
-        <path class="trace" fill="none" stroke-width="1.2" d="M0 33.5L15 32.9M24 32.2L40 31.2M45 30.9L92 28.6" vector-effect="non-scaling-stroke"/>
-        <path class="trace-lit" fill="none" stroke-width="1.4" d="M58.2 30.2L66.8 29.8" vector-effect="non-scaling-stroke"/>
+        <!-- hidden → interrupted → emerging: the trace fades in from inside the
+             planes, breaks twice (unequal gaps), then runs clean toward the glass -->
+        <defs>
+          <linearGradient id="heroSignal" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
+            <stop offset="0" stop-color="#FF5A36" stop-opacity="0"/>
+            <stop offset=".08" stop-color="#FF5A36" stop-opacity=".2"/>
+            <stop offset=".3" stop-color="#FF5A36" stop-opacity=".32"/>
+            <stop offset=".5" stop-color="#FF5A36" stop-opacity=".55"/>
+            <stop offset=".92" stop-color="#FF5A36" stop-opacity=".82"/>
+          </linearGradient>
+        </defs>
+        <path class="trace" fill="none" stroke="url(#heroSignal)" stroke-width="1" d="M2 35.6L5.5 34.3L8.4 35.9L11.8 34.5L14.6 35.4L17.9 34.7" vector-effect="non-scaling-stroke"/>
+        <path class="trace" fill="none" stroke="url(#heroSignal)" stroke-width="1.15" d="M30.5 33.9L35.2 33.1L38.6 33.5L45.6 32.5" vector-effect="non-scaling-stroke"/>
+        <path class="trace" fill="none" stroke="url(#heroSignal)" stroke-width="1.3" d="M48.9 32.1L93 29.1" vector-effect="non-scaling-stroke"/>
+        <path class="trace-lit" fill="none" stroke-width="1.4" d="M58.3 31.5L66.8 30.9" vector-effect="non-scaling-stroke"/>
       </svg>
       <div class="pl-glass"></div>
     </div>
     <div class="hero-body shell">
+      <!-- Phone version of the hero Signal: its own band, so it never meets the text -->
+      <svg class="sig sig-hero-m" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="heroSignalM" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
+            <stop offset="0" stop-color="#FF5A36" stop-opacity="0"/>
+            <stop offset=".1" stop-color="#FF5A36" stop-opacity=".22"/>
+            <stop offset=".32" stop-color="#FF5A36" stop-opacity=".34"/>
+            <stop offset=".52" stop-color="#FF5A36" stop-opacity=".58"/>
+            <stop offset=".95" stop-color="#FF5A36" stop-opacity=".85"/>
+          </linearGradient>
+        </defs>
+        <path class="frag" fill="none" stroke-width="1" d="M21 21H24.5M55 20L58.5 19.3M84 17.5H87.5" vector-effect="non-scaling-stroke"/>
+        <path fill="none" stroke="url(#heroSignalM)" stroke-width="1" d="M1 15.8L4.6 12.6L8.4 16.3L12 13.1L15.6 15.2" vector-effect="non-scaling-stroke"/>
+        <path fill="none" stroke="url(#heroSignalM)" stroke-width="1.15" d="M29 13.6L35.4 12.1L39.8 12.9L46.5 11.5" vector-effect="non-scaling-stroke"/>
+        <path fill="none" stroke="url(#heroSignalM)" stroke-width="1.3" d="M50.5 11L98 7.6" vector-effect="non-scaling-stroke"/>
+        <path class="trace-lit" fill="none" stroke-width="1.4" d="M60.5 10.3L72 9.5" vector-effect="non-scaling-stroke"/>
+      </svg>
       <div class="hero-eyebrow">A STUDIO THAT LEAVES A MARK</div>
       <div class="grid">
         <h1 class="hero-headline" data-ar-html='<span class="l1">ما تبلّش بشو بدك تبني.</span><span class="l2">بلّش بشو بدو ينحل.</span>' data-en-html='<span class="l1">Don&rsquo;t start with what you want to build.</span><span class="l2">Start with what needs to be solved.</span>'><span class="l1">ما تبلّش بشو بدك تبني.</span><span class="l2">بلّش بشو بدو ينحل.</span></h1>
