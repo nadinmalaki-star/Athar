@@ -3,7 +3,7 @@
  * Phase 5 · Milestone 3: MATERIALS + LIGHTING on the approved composition.
  * A small material family: precision black metal (the foreground), one
  * lightly smoked optical plane, neutral technical lines; Ember only on the
- * Signal and its meaningful intersections. One soft key, a faint rim, near-
+ * Signal and its meaningful intersections. One soft key, a faint low edge light, near-
  * zero ambient. No refraction, bloom, post-processing or environment maps.
  *
  * Camera is pixel-aligned to the hero section: elements are authored in the
@@ -95,10 +95,12 @@ export function create(ctx) {
       // precision black metal: black anodized, semi-matte, no chrome (opaque: it truly occludes)
       metal:     ctx.track(new THREE.MeshStandardMaterial({ color: 0x1c1c21, roughness: 0.5, metalness: 0.35, vertexColors: true })),
       metalEdge: ctx.track(new THREE.LineBasicMaterial({ color: 0x2b2b30 })),
-      metalLit:  ctx.track(new THREE.LineBasicMaterial({ color: 0xa7a59f, transparent: true, opacity: 0.5, depthWrite: false })),
+      metalLit:  ctx.track(new THREE.LineBasicMaterial({ color: 0xb4b2ac, vertexColors: true, transparent: true, depthWrite: false })),
       // optical glass: lightly smoked, clean edge, minimal reflection — no refraction in the Hero
       glass:     ctx.track(new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: 0.18, metalness: 0.0, transparent: true, opacity: 0.2, depthWrite: false })),
-      edge:      ctx.track(new THREE.LineBasicMaterial({ color: 0xdedbd3, transparent: true, opacity: 0.42, depthWrite: false })),
+      edge:      ctx.track(new THREE.LineBasicMaterial({ color: 0xe4e2dd, vertexColors: true, transparent: true, depthWrite: false })),
+      // the Hero glass sheet: same smoked glass, with a baked tonal shift + one soft reflection band
+      sheet:     ctx.track(new THREE.MeshStandardMaterial({ color: 0x1a1c1f, roughness: 0.2, metalness: 0.0, vertexColors: true, transparent: true, opacity: 0.3, depthWrite: false })),
       // Ember at the Signal's meaningful intersections (re-emergence points)
       mark:      ctx.track(new THREE.MeshBasicMaterial({ color: 0xff5a36, transparent: true, opacity: 0.5, depthWrite: false })),
       // THE SIGNAL: a thin light trace (no bloom, no halo). Soft edges are
@@ -172,22 +174,64 @@ export function create(ctx) {
   // key light catches — not by being bright.
   function addSlab(x, y, w, h, z, yaw, thick) {
     const g = new THREE.BoxGeometry(1, 1, 1);
-    // soft key falloff baked per vertex: the upper edge catches the light, the base settles
-    const pos = g.attributes.position, col = [];
-    for (let i = 0; i < pos.count; i++) { const v = 0.6 + 0.4 * (pos.getY(i) + 0.5); col.push(v, v, v); }
+    // Tone baked per vertex, by face: the front settles from a lit upper edge to a
+    // quieter base; the returns (sides) sit a step lighter than the face, the
+    // underside a step above the face base — so thickness reads without brightening the face.
+    const pos = g.attributes.position, nrm = g.attributes.normal, col = [];
+    for (let i = 0; i < pos.count; i++) {
+      const nx = nrm.getX(i), ny = nrm.getY(i);
+      let v;
+      if (Math.abs(nx) > 0.5) v = 1.6;                         // side returns
+      else if (ny > 0.5) v = 1.7;                              // top (rarely seen)
+      else if (ny < -0.5) v = 1.05;                            // underside: the visible thickness band
+      else v = 0.52 + 0.3 * (pos.getY(i) + 0.5) + 0.18 * (0.5 - pos.getX(i));   // face: soft diagonal key falloff
+      col.push(v, v, v);
+    }
     g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     const m = new THREE.Mesh(g, mats.metal);
-    const c = place(x + w / 2, y + h / 2, z), k = (D - z) / D;
-    m.position.set(c[0], c[1], c[2]); m.scale.set(w * k, h * k, thick); m.rotation.y = yaw || 0;
+    // The FRONT face sits exactly on the authored rect at depth z; the body extends behind it.
+    const f = place(x + w / 2, y + h / 2, z), k = (D - z) / D, a = yaw || 0;
+    m.position.set(f[0] - Math.sin(a) * thick / 2, f[1], f[2] - Math.cos(a) * thick / 2);
+    m.scale.set(w * k, h * k, thick); m.rotation.y = a;
     scene.add(m); built.push(m);
     const e = new THREE.LineSegments(new THREE.EdgesGeometry(g), mats.metalEdge);
     e.position.copy(m.position); e.scale.copy(m.scale); e.rotation.copy(m.rotation);
     scene.add(e); built.push(e);
-    const hl = new THREE.BufferGeometry();         // top-front edge: where the key light lands
-    hl.setAttribute('position', new THREE.Float32BufferAttribute([-0.5, 0.5, 0.5, 0.5, 0.5, 0.5], 3));
+    // Controlled edge response, one draw: the top-front edge where the key lands
+    // (strongest at the key side, easing off across), and a faint catch down the
+    // key-side front edge that fades out before the base.
+    const ks = -0.5;                                           // key comes from screen-left
+    const hl = new THREE.BufferGeometry();
+    hl.setAttribute('position', new THREE.Float32BufferAttribute([
+      -0.5, 0.5, 0.501, 0.5, 0.5, 0.501,
+      ks, 0.5, 0.501, ks, -0.1, 0.501,
+    ], 3));
+    hl.setAttribute('color', new THREE.Float32BufferAttribute([
+      1, 1, 1, 0.62, 1, 1, 1, 0.26,
+      1, 1, 1, 0.3, 1, 1, 1, 0,
+    ], 4));
     const l = new THREE.LineSegments(hl, mats.metalLit);
     l.position.copy(m.position); l.scale.copy(m.scale); l.rotation.copy(m.rotation);
     scene.add(l); built.push(l);
+    return m;
+  }
+
+  // The Hero glass sheet: smoked, a slight top-to-base tonal shift and one soft
+  // reflection band, baked into vertex colour/alpha (no texture, no extra pass).
+  function addSheet(x, y, w, h, z) {
+    const g = new THREE.PlaneGeometry(1, 1, 1, 10);
+    const pos = g.attributes.position, col = [];
+    for (let i = 0; i < pos.count; i++) {
+      const v = 0.5 - pos.getY(i);                              // 0 top → 1 base
+      const band = Math.exp(-Math.pow((v - 0.24) / 0.09, 2));   // soft, high, narrow
+      const t = 1.12 - 0.3 * v + 0.55 * band;
+      col.push(t, t, t, 0.72 + 0.28 * (1 - v) + 0.3 * band);
+    }
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
+    const m = new THREE.Mesh(g, mats.sheet);
+    const c = place(x + w / 2, y + h / 2, z), k = (D - z) / D;
+    m.position.set(c[0], c[1], c[2]); m.scale.set(w * k, h * k, 1);
+    scene.add(m); built.push(m);
     return m;
   }
 
@@ -260,12 +304,12 @@ export function create(ctx) {
       const reach = (gx1 - gx0) * 0.35;             // also swallows the tail of the hidden segment
       const x = rtl ? gx0 - 10 : gx0 - reach, w = (gx1 - gx0) + reach + 10;
       const h = mobile ? 40 : 92, y = (H0[1] + M0[1]) / 2 - h * (mobile ? 0.5 : 0.55);   // desktop: ~28% shallower than 1.1
-      occl.push({ x, y, w, h, z: Z.occluder1, yaw: (mobile ? 0.08 : 0.07) * dir, lineY: (H0[1] + M0[1]) / 2, thick: mobile ? 8 : 20 });   // a precision interruption, barely turned
+      occl.push({ x, y, w, h, z: Z.occluder1, yaw: (mobile ? 0.08 : 0.07) * dir, lineY: (H0[1] + M0[1]) / 2, thick: mobile ? 16 : 32 });   // a precision interruption, barely turned
     }
     if (!mobile && counts.planes >= 2) {   // occluder 2: a narrow precision fin across the second break
       const gx0 = Math.min(M1[0], E0[0]), gx1 = Math.max(M1[0], E0[0]);
       const w = Math.max(10, gx1 - gx0 + 6), h = 104;
-      occl.push({ x: gx0 - 3, y: (M1[1] + E0[1]) / 2 - h * 0.55, w, h, z: Z.occluder2, yaw: -0.1 * dir, lineY: (M1[1] + E0[1]) / 2, thick: 14 });
+      occl.push({ x: gx0 - 3, y: (M1[1] + E0[1]) / 2 - h * 0.55, w, h, z: Z.occluder2, yaw: -0.1 * dir, lineY: (M1[1] + E0[1]) / 2, thick: 22 });
     }
     // Foreground never reaches into the typography. A panel that would, moves UP
     // (keeping its size) so its lower edge ends just below the Signal line: the
@@ -300,9 +344,17 @@ export function create(ctx) {
     // optical plane on the DOM glass sliver (translucent; the Signal is revealed through it)
     const lite = mobile || c.tier === 'C';           // phones / low tier: no transparent layer
     if (glassR) {
-      if (!lite) addPanel(glassR.x, glassR.y, glassR.w, glassR.h, -40, 0, mats.glass, false);
-      const gx = rtl ? glassR.x + glassR.w : glassR.x;
-      addLines([...place(gx, glassR.y, -40), ...place(gx, glassR.y + glassR.h, -40)], mats.edge);
+      const gx = rtl ? glassR.x + glassR.w : glassR.x, gx2 = rtl ? glassR.x : glassR.x + glassR.w;
+      const gy0 = glassR.y, gy1 = glassR.y + glassR.h;
+      // clean neutral leading edge, easing off toward the base (all tiers)
+      const E = [...place(gx, gy0, -40), ...place(gx, gy1, -40)], EC = [1, 1, 1, 0.58, 1, 1, 1, 0.3];
+      if (!lite) {
+        addSheet(glassR.x, glassR.y, glassR.w, glassR.h, -40);
+        // the rest of the pane's edge: barely there, only enough to close the plane
+        E.push(...place(gx2, gy0, -40), ...place(gx2, gy1, -40), ...place(gx, gy0, -40), ...place(gx2, gy0, -40));
+        EC.push(1, 1, 1, 0.16, 1, 1, 1, 0.06, 1, 1, 1, 0.3, 1, 1, 1, 0.14);
+      }
+      addLines(E, mats.edge, EC);
     }
 
     // ================= strands — same count, distributed through depth =================
@@ -393,9 +445,9 @@ export function create(ctx) {
   return {
     init() {
       scene = new THREE.Scene();
-      // Minimal light: one soft key from upper-left, a faint rim, near-zero ambient.
+      // Minimal light: one soft key from upper-left, a faint low edge light, near-zero ambient.
       const key = new THREE.DirectionalLight(0xf2f0ea, 2.6); key.position.set(-0.45, 0.85, 0.6);
-      const rim = new THREE.DirectionalLight(0xe9e7e1, 0.5); rim.position.set(0.7, 0.2, -0.6);
+      const rim = new THREE.DirectionalLight(0xe9e7e1, 0.55); rim.position.set(0.55, -0.6, 0.3);   // low, right-front: lets thickness and returns catch a trace
       scene.add(key, rim, new THREE.AmbientLight(0xffffff, 0.06));
       camera = new THREE.PerspectiveCamera(30, 1, 1, 6000);
       mats = materials();
