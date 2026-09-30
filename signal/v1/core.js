@@ -140,9 +140,10 @@ export function start(boot) {
       canvas.className = 'signal-canvas';
       canvas.setAttribute('aria-hidden', 'true');
       canvas.setAttribute('tabindex', '-1');
-      canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;visibility:hidden;' +
-        (debug ? 'z-index:40;' : 'z-index:-1;');   // never above text in production; debug may overlay
-      document.body.appendChild(canvas);
+      // Mounted inside the active scene's section (see mountCanvas): it scrolls
+      // natively with the page and sits between the section's own art and its
+      // text, so it can never cover copy. Hidden until a scene has rendered.
+      canvas.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;visibility:hidden;opacity:0;transition:opacity .6s ease;';
       renderer = new THREE.WebGLRenderer({
         canvas, alpha: true, antialias: TIER[state.tier].antialias,
         powerPreference: state.tier === 'A' ? 'high-performance' : 'default',
@@ -150,7 +151,7 @@ export function start(boot) {
       });
       renderer.setClearColor(0x000000, 0);
       renderer.setPixelRatio(dprFor(state.tier));
-      renderer.setSize(innerWidth, innerHeight, false);
+      renderer.setSize(1, 1, false);
       loseExt = renderer.getContext().getExtension('WEBGL_lose_context');   // unavailable once lost: keep it now
       canvas.addEventListener('webglcontextlost', onContextLost, false);
       canvas.addEventListener('webglcontextrestored', onContextRestored, false);
@@ -180,6 +181,7 @@ export function start(boot) {
     state.lastReasons = Array.from(reasons); reasons.clear();
     state.frames++;
     rec.api.render(renderer);
+    if (!rec.shown) { rec.shown = true; canvas.style.opacity = '1'; setFallback(rec, true); }
     if (debug) checkBudget(rec);
     if (measuring) measureFrame(t);
     lastT = t;
@@ -222,11 +224,9 @@ export function start(boot) {
     if (next === 'S') { goStatic('downgraded to S'); return; }
     state.tier = next;
     document.documentElement.setAttribute('data-signal-tier', next);
-    renderer.setPixelRatio(dprFor(next));
-    renderer.setSize(innerWidth, innerHeight, false);
     // scenes no longer allowed at this tier are released
     for (const [name, rec] of scenes) if (rec.def.tiers.indexOf(next) < 0) disposeScene(name);
-    for (const rec of scenes.values()) if (rec.api) rec.api.resize(innerWidth, innerHeight, renderer.getPixelRatio(), contextFor(rec));
+    sizeToMount();
     requestFrame('tier-change');
   }
 
@@ -237,7 +237,7 @@ export function start(boot) {
     state.renderer = 'lost';
     stopScheduler();
     canvas.style.visibility = 'hidden';
-    for (const rec of scenes.values()) { setFallback(rec, false); rec.api = null; rec.lostGPU = true; }
+    for (const rec of scenes.values()) { setFallback(rec, false); rec.api = null; rec.lostGPU = true; rec.shown = false; }
     diag.update();
     if (state.losses > 1) { goStatic('context lost twice'); return; }
     setTimeout(() => { if (state.renderer === 'lost') goStatic('context not restored'); }, 3000);
@@ -269,7 +269,7 @@ export function start(boot) {
   function contextFor(rec) {
     return {
       THREE, renderer, tier: state.tier, tierConfig: TIER[state.tier], mode: state.mode,
-      viewport: { width: innerWidth, height: innerHeight }, dpr: renderer ? renderer.getPixelRatio() : 1, dprCap: TIER[state.tier].dprCap,
+      viewport: { width: innerWidth, height: innerHeight }, mount: rec.el, dpr: renderer ? renderer.getPixelRatio() : 1, dprCap: TIER[state.tier].dprCap,
       rtl, reducedMotion: false, debug, section: rec.el,
       track(obj) { rec.disposables.push(obj); return obj; },
       listen(target, type, fn, opts) { target.addEventListener(type, fn, opts); rec.listeners.push([target, type, fn, opts]); },
@@ -302,7 +302,7 @@ export function start(boot) {
     rec.disposables = []; rec.listeners = [];
     rec.api = rec.factory(contextFor(rec));
     rec.api.init();
-    rec.api.resize(innerWidth, innerHeight, renderer.getPixelRatio(), contextFor(rec));
+    rec.api.resize(rec.el.clientWidth || innerWidth, rec.el.clientHeight || innerHeight, renderer.getPixelRatio(), contextFor(rec));
   }
   function disposeScene(name) {
     const rec = scenes.get(name);
@@ -364,8 +364,9 @@ export function start(boot) {
     const next = scenes.get(best);
     if (next && next.api) {
       cacheGeometry(next);
+      mountCanvas(next);
       next.api.activate();
-      setFallback(next, true);
+      next.shown = false; canvas.style.opacity = '0';
       canvas.style.visibility = 'visible';
       updateProgress(true);
       requestFrame('activate');
@@ -374,6 +375,33 @@ export function start(boot) {
       canvas.style.visibility = 'hidden';   // nothing cinematic on screen: no frames at all
     }
     diag.update();
+  }
+
+  // ---------- canvas mount: one canvas, moved into the active section ----------
+  let mountEl = null;
+  const mountRO = new ResizeObserver(() => sizeToMount());
+  function mountCanvas(rec) {
+    const el = rec.el;
+    if (mountEl !== el) {
+      if (mountEl) mountRO.unobserve(mountEl);
+      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      el.appendChild(canvas);
+      mountEl = el;
+      mountRO.observe(el);
+    }
+    const z = rec.meta && rec.meta.zIndex != null ? rec.meta.zIndex : (debug ? 40 : 0);
+    canvas.style.zIndex = String(z);
+    sizeToMount();
+  }
+  function sizeToMount() {
+    if (!renderer || !mountEl) return;
+    const w = mountEl.clientWidth, h = mountEl.clientHeight;
+    if (!w || !h) return;
+    renderer.setPixelRatio(dprFor(state.tier));
+    renderer.setSize(w, h, false);
+    const rec = scenes.get(state.active);
+    if (rec && rec.api && rec.el === mountEl) rec.api.resize(w, h, renderer.getPixelRatio(), contextFor(rec));
+    requestFrame('resize');
   }
 
   // ---------- scroll progress: cached geometry, no layout reads on scroll ----------
@@ -420,11 +448,8 @@ export function start(boot) {
     resizeT = setTimeout(() => {
       state.mode = compositionMode(innerWidth, coarse);
       if (!renderer) return;
-      renderer.setPixelRatio(dprFor(state.tier));
-      renderer.setSize(innerWidth, innerHeight, false);
-      for (const rec of scenes.values()) if (rec.api) rec.api.resize(innerWidth, innerHeight, renderer.getPixelRatio(), contextFor(rec));
       const rec = scenes.get(state.active); if (rec) cacheGeometry(rec);
-      requestFrame('resize');
+      sizeToMount();
       diag.update();
     }, 100);
   };
@@ -434,11 +459,12 @@ export function start(boot) {
     removeEventListener('scroll', onScroll);
     removeEventListener('resize', onResize);
     if (pointerHandler) removeEventListener('pointermove', pointerHandler);
-    nearIO.disconnect(); activeIO.disconnect(); ro.disconnect();
+    nearIO.disconnect(); activeIO.disconnect(); ro.disconnect(); mountRO.disconnect();
   }
 
   function checkBudget(rec) {
     const info = renderer.info.render, b = rec.meta && rec.meta.budget;
+    state.usedDpr = Math.round(renderer.getPixelRatio() * 100) / 100;
     state.renderInfo = { calls: info.calls, triangles: info.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, programs: (renderer.info.programs || []).length };
     if (b) {
       const triCap = state.mode === 'mobile' ? b.triangles.mobile : b.triangles.desktop;
@@ -474,7 +500,7 @@ function createDiagnostics(state) {
     el.textContent =
       'SIGNAL DEBUG (local only)\n' +
       'tier        ' + state.tier + '  [' + state.why.join(', ') + ']\n' +
-      'mode        ' + state.mode + '   dpr ' + (state.dpr || 1) + ' → used ' + (document.querySelector('.signal-canvas') ? (Math.round((document.querySelector('.signal-canvas').width / innerWidth) * 100) / 100) : '-') + '\n' +
+      'mode        ' + state.mode + '   dpr ' + (state.dpr || 1) + ' → used ' + (state.usedDpr || '-') + '\n' +
       'gpu         ' + (state.gpu || '-').slice(0, 42) + '\n' +
       'three.js    ' + state.three + '\n' +
       'renderer    ' + state.renderer + (state.losses ? ' (context losses ' + state.losses + ')' : '') + '\n' +

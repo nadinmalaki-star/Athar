@@ -489,7 +489,9 @@
 
   /* WebGL enhancement hook (Phase 4): only a scene that declares it replaces
      its SVG state may hide it, and only with visibility — never layout. */
-  [data-signal-webgl="on"] [data-signal-fallback]{ visibility:hidden; }
+  /* The SVG recedes only after the scene's first frame is on screen; if WebGL
+     fails or is lost, the attribute is removed and the SVG returns at once. */
+  [data-signal-webgl="on"] [data-signal-fallback]{ opacity:0 !important; transition:opacity .6s ease; }
 
   /* ---------- Touch hit areas (look unchanged, >=44px to tap) ---------- */
   @media (pointer:coarse){
