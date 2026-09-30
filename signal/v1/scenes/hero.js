@@ -1,6 +1,7 @@
 /*
  * Scene: hero — "the meaningful signal inside complexity"
- * Phase 5 · Milestone 1.1: SPATIAL DEPTH BLOCKOUT (neutral, no final materials).
+ * Phase 5 · Milestone 2: SIGNAL INTEGRATION on the approved spatial blockout
+ * (everything except the Signal keeps neutral blockout materials).
  *
  * Camera is pixel-aligned to the hero section: elements are authored in the
  * section's CSS-pixel layout, then pushed into depth. Three readable layers
@@ -68,7 +69,12 @@ export function create(ctx) {
   let scene, camera, D = 1000, W = 1, H = 1;
   const built = [];                 // geometries rebuilt on every layout
   let mats = null;
-  const depthView = ctx.debug && new URLSearchParams(location.search).get('signal-view') === 'depth';
+  const params = new URLSearchParams(location.search);
+  const depthView = ctx.debug && params.get('signal-view') === 'depth';
+  // local debug only: pin the discovery state (0 = at rest, 1 = discovered) for review
+  const forcedT = ctx.debug && params.has('signal-state') ? Math.min(1, Math.max(0, parseFloat(params.get('signal-state')) || 0)) : null;
+  let discovery = forcedT != null ? forcedT : 0;
+  let lastCtx = null, fontsHooked = false;
 
   function rectIn(el, host) {
     if (!el) return null;
@@ -87,7 +93,35 @@ export function create(ctx) {
       occEdge:  ctx.track(new THREE.LineBasicMaterial({ color: 0x5f5e5a })),
       glass:    ctx.track(new THREE.MeshBasicMaterial({ color: 0x9a9995, transparent: true, opacity: 0.06, depthWrite: false })),
       edge:     ctx.track(new THREE.LineBasicMaterial({ color: 0xb8b6b0, transparent: true, opacity: 0.4, depthWrite: false })),
-      signal:   ctx.track(new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false })),
+      // THE SIGNAL: a thin light trace (no bloom, no halo). Soft edges are
+      // computed across the ribbon; strength follows the approved ramp and
+      // the discovery state. Depth-tested, so foreground geometry hides it.
+      signal: ctx.track(new THREE.ShaderMaterial({
+        transparent: true, depthWrite: false,
+        uniforms: { uT: { value: 0 }, uForward: { value: 0 }, uD: { value: 1000 }, uColor: { value: new THREE.Vector3(1.0, 0.353, 0.212) } },
+        vertexShader: `
+          attribute float aBase; attribute float aU; attribute float aAcross; attribute float aLit;
+          uniform float uT; uniform float uForward; uniform float uD;
+          varying float vA; varying float vAcross;
+          void main() {
+            vec3 p = position;
+            // discovered: the Signal comes forward out of the field, projection preserved
+            float z2 = p.z + uForward;
+            p.xy *= (uD - z2) / (uD - p.z);
+            p.z = z2;
+            // hidden end becomes readable, emerging end firms up; never fully resolved
+            float lift = uT * (0.24 * (1.0 - smoothstep(0.35, 0.8, aU)) + 0.12 * smoothstep(0.5, 1.0, aU));
+            vA = mix(min(aBase + lift, 0.94), aBase, aLit);
+            vAcross = aAcross;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+          }`,
+        fragmentShader: `
+          uniform vec3 uColor; varying float vA; varying float vAcross;
+          void main() {
+            float edge = 1.0 - smoothstep(0.45, 1.0, abs(vAcross));
+            gl_FragColor = vec4(uColor, vA * edge);
+          }`,
+      })),
     };
   }
 
@@ -100,6 +134,31 @@ export function create(ctx) {
     const l = new THREE.LineSegments(g, mat);
     scene.add(l); built.push(l); return l;
   }
+  // Screen-space ribbon along a list of segments: { a:[sx,sy,z], b:[sx,sy,z], ua, ub, base: [a,b], lit }.
+  function addRibbon(segs, widthPx, mat) {
+    const pos = [], base = [], uu = [], across = [], lit = [], idx = [];
+    let v = 0;
+    for (const s of segs) {
+      const dx = s.b[0] - s.a[0], dy = s.b[1] - s.a[1], len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len * widthPx / 2, ny = dx / len * widthPx / 2;
+      const quad = [[s.a, -1, s.ua, s.base[0]], [s.a, 1, s.ua, s.base[0]], [s.b, -1, s.ub, s.base[1]], [s.b, 1, s.ub, s.base[1]]];
+      for (const [p, side, u, bA] of quad) {
+        pos.push(...place(p[0] + nx * side, p[1] + ny * side, p[2]));
+        across.push(side); uu.push(u); base.push(bA); lit.push(s.lit ? 1 : 0);
+      }
+      idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2); v += 4;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('aBase', new THREE.Float32BufferAttribute(base, 1));
+    g.setAttribute('aU', new THREE.Float32BufferAttribute(uu, 1));
+    g.setAttribute('aAcross', new THREE.Float32BufferAttribute(across, 1));
+    g.setAttribute('aLit', new THREE.Float32BufferAttribute(lit, 1));
+    g.setIndex(idx);
+    const m = new THREE.Mesh(g, mat);
+    scene.add(m); built.push(m); return m;
+  }
+
   // A physical panel: an opaque quad (+ outline) centred on a screen rect, with slight yaw.
   function addPanel(x, y, w, h, z, yaw, material, withEdge) {
     const g = new THREE.PlaneGeometry(1, 1);
@@ -150,17 +209,15 @@ export function create(ctx) {
     // desktop: fully continuous — the gaps are made by the foreground (occlusion).
     // phone: only the first gap is occluded; the small second break stays as drawn.
     const breakAfter = mobile ? P.hidden.length + P.mid.length - 1 : -1;
-    const sp = [], sc = [];
+    const segs = [];
     for (let i = 0; i < chain.length - 1; i++) {
       if (i === breakAfter) continue;
-      const a = chain[i], b = chain[i + 1];
-      sp.push(...place(a[0], a[1], a[2]), ...place(b[0], b[1], b[2]));
-      sc.push(1, 0.353, 0.212, ramp(along(a[0])), 1, 0.353, 0.212, ramp(along(b[0])));
+      const a = chain[i], b = chain[i + 1], ua = along(a[0]), ub = along(b[0]);
+      segs.push({ a, b, ua, ub, base: [ramp(ua), ramp(ub)], lit: false });
     }
     const L = path.lit.map(toPx);                   // brightest where the glass reveals it
-    sp.push(...place(L[0][0], L[0][1], -40), ...place(L[1][0], L[1][1], -34));
-    sc.push(1, 0.353, 0.212, 0.95, 1, 0.353, 0.212, 0.95);
-    addLines(sp, mats.signal, sc);
+    segs.push({ a: [L[0][0], L[0][1], -40], b: [L[1][0], L[1][1], -34], ua: along(L[0][0]), ub: along(L[1][0]), base: [0.95, 0.95], lit: true });
+    addRibbon(segs, mobile ? 2.0 : 2.2, mats.signal);
 
     // ================= 3. FOREGROUND — what the Signal is hidden behind =================
     const H0 = P.hidden[P.hidden.length - 1], M0 = P.mid[0], M1 = P.mid[P.mid.length - 1], E0 = P.emerging[0];
@@ -262,6 +319,15 @@ export function create(ctx) {
     if (!mobile && counts.planes >= 3) addPanel(stage.x + stage.w * 0.55, stage.y + stage.h * 0.58, stage.w * 0.38, stage.h * 0.24, Z.rear[0], 0.12 * -dir, mats.glass, false);
   }
 
+  function applyDiscovery() {
+    if (!mats) return;
+    mats.signal.uniforms.uT.value = discovery;
+    // separates from the field behind it, but stays behind both foreground elements
+    // (fin at z -18, emerging start at z -55): the Hero never fully resolves the Signal
+    mats.signal.uniforms.uForward.value = discovery * 30;
+    mats.lines.opacity = 1 - 0.35 * discovery;                 // the complexity quietens, it does not vanish
+  }
+
   function setCamera() {
     D = (H / 2) / Math.tan((camera.fov * Math.PI / 180) / 2);   // 1 world unit = 1 CSS px at z = 0
     camera.aspect = W / H; camera.near = 1; camera.far = D + 4000;
@@ -272,6 +338,7 @@ export function create(ctx) {
       camera.position.set(0, 0, D); camera.lookAt(0, 0, 0);
     }
     camera.updateProjectionMatrix();
+    if (mats) mats.signal.uniforms.uD.value = D;
   }
 
   return {
@@ -282,9 +349,23 @@ export function create(ctx) {
     },
     activate() {},
     deactivate() {},
-    setProgress() {},        // scroll behaviour: Milestone 4
+    // Hero progress runs 0.5 (at the top) → 1 (scrolled past). Discovery completes
+    // after about half the hero has scrolled; camera/depth motion is Milestone 4.
+    setProgress(p) {
+      if (forcedT != null) return;
+      const t = Math.min(1, Math.max(0, (p - 0.5) / 0.25));
+      discovery = t * t * (3 - 2 * t);
+      applyDiscovery();
+    },
     setPointer() {},         // pointer parallax: Milestone 4
-    resize(w, h, dpr, c) { W = w; H = h; setCamera(); layout(c); },
+    resize(w, h, dpr, c) {
+      W = w; H = h; lastCtx = c; setCamera(); layout(c); applyDiscovery();
+      // the text's clear space depends on the web fonts: re-measure once they are in
+      if (!fontsHooked && document.fonts && document.fonts.status !== 'loaded') {
+        fontsHooked = true;
+        document.fonts.ready.then(() => { if (scene && lastCtx) { layout(lastCtx); ctx.requestFrame('fonts'); } });
+      }
+    },
     render(renderer) { renderer.render(scene, camera); },
     wantsFrame() { return false; },
     dispose() { clearBuilt(); scene = null; },
