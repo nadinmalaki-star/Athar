@@ -273,12 +273,19 @@
   /* --- KHZNTI: large cropped interface, a detail lens, a spec sheet --- */
   .kh{ margin-top:clamp(90px, 10vw, 150px); }
   .kh-top{ display:flex; justify-content:space-between; align-items:flex-end; gap:32px; margin-bottom:28px; }
+  .kh-top .p-desc{ max-width:52ch; }
+  .kh-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:14px; flex-shrink:0; }
+  [dir="rtl"] .kh-meta{ align-items:flex-start; }
+  /* product status: the one Ember mark here means "active / live" */
+  .p-status{ display:inline-flex; align-items:center; gap:10px; font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:var(--paper); border:1px solid var(--line-strong); padding:7px 12px; direction:ltr; }
+  .p-status i{ width:6px; height:6px; background:var(--ember); }
   .kh-stage{ position:relative; height:clamp(420px, 44vw, 660px); background:var(--graphite); border:1px solid var(--line); overflow:hidden; }
   .kh-stage .grid-bg{ position:absolute; inset:0; background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size:64px 64px; -webkit-mask-image:linear-gradient(180deg, #000, transparent 80%); mask-image:linear-gradient(180deg, #000, transparent 80%); opacity:.6; }
   .kh-stage img{ position:absolute; border:1px solid var(--line-strong); border-radius:22px 22px 0 0; box-shadow:0 30px 80px rgba(0,0,0,.6); }
   .kh-stage .kh-main{ left:40%; top:9%; width:27%; }
   .kh-stage .kh-back{ left:15%; top:21%; width:22%; opacity:.5; }
-  .kh-lens{ position:absolute; right:5%; top:14%; width:24%; aspect-ratio:4 / 3; border:1px solid rgba(245,243,237,0.3); background-image:url('images/case-khznti-dashboard.jpg'); background-size:240% auto; background-position:50% 29%; background-color:var(--void); box-shadow:0 20px 60px rgba(0,0,0,.55); }
+  .kh-lens{ position:absolute; right:3%; top:13%; width:27%; aspect-ratio:5 / 2; border:1px solid rgba(245,243,237,0.3); background:var(--void); box-shadow:0 20px 60px rgba(0,0,0,.55); }
+  .kh-lens img{ display:block; width:100%; height:100%; object-fit:cover; }
   .kh-lens::before{ content:''; position:absolute; top:50%; right:100%; width:clamp(40px, 6vw, 110px); height:1px; background:rgba(245,243,237,0.3); }
   .kh-lens::after{ content:''; position:absolute; top:calc(50% - 3px); right:calc(100% + clamp(40px, 6vw, 110px)); width:6px; height:6px; border:1px solid rgba(245,243,237,0.5); }
   .kh-spec{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); column-gap:clamp(20px, 3vw, 48px); border-top:1px solid var(--line-strong); }
@@ -453,6 +460,7 @@
     .kh-lens{ display:none; }
     .kh-spec{ grid-template-columns:1fr; }
     .kh-top{ flex-direction:column; align-items:flex-start; }
+    [dir] .kh-meta{ align-items:flex-start; }
   }
 
   /* =====================================================================
@@ -691,14 +699,18 @@
             <div class="p-index"><bdi dir="ltr">01 / 03</bdi></div>
             <h3 class="p-name" data-ar="خزنتي" data-en="KHZNTI">خزنتي</h3>
             <p class="p-headline" data-ar-html='من فوضى مصاريف، لتطبيق <span class="accent">واضح</span>' data-en-html='From messy expenses, to a <span class="accent">clear app</span>'>من فوضى مصاريف، لتطبيق <span class="accent">واضح</span></p>
+            <p class="p-desc" data-ar="منتج للوضوح المالي للأفراد والمشاريع الصغيرة، يجمع الحركة اليومية، الكاش والبنك، الديون، المخزون والتقارير ضمن تجربة واحدة منظّمة." data-en="A financial clarity product for individuals and small businesses — bringing daily money, cash and bank balances, debts, inventory and reporting into one structured experience.">منتج للوضوح المالي للأفراد والمشاريع الصغيرة، يجمع الحركة اليومية، الكاش والبنك، الديون، المخزون والتقارير ضمن تجربة واحدة منظّمة.</p>
           </div>
-          <div class="p-tags"><span>MVP</span><span>React</span><span>Supabase</span><span>REAL AUTH</span><span>ARABIC-FIRST</span></div>
+          <div class="kh-meta">
+            <div class="p-status"><i aria-hidden="true"></i>LIVE · BASIC MVP</div>
+            <div class="p-tags"><span>MVP</span><span>React</span><span>Supabase</span><span>REAL AUTH</span><span>ARABIC-FIRST</span></div>
+          </div>
         </div>
         <div class="kh-stage edge reveal">
           <div class="grid-bg" aria-hidden="true"></div>
-          <img class="kh-back" src="images/case-khznti-welcome.jpg" loading="lazy" width="560" height="1153" alt="صفحة الترحيب — خزنتي">
-          <img class="kh-main" src="images/case-khznti-dashboard.jpg" loading="lazy" width="463" height="872" alt="لوحة العمليات الفعلية — خزنتي">
-          <div class="kh-lens" aria-hidden="true"></div>
+          <img class="kh-back" src="images/khznti-welcome.webp" loading="lazy" width="560" height="922" alt="صفحة الترحيب — خزنتي">
+          <img class="kh-main" src="images/khznti-dashboard.webp" loading="lazy" width="600" height="986" alt="لوحة التحكم الحالية — خزنتي">
+          <div class="kh-lens" aria-hidden="true"><img src="images/khznti-balance.webp" loading="lazy" width="800" height="320" alt=""></div>
         </div>
         <dl class="kh-spec reveal">
           <div>
