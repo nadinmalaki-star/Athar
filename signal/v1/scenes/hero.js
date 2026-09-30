@@ -170,8 +170,8 @@ export function create(ctx) {
       const gx0 = Math.min(H0[0], M0[0]), gx1 = Math.max(H0[0], M0[0]);
       const reach = (gx1 - gx0) * 0.35;             // also swallows the tail of the hidden segment
       const x = rtl ? gx0 - 10 : gx0 - reach, w = (gx1 - gx0) + reach + 10;
-      const h = mobile ? 40 : 128, y = (H0[1] + M0[1]) / 2 - h * (mobile ? 0.5 : 0.55);
-      occl.push({ x, y, w, h, z: Z.occluder1, yaw: (mobile ? 0.08 : 0.16) * dir, lineY: (H0[1] + M0[1]) / 2 });
+      const h = mobile ? 40 : 92, y = (H0[1] + M0[1]) / 2 - h * (mobile ? 0.5 : 0.55);   // desktop: ~28% shallower than 1.1
+      occl.push({ x, y, w, h, z: Z.occluder1, yaw: (mobile ? 0.08 : 0.07) * dir, lineY: (H0[1] + M0[1]) / 2 });   // a precision interruption, barely turned
     }
     if (!mobile && counts.planes >= 2) {   // occluder 2: a narrow precision fin across the second break
       const gx0 = Math.min(M1[0], E0[0]), gx1 = Math.max(M1[0], E0[0]);
