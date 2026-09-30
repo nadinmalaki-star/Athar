@@ -473,6 +473,17 @@
   .path-primary{ position:relative; }
   .path-primary::before{ content:''; position:absolute; left:50%; bottom:100%; width:1px; height:clamp(44px, 5vw, 64px); background:linear-gradient(180deg, rgba(255,90,54,0), var(--ember)); }
 
+  /* ---------- Rendering foundation ----------
+     Measured (Phase 4 profiling): the page's first layout dominated load work
+     (~0.9s at 4x CPU), mostly below the first screen. Sections below the hero
+     now skip layout/paint until they approach the viewport. Estimates are
+     per-breakpoint section heights; once a section has rendered, the browser
+     keeps its real size (contain-intrinsic-size: auto). No visual change. */
+  main > section:not(.hero), footer{ content-visibility:auto; contain-intrinsic-size:auto var(--cis, 1200px); }
+  #about{ --cis:1760px; } #services{ --cis:1500px; } #work{ --cis:3530px; } #process{ --cis:1040px; } #faq{ --cis:736px; } #contact{ --cis:1420px; } footer{ --cis:280px; }
+  @media (max-width:1100px){ #about{ --cis:1200px; } #services{ --cis:1080px; } #work{ --cis:3000px; } #process{ --cis:1330px; } #faq{ --cis:660px; } #contact{ --cis:1170px; } }
+  @media (max-width:600px){ #about{ --cis:1580px; } #services{ --cis:1380px; } #work{ --cis:3080px; } #process{ --cis:1410px; } #faq{ --cis:620px; } #contact{ --cis:1150px; } }
+
   /* ---------- Touch hit areas (look unchanged, >=44px to tap) ---------- */
   @media (pointer:coarse){
     .nav-indicator-link, .lang-toggle, .foot-links a, .text-link{ position:relative; }
@@ -1386,6 +1397,61 @@
   }, 1500);
   }
 
+  // ---- In-page anchors + content-visibility ----
+  // Sections below the fold keep estimated heights until they render, so a
+  // jump (#work, #contact...) can land short while real sizes arrive. Once
+  // the scroll settles, align to the target again. Timers only, no loop;
+  // each section's real size is remembered after it renders once.
+  function afterScrollSettles(cb){
+    var done = false, timer;
+    function finish(){ if (done) return; done = true; window.removeEventListener('scroll', onScroll); cb(); }
+    function onScroll(){ clearTimeout(timer); timer = setTimeout(finish, 140); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    timer = setTimeout(finish, 450);
+  }
+  // Never fight the visitor: any manual scroll input cancels pending alignment.
+  var userMoved = false;
+  ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function(t){
+    window.addEventListener(t, function(){ userMoved = true; }, { passive: true, capture: true });
+  });
+  function alignTo(target, tries){
+    if (userMoved) return;
+    var margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+    var delta = target.getBoundingClientRect().top - margin;
+    var room = document.documentElement.scrollHeight - innerHeight - window.scrollY;
+    if (Math.abs(delta) > 2 && tries > 0 && !(delta > 0 && room < 2)) {
+      window.scrollBy({ top: delta, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      afterScrollSettles(function(){ alignTo(target, tries - 1); });
+    }
+  }
+  // For a short window after a jump, any late size change above the target
+  // (a section rendering for the first time, a web font arriving) re-aligns.
+  function holdAlignment(target, ms){
+    if (!('ResizeObserver' in window)) return;
+    var t, ro = new ResizeObserver(function(){
+      clearTimeout(t);
+      t = setTimeout(function(){ if (userMoved) { ro.disconnect(); return; } alignTo(target, 2); }, 120);
+    });
+    ro.observe(document.body);
+    setTimeout(function(){ ro.disconnect(); }, ms);
+  }
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var target = document.getElementById(a.getAttribute('href').slice(1));
+    if (!target) return;
+    userMoved = false;
+    afterScrollSettles(function(){ alignTo(target, 3); holdAlignment(target, 3000); });
+  });
+  if (location.hash.length > 1) {
+    var hashTarget = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (hashTarget) {
+      window.addEventListener('load', function(){ afterScrollSettles(function(){ alignTo(hashTarget, 3); holdAlignment(hashTarget, 3000); }); });
+      // web fonts can still resize sections above the target after load
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(function(){ alignTo(hashTarget, 2); }, 200); });
+    }
+  }
+
   // ---- THE SIGNAL (Phase 3) ----
   // State changes only: IntersectionObserver, ResizeObserver and pointer/focus
   // events. No animation loop. Without JS, or with reduced motion, every
@@ -1483,15 +1549,27 @@
         zone.addEventListener('blur', function(){ setActive(null); });
       })(zones[k]);
     }
-    draw();
-    if ('ResizeObserver' in window) {
-      var ro = new ResizeObserver(function(){ draw(); });
-      ro.observe(map);
-      for (k = 0; k < zones.length; k++) ro.observe(zones[k]);
-    } else {
-      window.addEventListener('resize', draw);
+    // Measure only once the map approaches the viewport: measuring earlier
+    // would force layout of content the browser is deliberately skipping.
+    function startDrawing(){
+      draw();
+      if ('ResizeObserver' in window) {
+        var ro = new ResizeObserver(function(){ draw(); });
+        ro.observe(map);
+        for (var q = 0; q < zones.length; q++) ro.observe(zones[q]);
+      } else {
+        window.addEventListener('resize', draw);
+      }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
     }
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+    if ('IntersectionObserver' in window) {
+      var mio = new IntersectionObserver(function(entries){
+        if (entries[0].isIntersecting) { mio.disconnect(); startDrawing(); }
+      }, { rootMargin: '50% 0px' });
+      mio.observe(map);
+    } else {
+      startDrawing();
+    }
   })();
 
   // ---- Console easter egg ----
