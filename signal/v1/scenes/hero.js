@@ -1,12 +1,17 @@
 /*
  * Scene: hero — "the meaningful signal inside complexity"
- * Phase 5 · Milestone 1: COMPOSITION BLOCKOUT (neutral, no final materials).
+ * Phase 5 · Milestone 1.1: SPATIAL DEPTH BLOCKOUT (neutral, no final materials).
  *
- * The camera is pixel-aligned to the hero section, and every element is
- * placed in the section's own CSS-pixel layout (then pushed into depth with
- * its projection preserved). So the 3D composition sits exactly on the
- * approved 2D one: the graphite planes, the glass sliver, the Phase 3 Signal
- * path, and the text's clear space, measured live for AR and EN.
+ * Camera is pixel-aligned to the hero section: elements are authored in the
+ * section's CSS-pixel layout, then pushed into depth. Three readable layers
+ * on desktop (two on phones):
+ *   1. rear structure  — faint open frames, deepest, perspective-reduced
+ *   2. Signal / mid     — ONE continuous Signal path; strands around it
+ *   3. foreground       — two opaque interruption elements that physically
+ *                          occlude the Signal (and strands) where it is hidden
+ * The Signal's gaps now come from geometry in front of it; the emerging end
+ * stays unobstructed. Local debug only: ?signal-view=depth shows an angled
+ * camera to verify the Z-layering.
  *
  * Lifecycle contract (shared by every scene):
  *   init() activate() setProgress(p) setPointer(x, y) resize(w, h, dpr, ctx)
@@ -39,12 +44,21 @@ const PATH_MOBILE = {    // viewBox 0..100 x 0..24 over the phone band
 const RAMP = [[0, 0], [0.08, 0.2], [0.3, 0.32], [0.5, 0.55], [0.92, 0.82], [1, 0.82]];
 const ramp = (u) => { for (let i = 1; i < RAMP.length; i++) if (u <= RAMP[i][0]) { const [a, va] = RAMP[i - 1], [b, vb] = RAMP[i]; return va + (vb - va) * (u - a) / (b - a); } return 0.82; };
 
-// Element budget per composition (meaning identical, complexity reduced).
+// Element budget per composition — unchanged from Milestone 1 (no added complexity).
 const COUNTS = {
   A:      { strands: 30, frames: 6, planes: 3 },
   B:      { strands: 20, frames: 4, planes: 2 },
   C:      { strands: 12, frames: 3, planes: 2 },
   mobile: { strands: 10, frames: 2, planes: 2 },
+};
+// Depth layers (CSS px behind the section plane; negative = further away)
+const Z = {
+  rear:   [-460, -380],   // structure
+  field:  [-300, -170],   // strands behind the Signal
+  near:   [-130, -70],    // strands beside the Signal
+  front:  [-10, 40],      // the very few strands in front (hidden end only)
+  signal: { hidden: -150, gap1: -135, mid: [-105, -80], gap2: -70, emerging: [-55, 0] },
+  occluder1: -30, occluder2: -18,
 };
 
 function prng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -54,6 +68,7 @@ export function create(ctx) {
   let scene, camera, D = 1000, W = 1, H = 1;
   const built = [];                 // geometries rebuilt on every layout
   let mats = null;
+  const depthView = ctx.debug && new URLSearchParams(location.search).get('signal-view') === 'depth';
 
   function rectIn(el, host) {
     if (!el) return null;
@@ -61,29 +76,23 @@ export function create(ctx) {
     if (!r.width || !r.height) return null;
     return { x: r.left - host.left, y: r.top - host.top, w: r.width, h: r.height };
   }
-  // screen position (section px) + depth → world position with the same projection
-  function place(sx, sy, z) {
-    const k = (D - z) / D;
-    return [(sx - W / 2) * k, (H / 2 - sy) * k, z];
-  }
+  // Screen position (section px) + depth → world position that projects to the same pixel.
+  function place(sx, sy, z) { const k = (D - z) / D; return [(sx - W / 2) * k, (H / 2 - sy) * k, z]; }
 
   function materials() {
     // BLOCKOUT: flat, neutral, unlit. Final materials come in Milestone 3.
     return {
-      strand: ctx.track(new THREE.LineBasicMaterial({ color: 0x8c8b87, transparent: true, opacity: 0.55, depthWrite: false })),
-      frame:  ctx.track(new THREE.LineBasicMaterial({ color: 0x6f6e6b, transparent: true, opacity: 0.6, depthWrite: false })),
-      plane:  ctx.track(new THREE.MeshBasicMaterial({ color: 0x1c1c20, transparent: true, opacity: 0.55, depthWrite: true })),
-      glass:  ctx.track(new THREE.MeshBasicMaterial({ color: 0x9a9995, transparent: true, opacity: 0.07, depthWrite: false })),
-      edge:   ctx.track(new THREE.LineBasicMaterial({ color: 0xb8b6b0, transparent: true, opacity: 0.45, depthWrite: false })),
-      signal: ctx.track(new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false })),
+      lines:    ctx.track(new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false })),
+      occluder: ctx.track(new THREE.MeshBasicMaterial({ color: 0x1a1a1d })),                 // opaque: truly in front
+      occEdge:  ctx.track(new THREE.LineBasicMaterial({ color: 0x5f5e5a })),
+      glass:    ctx.track(new THREE.MeshBasicMaterial({ color: 0x9a9995, transparent: true, opacity: 0.06, depthWrite: false })),
+      edge:     ctx.track(new THREE.LineBasicMaterial({ color: 0xb8b6b0, transparent: true, opacity: 0.4, depthWrite: false })),
+      signal:   ctx.track(new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false })),
     };
   }
 
-  function clearBuilt() {
-    for (const o of built) { scene.remove(o); o.geometry.dispose(); }
-    built.length = 0;
-  }
-  function addLines(points, mat, colors) {   // points: flat [x,y,z,...] pairs for LineSegments
+  function clearBuilt() { for (const o of built) { scene.remove(o); o.geometry.dispose(); } built.length = 0; }
+  function addLines(points, mat, colors) {
     if (!points.length) return null;
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
@@ -91,12 +100,21 @@ export function create(ctx) {
     const l = new THREE.LineSegments(g, mat);
     scene.add(l); built.push(l); return l;
   }
-  function addQuad(x, y, w, h, z, mat, rotY) {
+  // A physical panel: an opaque quad (+ outline) centred on a screen rect, with slight yaw.
+  function addPanel(x, y, w, h, z, yaw, material, withEdge) {
     const g = new THREE.PlaneGeometry(1, 1);
-    const m = new THREE.Mesh(g, mat);
+    const m = new THREE.Mesh(g, material);
     const c = place(x + w / 2, y + h / 2, z), k = (D - z) / D;
-    m.position.set(c[0], c[1], c[2]); m.scale.set(w * k, h * k, 1); if (rotY) m.rotation.y = rotY;
-    scene.add(m); built.push(m); return m;
+    m.position.set(c[0], c[1], c[2]); m.scale.set(w * k, h * k, 1); m.rotation.y = yaw || 0;
+    scene.add(m); built.push(m);
+    if (withEdge) {
+      const eg = new THREE.EdgesGeometry(g);
+      const e = new THREE.LineSegments(eg, mats.occEdge);
+      e.position.copy(m.position); e.scale.copy(m.scale); e.rotation.copy(m.rotation);
+      e.position.z += 0.5;
+      scene.add(e); built.push(e);
+    }
+    return m;
   }
 
   function layout(c) {
@@ -105,13 +123,13 @@ export function create(ctx) {
     const mobile = c.mode === 'mobile';
     const counts = mobile ? COUNTS.mobile : COUNTS[c.tier] || COUNTS.B;
     const rtl = document.documentElement.dir === 'rtl';
+    const dir = rtl ? -1 : 1;                      // the direction the Signal travels on screen
     const q = (s) => c.mount.querySelector(s);
     const stage = rectIn(q('.hero-stage'), host);
     const glassR = rectIn(q('.pl-glass'), host);
     const box = mobile ? rectIn(q('.sig-hero-m'), host) : rectIn(q('.sig-hero'), host);
     if (!stage || !box) return;
     const path = mobile ? PATH_MOBILE : PATH_DESKTOP;
-    // the fallback SVG mirrors with the composition in RTL; the WebGL path matches it
     const toPx = ([u, v]) => [box.x + (rtl ? 100 - u : u) / 100 * box.w, box.y + v / path.vbH * box.h];
 
     // clear space: every text block, padded
@@ -121,81 +139,139 @@ export function create(ctx) {
       .map((r) => ({ x: r.x - pad, y: r.y - pad, w: r.w + pad * 2, h: r.h + pad * 2 }));
     const blocked = (x, y) => keepOut.some((r) => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h);
 
-    // ---- Signal: depth recedes where it is hidden, comes forward as it emerges
-    const segs = [['hidden', -170, -140], ['mid', -100, -70], ['emerging', -40, 0]];
-    const pts = [], cols = [];
-    const x0 = toPx(path.hidden[0])[0], x1 = toPx(path.emerging[1])[0];
+    // ================= 2. SIGNAL — one continuous path in depth =================
+    const P = { hidden: path.hidden.map(toPx), mid: path.mid.map(toPx), emerging: path.emerging.map(toPx) };
+    const x0 = P.hidden[0][0], x1 = P.emerging[1][0];
     const along = (x) => Math.abs((x - x0) / ((x1 - x0) || 1));
-    for (const [key, zA, zB] of segs) {
-      const P = path[key].map(toPx);
-      for (let i = 0; i < P.length - 1; i++) {
-        const za = zA + (zB - zA) * (i / (P.length - 1)), zb = zA + (zB - zA) * ((i + 1) / (P.length - 1));
-        pts.push(...place(P[i][0], P[i][1], za), ...place(P[i + 1][0], P[i + 1][1], zb));
-        cols.push(1, 0.353, 0.212, ramp(along(P[i][0])), 1, 0.353, 0.212, ramp(along(P[i + 1][0])));
-      }
+    const chain = [];                               // [sx, sy, z]
+    P.hidden.forEach((p) => chain.push([p[0], p[1], Z.signal.hidden]));
+    P.mid.forEach((p, i) => chain.push([p[0], p[1], Z.signal.mid[0] + (Z.signal.mid[1] - Z.signal.mid[0]) * i / (P.mid.length - 1)]));
+    P.emerging.forEach((p, i) => chain.push([p[0], p[1], Z.signal.emerging[0] + (Z.signal.emerging[1] - Z.signal.emerging[0]) * i]));
+    // desktop: fully continuous — the gaps are made by the foreground (occlusion).
+    // phone: only the first gap is occluded; the small second break stays as drawn.
+    const breakAfter = mobile ? P.hidden.length + P.mid.length - 1 : -1;
+    const sp = [], sc = [];
+    for (let i = 0; i < chain.length - 1; i++) {
+      if (i === breakAfter) continue;
+      const a = chain[i], b = chain[i + 1];
+      sp.push(...place(a[0], a[1], a[2]), ...place(b[0], b[1], b[2]));
+      sc.push(1, 0.353, 0.212, ramp(along(a[0])), 1, 0.353, 0.212, ramp(along(b[0])));
     }
-    const L = path.lit.map(toPx);                      // brightest where the glass reveals it
-    pts.push(...place(L[0][0], L[0][1], -12), ...place(L[1][0], L[1][1], -8));
-    cols.push(1, 0.353, 0.212, 0.95, 1, 0.353, 0.212, 0.95);
-    addLines(pts, mats.signal, cols);
+    const L = path.lit.map(toPx);                   // brightest where the glass reveals it
+    sp.push(...place(L[0][0], L[0][1], -40), ...place(L[1][0], L[1][1], -34));
+    sc.push(1, 0.353, 0.212, 0.95, 1, 0.353, 0.212, 0.95);
+    addLines(sp, mats.signal, sc);
 
-    // ---- where the Signal is interrupted, something is in front of it
-    const H0 = toPx(path.hidden[path.hidden.length - 1]), M0 = toPx(path.mid[0]);
-    const M1 = toPx(path.mid[path.mid.length - 1]), E0 = toPx(path.emerging[0]);
-    const occ = [];
-    occ.push({ x: Math.min(H0[0], M0[0]) - 6, y: Math.min(H0[1], M0[1]) - (mobile ? 22 : 70), w: Math.abs(M0[0] - H0[0]) + 12, h: mobile ? 44 : 150, z: -60 });
-    if (counts.planes >= 2) occ.push({ x: Math.min(M1[0], E0[0]) - 3, y: Math.min(M1[1], E0[1]) - (mobile ? 16 : 46), w: Math.abs(E0[0] - M1[0]) + 6, h: mobile ? 32 : 96, z: -30 });
-    for (const o of occ) addQuad(o.x, o.y, o.w, o.h, o.z, mats.plane);
-
-    // ---- optical plane aligned with the DOM glass sliver (the Signal passes through it)
-    if (glassR) {
-      addQuad(glassR.x, glassR.y, glassR.w, glassR.h, 10, mats.glass);
-      const e = [], gx = glassR.x, gy = glassR.y, gw = glassR.w, gh = glassR.h;
-      e.push(...place(rtl ? gx + gw : gx, gy, 10), ...place(rtl ? gx + gw : gx, gy + gh, 10));   // one precise leading edge
-      addLines(e, mats.edge);
-    }
-    if (counts.planes >= 3) addQuad(stage.x + stage.w * 0.55, stage.y + stage.h * 0.58, stage.w * 0.38, stage.h * 0.24, -320, mats.glass, rtl ? 0.18 : -0.18);
-
-    // ---- complexity field: few, intentional strands, denser toward the hidden end
-    const rnd = prng(mobile ? 11 : 7);
+    // ================= 3. FOREGROUND — what the Signal is hidden behind =================
+    const H0 = P.hidden[P.hidden.length - 1], M0 = P.mid[0], M1 = P.mid[P.mid.length - 1], E0 = P.emerging[0];
     const lineY = (H0[1] + E0[1]) / 2;
-    const hiddenEndX = toPx(path.hidden[0])[0], emergeEndX = x1;
-    // the field lives in a band around the Signal, inside the planes — never up by the nav or down by the actions
+    const occl = [];
+    {   // occluder 1: a panel over the first interruption, reaching back over the end of the hidden run
+      const gx0 = Math.min(H0[0], M0[0]), gx1 = Math.max(H0[0], M0[0]);
+      const reach = (gx1 - gx0) * 0.35;             // also swallows the tail of the hidden segment
+      const x = rtl ? gx0 - 10 : gx0 - reach, w = (gx1 - gx0) + reach + 10;
+      const h = mobile ? 40 : 128, y = (H0[1] + M0[1]) / 2 - h * (mobile ? 0.5 : 0.55);
+      occl.push({ x, y, w, h, z: Z.occluder1, yaw: (mobile ? 0.08 : 0.16) * dir, lineY: (H0[1] + M0[1]) / 2 });
+    }
+    if (!mobile && counts.planes >= 2) {   // occluder 2: a narrow precision fin across the second break
+      const gx0 = Math.min(M1[0], E0[0]), gx1 = Math.max(M1[0], E0[0]);
+      const w = Math.max(10, gx1 - gx0 + 6), h = 104;
+      occl.push({ x: gx0 - 3, y: (M1[1] + E0[1]) / 2 - h * 0.55, w, h, z: Z.occluder2, yaw: -0.1 * dir, lineY: (M1[1] + E0[1]) / 2 });
+    }
+    // Foreground never reaches into the typography. A panel that would, moves UP
+    // (keeping its size) so its lower edge ends just below the Signal line: the
+    // Signal stays genuinely behind it, the text stays clear. (The keep-out already
+    // carries padding, so the edge may sit inside the pad, never on the glyphs.)
+    for (const o of occl) {
+      let bottom = o.y + o.h;
+      for (const r of keepOut) {
+        const overlapsX = o.x < r.x + r.w && o.x + o.w > r.x;
+        if (overlapsX && r.y < bottom && r.y + r.h > o.y) bottom = Math.min(bottom, r.y - 8);
+      }
+      bottom = Math.max(bottom, o.lineY + (mobile ? 6 : 9));
+      o.y = bottom - o.h;
+      addPanel(o.x, o.y, o.w, o.h, o.z, o.yaw, mats.occluder, true);
+    }
+
+    // optical plane on the DOM glass sliver (translucent; the Signal is revealed through it)
+    if (glassR) {
+      addPanel(glassR.x, glassR.y, glassR.w, glassR.h, -40, 0, mats.glass, false);
+      const gx = rtl ? glassR.x + glassR.w : glassR.x;
+      addLines([...place(gx, glassR.y, -40), ...place(gx, glassR.y + glassR.h, -40)], mats.edge);
+    }
+
+    // ================= strands — same count, distributed through depth =================
+    const rnd = prng(mobile ? 11 : 7);
+    const hiddenEndX = x0, emergeEndX = x1;
     const navBottom = 90;
     const region = mobile
       ? { x: 8, y: Math.max(navBottom, box.y - 120), w: W - 16, h: Math.min(200, box.y + box.h + 40 - Math.max(navBottom, box.y - 120)) }
       : { x: stage.x, y: Math.max(navBottom + 30, stage.y + stage.h * 0.13), w: stage.w * 0.97, h: stage.h * 0.46 };
-    const S = []; let tries = 0;
-    while (S.length / 6 < counts.strands && tries++ < 4000) {
-      const t = Math.pow(rnd(), 1.7);                                 // bias toward the hidden end
+    const S = [], SC = []; let tries = 0, n = 0;
+    const tone = (z) => {                           // depth fading: rear quiet, front firmer
+      const t = Math.min(1, Math.max(0, (z - Z.field[0]) / (Z.front[1] - Z.field[0])));
+      return [0.55 + 0.1 * t, 0.2 + 0.5 * t];         // [grey level, alpha]
+    };
+    while (n < counts.strands && tries++ < 6000) {
+      const t = Math.pow(rnd(), 1.7);               // bias toward the hidden end
       const x = hiddenEndX + (emergeEndX - hiddenEndX) * t + (rnd() - 0.5) * region.w * 0.25;
       const y = rnd() < 0.72 ? lineY + (rnd() + rnd() + rnd() - 1.5) * region.h * 0.26 : region.y + rnd() * region.h;
       if (x < region.x || x > region.x + region.w || y < region.y || y > region.y + region.h) continue;
       if (blocked(x, y)) continue;
       if (t > 0.45 && Math.abs(y - lineY) < (mobile ? 10 : 22)) continue;   // the emerging Signal stays clean
+      // layer: most behind, some beside, very few in front (hidden end only); phones: two levels
+      const r = rnd();
+      let band;
+      if (mobile) band = r < 0.75 ? Z.field : Z.near;
+      else band = (r < 0.1 && t < 0.3) ? Z.front : (r < 0.62 ? Z.field : Z.near);
+      const z = band[0] + rnd() * (band[1] - band[0]);
       const vertical = rnd() < 0.2;
       const len = (mobile ? 10 : 16) + rnd() * (mobile ? 30 : 58);
       const a = vertical ? Math.PI / 2 + (rnd() - 0.5) * 0.3 : (rnd() - 0.5) * 0.5;
-      const z = -260 + rnd() * 300;
       const dx = Math.cos(a) * len / 2, dy = Math.sin(a) * len / 2;
       if (blocked(x + dx, y + dy) || blocked(x - dx, y - dy)) continue;
+      const [g, al] = tone(z);
       S.push(...place(x - dx, y - dy, z), ...place(x + dx, y + dy, z));
+      SC.push(g, g, g * 0.98, al, g, g, g * 0.98, al);
+      n++;
     }
-    addLines(S, mats.strand);
+    addLines(S, mats.lines, SC);
 
-    // ---- partial structural frames: open corners at shallow depths
-    const F = []; tries = 0; let made = 0;
+    // ================= 1. REAR STRUCTURE — faint, deepest, perspective-reduced =================
+    const F = [], FC = []; tries = 0; let made = 0;
     while (made < counts.frames && tries++ < 2000) {
       const w = (mobile ? 36 : 60) + rnd() * (mobile ? 50 : 110), h = w * (0.45 + rnd() * 0.5);
       const x = region.x + rnd() * (region.w - w), y = region.y + rnd() * (region.h - h);
       if (blocked(x, y) || blocked(x + w, y) || blocked(x, y + h) || blocked(x + w, y + h) || blocked(x + w / 2, y + h / 2)) continue;
-      const z = -220 + rnd() * 180, arm = Math.min(w, h) * 0.35;
-      const corner = (cx, cy, sx, sy) => { F.push(...place(cx, cy, z), ...place(cx + arm * sx, cy, z), ...place(cx, cy, z), ...place(cx, cy + arm * sy, z)); };
-      corner(x, y, 1, 1); corner(x + w, y + h, -1, -1);                // incomplete: two opposite corners only
-      if (rnd() < 0.5) corner(x + w, y, -1, 1);
+      const z = Z.rear[0] + rnd() * (Z.rear[1] - Z.rear[0]);
+      // anchored where authored, but NOT size-compensated: real perspective makes it smaller
+      const cx = x + w / 2, cy = y + h / 2, [wx, wy] = place(cx, cy, z);
+      const yaw = (rnd() - 0.5) * 0.24;              // a few degrees at most
+      const arm = Math.min(w, h) * 0.35, hw = w / 2, hh = h / 2;
+      const pt = (lx, ly) => { const cxr = Math.cos(yaw), sxr = Math.sin(yaw); return [wx + lx * cxr, wy + ly, z - lx * sxr]; };
+      const corner = (lx, ly, sx, sy) => { F.push(...pt(lx, ly), ...pt(lx + arm * sx, ly), ...pt(lx, ly), ...pt(lx, ly + arm * sy)); };
+      corner(-hw, hh, 1, -1); corner(hw, -hh, -1, 1);
+      if (rnd() < 0.5) corner(hw, hh, -1, -1);
+      const segs = F.length / 3 - FC.length / 4;
+      for (let s = 0; s < segs; s++) FC.push(0.5, 0.5, 0.49, 0.3);
       made++;
     }
-    addLines(F, mats.frame);
+    addLines(F, mats.lines, FC);
+
+    // optional deepest plane (Tier A only)
+    if (!mobile && counts.planes >= 3) addPanel(stage.x + stage.w * 0.55, stage.y + stage.h * 0.58, stage.w * 0.38, stage.h * 0.24, Z.rear[0], 0.12 * -dir, mats.glass, false);
+  }
+
+  function setCamera() {
+    D = (H / 2) / Math.tan((camera.fov * Math.PI / 180) / 2);   // 1 world unit = 1 CSS px at z = 0
+    camera.aspect = W / H; camera.near = 1; camera.far = D + 4000;
+    if (depthView) {   // local debug only: angled view to verify Z-layering and occlusion
+      camera.position.set(D * 0.62, D * 0.2, D * 0.78);
+      camera.lookAt(0, 0, -200);
+    } else {
+      camera.position.set(0, 0, D); camera.lookAt(0, 0, 0);
+    }
+    camera.updateProjectionMatrix();
   }
 
   return {
@@ -208,13 +284,7 @@ export function create(ctx) {
     deactivate() {},
     setProgress() {},        // scroll behaviour: Milestone 4
     setPointer() {},         // pointer parallax: Milestone 4
-    resize(w, h, dpr, c) {
-      W = w; H = h;
-      D = (h / 2) / Math.tan((camera.fov * Math.PI / 180) / 2);   // 1 world unit = 1 CSS px at z = 0
-      camera.aspect = w / h; camera.position.set(0, 0, D); camera.near = 1; camera.far = D + 2000;
-      camera.updateProjectionMatrix();
-      layout(c);
-    },
+    resize(w, h, dpr, c) { W = w; H = h; setCamera(); layout(c); },
     render(renderer) { renderer.render(scene, camera); },
     wantsFrame() { return false; },
     dispose() { clearBuilt(); scene = null; },
