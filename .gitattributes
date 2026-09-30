@@ -1,0 +1,3 @@
+# Vendored third-party builds must stay byte-exact (provenance hashes in
+# each VENDOR.md): no line-ending conversion, no text diffs.
+/vendor/** -text -diff
