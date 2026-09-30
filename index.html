@@ -44,295 +44,364 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!-- Brand fonts load without blocking first paint; metric-matched local
+     fallbacks (below) keep the layout still when they swap in. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Almarai:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Space+Mono&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Space+Mono&display=swap"></noscript>
 <style>
   :root{
     --void:#050505;
     --void-2:#0c0c0c;
+    --graphite:#101010;
     --paper:#F5F3ED;
-    --paper-dim: rgba(245,243,237,0.55);
+    /* Solid text greys (not alpha): no seams where Arabic glyphs overlap,
+       and both pass WCAG AA contrast on --void. */
+    --paper-dim:#9a9995;
+    --paper-mute:#7d7c78;
     --paper-faint: rgba(245,243,237,0.18);
     --ember:#FF5A36;
     --ember-hot:#FFB199;
     --line: rgba(245,243,237,0.09);
+    --line-strong: rgba(245,243,237,0.16);
+    --gutter: clamp(22px, 4.2vw, 64px);
+    --shell: 1360px;
+    --display: 'Almarai', 'Almarai Fallback', sans-serif;
+    --body: 'IBM Plex Sans Arabic', 'Plex Fallback', sans-serif;
+    --mono: 'Space Mono', 'Mono Fallback', ui-monospace, monospace;
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{ background:var(--void); scroll-behavior:smooth; }
-  body{
-    background:var(--void);
-    color:var(--paper);
-    font-family:'IBM Plex Sans Arabic', sans-serif;
-    overflow-x:hidden;
-    cursor:auto;
-  }
+  /* Local fallbacks sized to the brand fonts' metrics, so text keeps the same
+     footprint before and after the web fonts arrive (no layout shift). */
+  /* Measured against the brand fonts in Chrome (width, ascent, descent);
+     Arabic and Latin get separate factors because Almarai's Arabic is much
+     wider than Arial's. The Arabic faces come last so they win for Arabic. */
+  @font-face{ font-family:'Almarai Fallback'; font-weight:700 800; src:local('Arial Bold'), local('Arial-BoldMT'); size-adjust:101.1%; ascent-override:90%; descent-override:20.8%; line-gap-override:0%; }
+  @font-face{ font-family:'Almarai Fallback'; font-weight:700 800; src:local('Arial Bold'), local('Arial-BoldMT'); size-adjust:135.9%; ascent-override:67%; descent-override:15.5%; line-gap-override:0%; unicode-range:U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200E, U+2010-2011, U+204F, U+2E41; }
+  @font-face{ font-family:'Plex Fallback'; font-weight:400 600; src:local('Arial'), local('ArialMT'); size-adjust:102.5%; ascent-override:106.4%; descent-override:41%; line-gap-override:0%; }
+  @font-face{ font-family:'Plex Fallback'; font-weight:400 600; src:local('Arial'), local('ArialMT'); size-adjust:115.9%; ascent-override:94%; descent-override:36.2%; line-gap-override:0%; unicode-range:U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200E, U+2010-2011, U+204F, U+2E41; }
+  @font-face{ font-family:'Mono Fallback'; src:local('Courier New'), local('CourierNewPSMT'); size-adjust:102%; ascent-override:109.8%; descent-override:35.3%; line-gap-override:0%; }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ background:var(--void); scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+  body{ background:var(--void); color:var(--paper); font-family:var(--body); font-size:16px; line-height:1.75; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
   ::selection{ background:var(--ember); color:var(--void); }
   a{ color:inherit; text-decoration:none; }
-  .mono{ font-family:'Space Mono', monospace; }
-  .display{ font-family:'Almarai', sans-serif; }
+  img{ display:block; max-width:100%; height:auto; }
+  :focus-visible{ outline:1px solid var(--ember); outline-offset:4px; }
+  [id]{ scroll-margin-top:84px; }
+  .mono{ font-family:var(--mono); }
+  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  html[lang="en"] .only-ar, html[lang="ar"] .only-en{ display:none; }
 
-  .wrap{ max-width:1120px; margin:0 auto; padding:0 40px; position:relative; z-index:10; }
+  .shell{ max-width:var(--shell); margin:0 auto; padding:0 var(--gutter); position:relative; }
+  .grid{ display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); column-gap:clamp(16px, 2vw, 32px); }
 
-  /* ---------- Nav ---------- */
-  nav{ position:fixed; top:0; left:0; right:0; z-index:50; padding:28px 40px; display:flex; justify-content:space-between; align-items:center; gap:16px; }
-  .nav-actions{ display:flex; align-items:center; gap:16px; }
-  /* Logo guard: the official wordmark PNG ships on an opaque #050505 field
-     (= --void). This small surface, sized to the logo only, extends that same
-     field so the untouched asset always sits on its own background, whatever
-     scrolls underneath. Negative margins keep the nav layout unchanged. */
-  .nav-mark{ display:flex; align-items:center; background:var(--void); padding:8px 10px; margin:-8px -10px; border-radius:4px; }
-  .brand-logo-header{ display:block; height:26px; width:auto; }
-  .nav-en{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--paper); opacity:0.7; }
-  .lang-toggle{
-    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px;
-    background:transparent; border:1px solid var(--paper-faint); color:var(--paper);
-    padding:6px 14px; border-radius:99px; cursor:pointer;
-    transition:border-color .25s ease, background .25s ease;
-  }
-  .lang-toggle:hover{ border-color:var(--ember); background:rgba(255,90,54,0.08); }
-  @media (max-width:760px){ .nav-en{ display:none; } }
-  .nav-indicator-link{
-    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px;
-    color:var(--paper); border:1px solid var(--paper-faint); padding:6px 14px; border-radius:99px;
-    transition:border-color .25s ease, background .25s ease;
-  }
-  .nav-indicator-link:hover{ border-color:var(--ember); background:rgba(255,90,54,0.08); }
+  /* Section label: fine rule + mono kicker (English in both languages, as before). */
+  .label{ display:flex; align-items:center; gap:14px; white-space:nowrap; font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--paper-mute); text-transform:uppercase; line-height:1; }
+  .label::before{ content:''; width:28px; height:1px; background:var(--line-strong); flex-shrink:0; }
 
-  /* ---------- Hero ---------- */
-  .hero{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; text-align:center; padding:120px 24px 60px; }
-  .hero-eyebrow{ font-family:'Space Mono',monospace; font-size:12px; letter-spacing:4px; color:var(--paper-dim); margin-bottom:36px; }
-  .carve-svg{ width:min(90vw, 720px); height:auto; margin-bottom:8px; }
-  .carve-path{
-    fill:none; stroke:var(--paper); stroke-width:2;
-    stroke-dasharray:2600; stroke-dashoffset:2600;
-    animation:carve 2.6s cubic-bezier(.65,0,.35,1) forwards;
-  }
-  .carve-fill{
-    fill:var(--paper); opacity:0;
-    animation:reveal 1s ease forwards; animation-delay:2.2s;
-  }
-  @keyframes carve{ to{ stroke-dashoffset:0; } }
-  @keyframes reveal{ to{ opacity:1; } }
-  .hero-line{
-    font-size:clamp(17px,2vw,20px); color:var(--paper-dim); max-width:520px; margin:34px auto 0; line-height:2;
-    opacity:0; animation:fadeUp 1.2s ease forwards; animation-delay:.5s;
-  }
-  @keyframes fadeUp{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
-  .scroll-cue{
-    display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:48px;
-    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--paper-faint);
-    opacity:0; animation:fadeUp 1.2s ease forwards; animation-delay:1.2s;
-  }
-  .scroll-cue .line{ width:1px; height:36px; background:linear-gradient(180deg, var(--paper-faint), transparent); animation:pulse 2s ease-in-out infinite; }
-  @keyframes pulse{ 0%,100%{opacity:.3;} 50%{opacity:1;} }
+  .h2{ font-family:var(--display); font-weight:800; font-size:clamp(34px, 4.6vw, 72px); line-height:1.08; letter-spacing:-0.01em; text-wrap:balance; }
+  html[lang="ar"] .h2{ line-height:1.3; letter-spacing:0; }
+  .lede{ font-size:clamp(16px, 1.25vw, 18px); line-height:1.85; color:var(--paper-dim); max-width:46ch; }
 
-  /* ---------- Reveal-on-scroll ---------- */
-  /* Content is visible by default (no-JS / slow-JS safe).
-     JS adds .pending to opt elements into the hide→reveal animation;
-     if JS never runs, everything just stays visible. */
+  /* Reserved fields for the future Signal scenes: registration corners only.
+     Deliberately empty — no particles, no glow, no imitation of the Signal. */
+  .field{ position:relative; pointer-events:none;
+    --t: var(--line-strong);
+    background:
+      linear-gradient(var(--t),var(--t)) top left / 14px 1px no-repeat,
+      linear-gradient(var(--t),var(--t)) top left / 1px 14px no-repeat,
+      linear-gradient(var(--t),var(--t)) top right / 14px 1px no-repeat,
+      linear-gradient(var(--t),var(--t)) top right / 1px 14px no-repeat,
+      linear-gradient(var(--t),var(--t)) bottom left / 14px 1px no-repeat,
+      linear-gradient(var(--t),var(--t)) bottom left / 1px 14px no-repeat,
+      linear-gradient(var(--t),var(--t)) bottom right / 14px 1px no-repeat,
+      linear-gradient(var(--t),var(--t)) bottom right / 1px 14px no-repeat;
+  }
+
+  /* ---------- Reveal (progressive enhancement: visible unless JS opts in) ---------- */
   .reveal.pending{ opacity:0; transform:translateY(12px); transition:opacity 1.4s cubic-bezier(.22,1,.36,1), transform 1.4s cubic-bezier(.22,1,.36,1); }
-  .reveal.pending.in{ opacity:1; transform:translateY(0); }
-
-  section{ padding:180px 0; position:relative; }
-  .kicker{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--ember); margin-bottom:28px; }
-  /* Lines are visible by default; they only start hidden once JS has opted the
-     paragraph in with .pending (so no-JS and reduced-motion users always see them). */
+  .reveal.pending.in{ opacity:1; transform:none; }
   .stagger-line{ display:block; transition:opacity 1.2s ease, transform 1.2s ease; transition-delay:calc(var(--d,0) * 0.2s); }
   .reveal-line.pending .stagger-line{ opacity:0; transform:translateY(8px); }
-  .reveal-line.pending.in .stagger-line{ opacity:1; transform:translateY(0); }
-  .stats-strip{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:34px 0; }
-  .stats-strip .wrap{ display:flex; justify-content:center; gap:60px; flex-wrap:wrap; text-align:center; }
-  .stat-num{ font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(20px,3vw,28px); color:var(--ember); }
-  .stat-label{ font-size:11px; letter-spacing:1px; color:var(--paper-dim); margin-top:6px; }
-  @media (max-width:760px){ .stats-strip .wrap{ gap:34px; } }
+  .reveal-line.pending.in .stagger-line{ opacity:1; transform:none; }
 
-  /* ---------- Manifesto ---------- */
-  .manifesto p{
-    font-family:'Almarai',sans-serif; font-weight:700; font-size:clamp(26px,4.2vw,48px);
-    line-height:1.9; max-width:920px; color:var(--paper-dim);
-  }
-  .manifesto p strong{ color:var(--paper); font-weight:800; }
+  /* ---------- Buttons & links ---------- */
+  .btn{ display:inline-flex; align-items:center; gap:14px; min-height:52px; padding:0 8px 0 26px; border-radius:99px; font-family:var(--body); font-weight:600; font-size:15px; line-height:1; border:1px solid transparent; cursor:pointer; transition:background .25s ease, border-color .25s ease, color .25s ease; }
+  [dir="rtl"] .btn{ padding:0 26px 0 8px; }
+  .btn-primary{ background:var(--paper); color:var(--void); }
+  .btn-primary:hover{ background:#fff; }
+  .btn-arrow{ width:38px; height:38px; border-radius:50%; background:var(--ember); display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .25s ease; }
+  .btn:hover .btn-arrow{ transform:translateX(3px); }
+  [dir="rtl"] .btn:hover .btn-arrow{ transform:translateX(-3px); }
+  [dir="rtl"] .btn-arrow svg, [dir="rtl"] .arrow-flip{ transform:scaleX(-1); }
+  .btn-quiet{ background:transparent; color:var(--paper); border-color:var(--line-strong); padding:0 26px; }
+  [dir="rtl"] .btn-quiet{ padding:0 26px; }
+  .btn-quiet:hover{ border-color:var(--paper-faint); background:rgba(245,243,237,0.04); }
+  .btn:disabled{ opacity:.55; cursor:default; }
+  .text-link{ display:inline-flex; align-items:center; gap:10px; font-weight:500; font-size:15px; color:var(--paper); padding-bottom:4px; border-bottom:1px solid var(--line-strong); transition:border-color .25s ease; }
+  .text-link:hover{ border-color:var(--ember); }
+  .text-link .arrow{ font-family:var(--mono); font-size:13px; color:var(--paper-mute); }
 
-  /* ---------- Services index ---------- */
-  .index-list{ border-top:1px solid var(--line); }
-  .index-row{
-    display:flex; align-items:center; justify-content:space-between; gap:24px;
-    padding:44px 0; border-bottom:1px solid var(--line);
-    position:relative; overflow:hidden;
-  }
-  .index-num{ font-family:'Space Mono',monospace; font-size:13px; color:var(--paper-dim); width:44px; flex-shrink:0; }
-  .index-name{ font-family:'Almarai',sans-serif; font-weight:800; font-size:clamp(28px,4vw,52px); transition:color .4s ease, transform .4s ease; }
-  .index-row:hover .index-name{ color:var(--ember); transform:translateX(-10px); }
-  .index-desc{ font-size:14px; color:var(--paper-dim); max-width:280px; text-align:left; flex-shrink:0; }
-  @media (max-width:760px){
-    .index-row{ flex-direction:column; align-items:flex-start; gap:12px; }
-    .index-desc{ text-align:right; max-width:100%; }
-  }
+  /* ---------- Nav ---------- */
+  nav{ position:fixed; top:0; left:0; right:0; z-index:50; display:flex; justify-content:space-between; align-items:center; gap:16px; padding:22px var(--gutter); }
+  /* Dissolves into the page instead of a bar: a soft void fade for legibility. */
+  nav::before{ content:''; position:absolute; inset:0 0 -40px 0; background:linear-gradient(180deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.6) 55%, rgba(5,5,5,0) 100%); pointer-events:none; z-index:-1; }
+  /* Logo guard: the official wordmark PNG ships on an opaque #050505 field
+     (= --void). This surface, sized to the logo only, extends that same field
+     so the untouched asset always sits on its own background. */
+  .nav-mark{ display:flex; align-items:center; background:var(--void); padding:8px 10px; margin:-8px -10px; border-radius:3px; }
+  .brand-logo-header{ display:block; height:24px; width:auto; }
+  .nav-actions{ display:flex; align-items:center; gap:22px; }
+  .nav-indicator-link{ font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--paper); padding:6px 0; border-bottom:1px solid var(--line-strong); transition:border-color .25s ease; }
+  .nav-indicator-link:hover{ border-color:var(--ember); }
+  .nav-en{ font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--paper-mute); }
+  .lang-toggle{ font-family:var(--mono); font-size:11px; letter-spacing:1px; background:transparent; border:1px solid var(--line-strong); color:var(--paper); min-width:40px; padding:6px 10px; border-radius:2px; cursor:pointer; transition:border-color .25s ease; }
+  .lang-toggle:hover{ border-color:var(--paper-faint); }
 
-  /* ---------- Case study: artifact display ---------- */
-  .artifact-head{ text-align:center; margin-bottom:80px; }
-  .artifact-title{ font-family:'Almarai',sans-serif; font-weight:800; font-size:clamp(30px,5vw,54px); }
-  .artifact-title .accent{ color:var(--ember); }
-  .vitrine{
-    position:relative; border:1px solid var(--line); border-radius:2px;
-    padding:80px 40px; background:
-      radial-gradient(ellipse 60% 50% at 50% 30%, rgba(255,90,54,0.09), transparent 70%),
-      var(--void-2);
-    display:flex; align-items:flex-end; justify-content:center; gap:50px; flex-wrap:wrap;
-    margin-bottom:70px;
-  }
-  .vitrine::before{
-    content:''; position:absolute; inset:14px; border:1px solid var(--paper-faint); pointer-events:none;
-  }
-  .artifact-shot{
-    width:100%; max-width:230px; height:auto; border-radius:14px 14px 0 0;
-    box-shadow:0 50px 90px -30px rgba(0,0,0,0.8);
-  }
-  .artifact-shot.secondary{ max-width:175px; opacity:0.8; margin-bottom:30px; }
+  /* ---------- 1. Hero ---------- */
+  .hero{ position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; padding:128px 0 0; }
+  /* Desktop: the field owns the end third, the text owns the first two thirds. */
+  .hero-field{ position:absolute; top:112px; bottom:112px; inset-inline-start:calc(66.66% + 16px); inset-inline-end:var(--gutter); }
+  .hero-body{ margin-top:auto; padding-bottom:clamp(48px, 7vh, 88px); }
+  .hero-eyebrow{ font-family:var(--mono); font-size:10.5px; letter-spacing:4px; color:var(--paper-mute); margin-bottom:clamp(22px, 3vh, 34px); }
+  .hero-headline{ grid-column:1 / span 8; font-family:var(--display); font-weight:800; font-size:clamp(40px, 5.3vw, 86px); line-height:1.04; letter-spacing:-0.02em; }
+  html[lang="ar"] .hero-headline{ line-height:1.24; letter-spacing:0; font-size:clamp(42px, 5.6vw, 92px); }
+  .hero-headline .l1{ display:block; color:var(--paper-mute); text-wrap:balance; }
+  .hero-headline .l2{ display:block; color:var(--paper); text-wrap:balance; }
+  .hero-sub{ grid-column:1 / span 5; margin-top:clamp(28px, 4vh, 44px); }
+  .hero-actions{ grid-column:1 / span 8; grid-row:3; display:flex; align-items:center; gap:28px; flex-wrap:wrap; margin-top:clamp(28px, 4vh, 44px); }
+  .hero-foot{ border-top:1px solid var(--line); }
+  .hero-foot .shell{ display:flex; justify-content:space-between; align-items:center; gap:16px; height:64px; font-family:var(--mono); font-size:10.5px; letter-spacing:3px; color:var(--paper-mute); }
+  .scroll-cue{ display:flex; align-items:center; gap:12px; }
+  .scroll-cue .line{ width:1px; height:18px; background:var(--paper-faint); }
 
-  .case-narrative{ display:grid; grid-template-columns:repeat(3,1fr); gap:40px; }
-  .case-block .k{ font-family:'Space Mono',monospace; font-size:11px; color:var(--ember); letter-spacing:2px; margin-bottom:16px; }
-  .case-block p{ font-size:15px; line-height:2; color:var(--paper-dim); }
-  .case-tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:60px; justify-content:center; }
-  .case-tag{ font-family:'Space Mono',monospace; font-size:11px; border:1px solid var(--line); padding:7px 16px; border-radius:99px; color:var(--paper-dim); }
-  .view-case{ display:block; text-align:center; margin-top:32px; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:1px; color:var(--ember); }
-  .view-case a{ border-bottom:1px solid rgba(255,90,54,0.4); padding-bottom:2px; transition:border-color .25s ease; }
-  .view-case a:hover{ border-color:var(--ember); }
-  .stack-badges{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-  .faq-list{ max-width:760px; margin:0 auto; display:flex; flex-direction:column; }
-  .faq-item{ border-bottom:1px solid var(--line); padding:22px 0; }
-  .faq-item summary{ cursor:pointer; font-family:'Almarai',sans-serif; font-weight:700; font-size:17px; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:16px; }
+  /* ---------- 2. Understanding ---------- */
+  .understanding{ padding:clamp(140px, 17vw, 240px) 0 clamp(120px, 14vw, 200px); }
+  .understanding .label{ grid-column:1 / span 6; }
+  .u-display{ grid-column:1 / span 7; margin-top:36px; }
+  .u-field{ grid-column:8 / span 5; grid-row:1 / span 3; min-height:520px; }
+  .u-field i{ position:absolute; border:1px solid var(--line); }
+  .u-field i:nth-child(1){ inset:0 18% 22% 0; }
+  .u-field i:nth-child(2){ inset:9% 9% 13% 9%; border-color:var(--line-strong); }
+  .u-field i:nth-child(3){ inset:18% 0 4% 18%; }
+  .u-intro{ grid-column:1 / span 5; margin-top:40px; }
+  .u-statement{ grid-column:3 / span 9; margin-top:clamp(96px, 11vw, 160px); padding-top:40px; border-top:1px solid var(--line); font-family:var(--display); font-weight:700; font-size:clamp(22px, 2.6vw, 38px); line-height:1.5; color:var(--paper-mute); }
+  html[lang="ar"] .u-statement{ line-height:1.75; }
+  .u-statement strong{ color:var(--paper); font-weight:800; }
+  .u-statement .stagger-line + .stagger-line{ margin-top:.35em; }
+
+  /* ---------- 3. What can be built ---------- */
+  .build{ padding:clamp(120px, 13vw, 190px) 0; }
+  .build-head .label{ grid-column:1 / span 6; }
+  .build-head .h2{ grid-column:1 / span 8; margin-top:32px; }
+  /* Structural route reserved for the four future Signal branches. */
+  .route{ position:relative; margin-top:clamp(64px, 7vw, 104px); height:28px; }
+  .route::before{ content:''; position:absolute; top:0; inset-inline:0; height:1px; background:var(--line-strong); }
+  .families{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); }
+  .family{ position:relative; padding:0 clamp(16px, 2vw, 32px) 0 0; }
+  [dir="rtl"] .family{ padding:0 0 0 clamp(16px, 2vw, 32px); }
+  .family::before{ content:''; position:absolute; top:-28px; inset-inline-start:0; width:1px; height:28px; background:var(--line-strong); }
+  .family + .family{ border-inline-start:1px solid var(--line); padding-inline-start:clamp(16px, 2vw, 32px); }
+  .family-name{ font-family:var(--display); font-weight:800; font-size:clamp(24px, 2.2vw, 34px); line-height:1.15; padding-top:6px; }
+  html[lang="ar"] .family-name{ line-height:1.4; }
+  .family ul{ list-style:none; margin-top:28px; }
+  .family li{ font-size:16px; color:var(--paper-dim); padding:12px 0; border-top:1px solid var(--line); line-height:1.5; }
+  .build-note{ margin-top:clamp(72px, 8vw, 120px); display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); column-gap:clamp(16px, 2vw, 32px); }
+  .build-note p{ grid-column:7 / span 6; font-family:var(--display); font-weight:700; font-size:clamp(19px, 1.6vw, 24px); line-height:1.6; color:var(--paper-dim); }
+
+  /* ---------- 4. Built by Athar ---------- */
+  .built{ padding:clamp(120px, 13vw, 190px) 0 clamp(80px, 9vw, 140px); border-top:1px solid var(--line); }
+  .built-head .label{ grid-column:1 / span 6; }
+  .built-head .h2{ grid-column:1 / span 7; margin-top:32px; }
+  .built-head .built-line{ grid-column:1 / span 6; margin-top:18px; font-size:17px; color:var(--paper-mute); }
+  .built-line .accent{ color:var(--paper-dim); }
+  .product{ margin-top:clamp(96px, 11vw, 160px); align-items:start; }
+  .product-visual{ grid-column:1 / span 7; }
+  .product-text{ grid-column:9 / span 4; padding-top:8px; }
+  .product.flip .product-visual{ grid-column:6 / span 7; grid-row:1; }
+  .product.flip .product-text{ grid-column:1 / span 4; grid-row:1; }
+  .p-index{ font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--paper-mute); }
+  .p-name{ font-family:var(--display); font-weight:800; font-size:clamp(30px, 2.8vw, 44px); line-height:1.1; margin-top:14px; }
+  html[lang="ar"] .p-name{ line-height:1.35; }
+  .p-sub{ font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--paper-mute); margin-top:8px; }
+  .p-headline{ font-family:var(--display); font-weight:700; font-size:19px; line-height:1.5; color:var(--paper-mute); margin-top:18px; }
+  .p-headline .accent{ color:var(--paper); }
+  .p-desc{ font-size:16px; line-height:1.85; color:var(--paper-dim); margin-top:20px; }
+  .p-facts{ margin-top:28px; border-top:1px solid var(--line); }
+  .p-facts div{ padding:16px 0; border-bottom:1px solid var(--line); }
+  .p-facts dt{ font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:var(--paper-mute); margin-bottom:6px; }
+  .p-facts dd{ font-size:14.5px; line-height:1.85; color:var(--paper-dim); }
+  .p-tags{ display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:22px; font-family:var(--mono); font-size:10.5px; letter-spacing:1.5px; color:var(--paper-mute); }
+  .p-link{ margin-top:28px; }
+
+  .display{ position:relative; border:1px solid var(--line); background:var(--graphite); overflow:hidden; }
+  .display-bar{ display:flex; align-items:center; justify-content:space-between; gap:12px; height:38px; padding:0 16px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:10.5px; letter-spacing:1px; color:var(--paper-mute); direction:ltr; }
+  .display-bar i{ display:block; width:28px; height:1px; background:var(--line-strong); }
+  /* KHZNTI: real phone screens, cropped by the frame's lower edge. */
+  .display-phones{ aspect-ratio: 7 / 6; }
+  .display-phones img{ position:absolute; border:1px solid var(--line-strong); border-radius:18px 18px 0 0; }
+  .display-phones .ph-a{ left:9%; top:16%; width:38%; opacity:.7; }
+  .display-phones .ph-b{ left:45%; top:8%; width:45%; }
+  /* Solution Indicator: real desktop intro screen + real mobile question screen. */
+  .display-screen img.screen{ width:100%; aspect-ratio:16 / 10; object-fit:cover; object-position:top; }
+  .si-phone{ position:absolute; width:21%; bottom:-10%; right:4%; border:1px solid var(--line-strong); border-radius:18px 18px 0 0; overflow:hidden; background:var(--void); box-shadow:0 -24px 60px rgba(0,0,0,0.55); }
+  .si-phone img{ width:100%; }
+  .display-screen{ padding-bottom:0; }
+  /* Digital Clue: internal placeholder until an unbranded asset exists. */
+  .display-pending{ aspect-ratio: 16 / 11; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; padding:24px; border:1px dashed var(--line-strong); background:transparent; font-family:var(--mono); color:var(--paper-mute); direction:ltr; }
+  .display-pending b{ font-weight:400; font-size:12px; letter-spacing:4px; color:var(--paper-dim); }
+  .display-pending span{ font-size:10.5px; letter-spacing:1px; max-width:34ch; line-height:1.8; }
+
+  /* ---------- 5. How Athar thinks ---------- */
+  .thinks{ padding:clamp(120px, 13vw, 190px) 0; border-top:1px solid var(--line); }
+  .thinks-head .label{ grid-column:1 / span 6; }
+  .thinks-head .h2{ grid-column:1 / span 7; margin-top:32px; }
+  /* One continuous rail through all six stages (ready for Signal states). */
+  .sequence{ list-style:none; position:relative; display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); column-gap:clamp(14px, 1.6vw, 28px); margin-top:clamp(72px, 8vw, 120px); padding-top:40px; }
+  .sequence::before{ content:''; position:absolute; top:0; inset-inline:0; height:1px; background:var(--line-strong); }
+  .stage{ position:relative; }
+  .stage::before{ content:''; position:absolute; top:-40px; inset-inline-start:0; width:1px; height:17px; background:var(--paper-faint); }
+  .stage-i{ font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:var(--paper-mute); }
+  .stage-name{ font-family:var(--display); font-weight:800; font-size:clamp(20px, 1.7vw, 26px); line-height:1.25; margin-top:10px; }
+  html[lang="ar"] .stage-name{ line-height:1.5; }
+  .stage p{ font-size:14.5px; line-height:1.8; color:var(--paper-dim); margin-top:12px; }
+
+  /* ---------- 6. FAQ ---------- */
+  .faq{ padding:clamp(100px, 11vw, 160px) 0; border-top:1px solid var(--line); }
+  .faq .label{ grid-column:1 / span 4; align-self:start; margin-top:30px; }
+  .faq-list{ grid-column:5 / span 8; }
+  .faq-item{ border-bottom:1px solid var(--line); }
+  .faq-item:first-child{ border-top:1px solid var(--line); }
+  .faq-item summary{ cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:24px; padding:24px 0; font-family:var(--display); font-weight:700; font-size:clamp(17px, 1.4vw, 20px); line-height:1.5; }
   .faq-item summary::-webkit-details-marker{ display:none; }
-  .faq-item summary::after{ content:'+'; font-family:'Space Mono',monospace; font-size:20px; color:var(--ember); flex-shrink:0; transition:transform .25s ease; }
-  .faq-item[open] summary::after{ transform:rotate(45deg); }
-  .faq-item p{ margin-top:14px; font-size:14px; line-height:1.9; color:var(--paper-dim); }
-  @media (max-width:760px){ .case-narrative{ grid-template-columns:1fr; } }
+  .faq-item summary::after{ content:'+'; font-family:var(--mono); font-size:18px; color:var(--paper-mute); flex-shrink:0; transition:transform .25s ease, color .25s ease; }
+  .faq-item[open] summary::after{ transform:rotate(45deg); color:var(--ember); }
+  .faq-item p{ padding:0 0 26px; max-width:62ch; font-size:15px; line-height:1.9; color:var(--paper-dim); }
 
-  /* ---------- Process ghost numbers ---------- */
-  .process-row{ display:flex; align-items:center; gap:28px; padding:38px 0; border-bottom:1px solid var(--line); }
-  .process-row:first-child{ border-top:1px solid var(--line); }
-  .ghost-num{
-    font-family:'Almarai',sans-serif; font-weight:800; font-size:52px; color:transparent;
-    -webkit-text-stroke:1px var(--line); user-select:none; line-height:1; flex-shrink:0; width:76px;
-  }
-  .process-row h4{ font-family:'Almarai',sans-serif; font-weight:700; font-size:19px; width:190px; flex-shrink:0; }
-  .process-row p{ color:var(--paper-dim); font-size:14.5px; line-height:1.9; max-width:480px; }
-  @media (max-width:760px){ .process-row{ flex-direction:column; gap:10px; align-items:flex-start; } .process-row h4{ width:auto; } .ghost-num{ width:auto; font-size:36px; } }
-
-  /* ---------- Closing ---------- */
-  .closing{ text-align:center; padding:220px 0 160px; }
-  .closing-title{ font-family:'Almarai',sans-serif; font-weight:800; font-size:clamp(34px,6vw,68px); line-height:1.4; max-width:820px; margin:0 auto; }
-  .closing-title .accent{ color:var(--ember); }
-  .magnet-btn{
-    position:relative; display:inline-flex; align-items:center; gap:12px;
-    font-family:'IBM Plex Sans Arabic',sans-serif; font-weight:600; font-size:16px;
-    background:var(--paper); color:var(--void); padding:12px 14px 12px 46px; border-radius:99px;
-    border:none; cursor:pointer;
-  }
-  .btn-arrow{
-    position:absolute; left:6px; top:50%; transform:translateY(-50%);
-    width:34px; height:34px; border-radius:50%; background:var(--ember);
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .15s ease-out;
-  }
-  .magnet-btn:hover .btn-arrow{ transform:translateY(-50%) scale(1.08); }
-
-
-  /* ---------- Hero headline + actions ---------- */
-  .hero-headline{
-    font-family:'Almarai',sans-serif; font-weight:800; font-size:clamp(26px,4.2vw,44px);
-    color:var(--paper); max-width:720px; margin:30px auto 0; line-height:1.3;
-  }
-  .hero-headline .accent{ color:var(--ember); }
-  .hero-actions{ display:flex; align-items:center; justify-content:center; gap:18px; margin-top:38px; flex-wrap:wrap; }
-  .hero-actions .magnet-btn{ margin-top:0; }
-  .hero-btn-secondary{
-    font-family:'IBM Plex Sans Arabic',sans-serif; font-weight:600; font-size:15px;
-    color:var(--paper); border:1px solid var(--paper-faint); padding:13px 26px; border-radius:99px;
-    transition:border-color .25s ease, background .25s ease;
-  }
-  .hero-btn-secondary:hover{ border-color:var(--ember); background:rgba(255,90,54,0.08); }
-
-  /* ---------- Problem -> Solution ---------- */
-  .flow-row{ display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap; margin-top:56px; }
-  .flow-node{ font-family:'Space Mono',monospace; font-size:12px; letter-spacing:1px; color:var(--paper-dim); border:1px solid var(--line); padding:10px 18px; border-radius:99px; }
-  .flow-node.accent{ color:var(--ember); border-color:rgba(255,90,54,0.4); }
-  .flow-arrow{ color:var(--paper-faint); padding:0 10px; font-family:'Space Mono',monospace; }
-  @media (max-width:760px){ .flow-row{ flex-direction:column; gap:12px; } .flow-arrow{ transform:rotate(90deg); padding:0; } }
-
-  /* ---------- Contact form ---------- */
-  .contact-form{
-    max-width:460px; margin:56px auto 0; text-align:right;
-    display:flex; flex-direction:column; gap:14px;
-  }
-  .contact-form input, .contact-form textarea{
-    width:100%; background:var(--void-2); border:1px solid var(--line); color:var(--paper);
-    font-family:'IBM Plex Sans Arabic',sans-serif; font-size:14px; padding:14px 16px;
-    border-radius:10px; outline:none; transition:border-color .2s ease;
-  }
+  /* ---------- 7. One clear path ---------- */
+  .path{ position:relative; padding:0 0 clamp(110px, 12vw, 170px); text-align:center; border-top:1px solid var(--line); }
+  /* The axis: reserved for the future One Clear Path scene. Ember only at its
+     end, where it meets the headline — direction, not decoration. */
+  .path-axis{ width:1px; height:clamp(120px, 16vw, 220px); margin:0 auto clamp(40px, 5vw, 64px); background:linear-gradient(180deg, var(--line) 0%, var(--line-strong) 78%, var(--ember) 100%); }
+  .path-title{ font-family:var(--display); font-weight:800; font-size:clamp(46px, 7.4vw, 124px); line-height:1.02; letter-spacing:-0.02em; }
+  html[lang="ar"] .path-title{ line-height:1.25; letter-spacing:0; }
+  .path-sub{ margin:clamp(20px, 2.4vw, 30px) auto 0; font-size:clamp(17px, 1.4vw, 20px); color:var(--paper-dim); }
+  .path-primary{ margin-top:clamp(40px, 4.4vw, 56px); }
+  .path-primary .btn{ min-height:60px; font-size:16px; }
+  .path-secondary{ max-width:520px; margin:clamp(88px, 9vw, 130px) auto 0; padding-top:44px; border-top:1px solid var(--line); }
+  .path-secondary .form-intro{ font-size:15px; line-height:1.9; color:var(--paper-dim); }
+  .contact-form{ margin-top:30px; display:flex; flex-direction:column; gap:12px; text-align:start; }
+  .contact-form input, .contact-form textarea{ width:100%; background:transparent; border:0; border-bottom:1px solid var(--line-strong); color:var(--paper); font-family:var(--body); font-size:15px; padding:14px 2px; border-radius:0; outline:none; transition:border-color .2s ease; }
+  .contact-form input::placeholder, .contact-form textarea::placeholder{ color:var(--paper-mute); }
   .contact-form input:focus, .contact-form textarea:focus{ border-color:var(--ember); }
-  .contact-form textarea{ min-height:110px; resize:vertical; font-family:inherit; }
-  .contact-form .magnet-btn{ align-self:center; margin-top:6px; }
-  .contact-form .magnet-btn:disabled{ opacity:0.6; cursor:default; }
-  .contact-status{ font-size:13px; margin-top:14px; min-height:18px; }
+  .contact-form textarea{ min-height:104px; resize:vertical; }
+  .contact-form .btn{ align-self:center; margin-top:18px; }
+  .contact-status{ font-size:13px; margin-top:14px; min-height:18px; text-align:center; }
   .contact-status.ok{ color:#7fd99a; }
   .contact-status.err{ color:var(--ember-hot); }
-  .sr-only{
-    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
-    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
-  }
-
-  footer{ border-top:1px solid var(--line); padding:50px 0 40px; text-align:center; }
-  .foot-mark{ display:flex; align-items:center; justify-content:center; gap:10px; margin:0 auto 18px; }
-  .brand-logo-footer{ display:block; height:34px; width:auto; }
-  footer .l1{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--paper-dim); }
-  footer .l2{ font-size:11px; color:var(--paper-dim); margin-top:8px; }
-  .foot-links{ display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:14px 18px; margin-top:22px; }
-  .foot-links a{
-    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px;
-    color:var(--paper-dim); border:1px solid var(--paper-faint); padding:7px 16px; border-radius:99px;
-    transition:border-color .25s ease, color .25s ease, background .25s ease;
-  }
-  .foot-links a:hover{ border-color:var(--ember); color:var(--paper); background:rgba(255,90,54,0.08); }
-
-  /* ---------- No-JS contact state (shown via <noscript>) ---------- */
-  .contact-noscript{
-    max-width:460px; margin:56px auto 0; padding:22px 24px; text-align:center;
-    border:1px solid var(--line); border-radius:10px; background:var(--void-2);
-    font-size:14px; line-height:1.9; color:var(--paper-dim);
-  }
+  .contact-noscript{ margin-top:30px; padding:22px 24px; border:1px solid var(--line); font-size:14px; line-height:1.9; color:var(--paper-dim); }
   .contact-noscript p + p{ margin-top:10px; }
   .contact-noscript a{ color:var(--paper); border-bottom:1px solid rgba(255,90,54,0.5); }
 
-  /* ---------- Tap targets ---------- */
-  /* Small pill links keep their look but get a >=44px hit area on touch screens. */
+  /* ---------- Footer ---------- */
+  footer{ border-top:1px solid var(--line); padding:56px 0 44px; text-align:center; }
+  .foot-mark{ display:flex; justify-content:center; margin:0 auto 20px; }
+  .brand-logo-footer{ display:block; height:32px; width:auto; }
+  footer .l1{ font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:var(--paper-mute); }
+  footer .l2{ font-size:11px; color:var(--paper-mute); margin-top:8px; }
+  .foot-links{ display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:12px 28px; margin-top:24px; }
+  .foot-links a{ font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--paper-dim); padding:6px 0; border-bottom:1px solid var(--line-strong); transition:border-color .25s ease, color .25s ease; }
+  .foot-links a:hover{ border-color:var(--ember); color:var(--paper); }
+
+  /* ---------- Touch hit areas (look unchanged, >=44px to tap) ---------- */
   @media (pointer:coarse){
-    .nav-indicator-link, .lang-toggle, .foot-links a, .view-case a{ position:relative; }
-    .nav-indicator-link::after, .lang-toggle::after, .foot-links a::after, .view-case a::after{
-      content:''; position:absolute; left:-4px; right:-4px; top:50%; height:44px; transform:translateY(-50%);
+    .nav-indicator-link, .lang-toggle, .foot-links a, .text-link{ position:relative; }
+    .nav-indicator-link::after, .lang-toggle::after, .foot-links a::after, .text-link::after{
+      content:''; position:absolute; left:-6px; right:-6px; top:50%; height:44px; transform:translateY(-50%);
     }
   }
 
-  /* ---------- Narrow screens ---------- */
-  @media (max-width:760px){
-    section{ padding:112px 0; }
-    .closing{ padding:140px 0 110px; }
-    .wrap{ padding:0 22px; }
-    nav{ padding:18px 20px; }
-    .nav-actions{ gap:10px; }
-    .artifact-head{ margin-bottom:48px; }
-    .vitrine{ padding:48px 20px; gap:24px; margin-bottom:48px; }
-    .case-tags{ margin-top:40px; }
+  /* ---------- Tablet (<=1100) ---------- */
+  @media (max-width:1100px){
+    .families{ grid-template-columns:repeat(2, minmax(0,1fr)); row-gap:56px; }
+    .family:nth-child(3){ border-inline-start:0; padding-inline-start:0; }
+    .route{ display:none; }
+    .family::before{ display:none; }
+    .family{ padding-top:22px; border-top:1px solid var(--line-strong); }
+    .sequence{ grid-template-columns:1fr; row-gap:40px; padding-top:0; padding-inline-start:36px; }
+    .sequence::before{ top:0; bottom:0; inset-inline-start:0; inset-inline-end:auto; width:1px; height:auto; }
+    .stage::before{ top:8px; inset-inline-start:-36px; width:17px; height:1px; }
+    .stage{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); column-gap:32px; }
+    .stage-i{ grid-column:1 / -1; }
+    .stage p{ margin-top:12px; }
+    .product-visual, .product.flip .product-visual{ grid-column:1 / -1; grid-row:1; }
+    .product-text, .product.flip .product-text{ grid-column:1 / span 10; grid-row:2; margin-top:44px; }
+    .faq .label{ grid-column:1 / -1; margin:0 0 28px; }
+    .faq-list{ grid-column:1 / -1; }
+  }
+
+  /* ---------- Narrow tablet / large phone (<=860) ---------- */
+  @media (max-width:860px){
+    .hero-field{ position:relative; top:auto; bottom:auto; inset:auto; flex:1 1 auto; min-height:22svh; margin:0 var(--gutter) 36px; }
+    .hero-headline{ grid-column:1 / -1; }
+    .hero-sub{ grid-column:1 / span 9; }
+    .hero-actions{ grid-column:1 / -1; justify-self:start; }
+    .u-field{ grid-column:1 / -1; grid-row:auto; min-height:0; height:clamp(200px, 44vw, 320px); margin-top:48px; order:2; }
+    .understanding .label{ order:1; }
+    .u-display{ grid-column:1 / -1; order:3; }
+    .u-intro{ grid-column:1 / span 10; order:4; }
+    .u-statement{ grid-column:1 / -1; order:5; }
+    .build-head .h2, .built-head .h2, .thinks-head .h2{ grid-column:1 / -1; }
+    .grid > .label{ grid-column:1 / -1; }
+    .built-head .built-line{ grid-column:1 / -1; }
+    .build-note p{ grid-column:1 / -1; }
+    .stage{ grid-template-columns:1fr; }
+  }
+
+  /* ---------- Phone (<=600): its own composition, not a squeezed desktop ---------- */
+  @media (max-width:600px){
+    body{ font-size:15.5px; }
+    nav{ padding:16px var(--gutter); }
+    .nav-en{ display:none; }
+    .nav-actions{ gap:16px; }
+    .hero{ padding-top:96px; }
+    .hero-field{ min-height:18svh; margin-bottom:28px; }
+    .hero-eyebrow{ font-size:9.5px; letter-spacing:3px; }
+    .hero-headline{ font-size:clamp(34px, 10.4vw, 48px); line-height:1.06; }
+    html[lang="ar"] .hero-headline{ font-size:clamp(36px, 11vw, 50px); line-height:1.3; }
+    .hero-sub{ grid-column:1 / -1; }
+    .hero-actions{ flex-direction:column; align-items:flex-start; gap:22px; }
+    .hero-foot .shell{ height:56px; font-size:9.5px; }
+    .understanding{ padding:104px 0 96px; }
+    .u-statement{ margin-top:72px; font-size:22px; }
+    .u-intro{ grid-column:1 / -1; }
+    .build, .built, .thinks{ padding:96px 0; }
+    .families{ grid-template-columns:1fr; row-gap:44px; margin-top:52px; }
+    [dir] .family{ border-inline-start:1px solid var(--line-strong); padding:0; padding-inline-start:20px; border-top:0; }
+    .family ul{ margin-top:14px; }
+    .family li{ padding:9px 0; }
+    .product{ margin-top:88px; }
+    .product-text, .product.flip .product-text{ grid-column:1 / -1; margin-top:32px; }
+    .display-phones{ aspect-ratio: 5 / 6; }
+    .display-phones .ph-a{ left:3%; top:14%; width:44%; }
+    .display-phones .ph-b{ left:43%; top:7%; width:54%; }
+    .si-phone{ width:30%; bottom:-20%; }
+    .display-bar{ height:32px; font-size:9.5px; }
+    .sequence{ padding-inline-start:26px; }
+    .stage::before{ inset-inline-start:-26px; width:12px; }
+    .faq{ padding:88px 0; }
+    .path-axis{ height:96px; }
+    .path-title{ font-size:clamp(40px, 12.4vw, 58px); }
+    html[lang="ar"] .path-title{ font-size:clamp(40px, 12.4vw, 58px); }
+    .path-primary .btn{ width:100%; justify-content:space-between; }
   }
   @media (max-width:360px){
-    nav{ padding:16px; gap:12px; }
-    .nav-actions{ gap:8px; }
-    .nav-indicator-link, .lang-toggle{ padding:6px 10px; letter-spacing:0; white-space:nowrap; }
-    .brand-logo-header{ height:22px; }
+    .nav-actions{ gap:12px; }
+    .brand-logo-header{ height:21px; }
+    .nav-indicator-link{ letter-spacing:0; }
   }
 
   /* ---------- Reduced motion ---------- */
-  /* Everything renders in its final, readable state immediately: no smooth
-     scrolling, no delayed or looping animation, no motion on transitions. */
   @media (prefers-reduced-motion:reduce){
     html{ scroll-behavior:auto; }
     *, *::before, *::after{
@@ -340,79 +409,60 @@
       animation-iteration-count:1 !important;
       transition-duration:0.01ms !important; transition-delay:0s !important;
     }
-    .carve-path{ animation:none; stroke-dashoffset:0; opacity:0; }
-    .carve-fill{ animation:none; opacity:1; }
-    .hero-line, .scroll-cue{ animation:none; opacity:1; }
-    .scroll-cue .line{ animation:none; opacity:.6; }
   }
 </style>
 <!-- Without JavaScript the online form cannot submit, so it is hidden and
-     replaced by the direct-email notice further down. -->
+     replaced by the direct-email notice in the contact section. -->
 <noscript><style>.contact-form{ display:none !important; }</style></noscript>
 </head>
 <body>
 
-  <nav>
+  <nav aria-label="Athar">
     <div class="nav-mark">
-      <img src="images/athar-logo-wordmark-official.png" alt="Athar" class="brand-logo-header">
+      <img src="images/athar-logo-wordmark-official.png" alt="Athar" class="brand-logo-header" width="1463" height="370">
     </div>
     <div class="nav-actions">
-      <a href="/solution-indicator/" class="nav-indicator-link" data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</a>
-      <div class="nav-en mono">ATHAR — 2026</div>
-      <button id="langToggle" class="lang-toggle mono" onclick="toggleLang()">EN</button>
+      <a href="/solution-indicator/" class="nav-indicator-link" data-indicator-link data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</a>
+      <div class="nav-en">ATHAR — 2026</div>
+      <button id="langToggle" class="lang-toggle" onclick="toggleLang()">EN</button>
     </div>
   </nav>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-eyebrow mono">A STUDIO THAT LEAVES A MARK</div>
-
-    <svg class="carve-svg" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
-      <!-- Hand-carved stroke outline of "أثر" that draws itself, then fills solid -->
-      <text x="300" y="150" text-anchor="middle" font-family="Almarai, sans-serif" font-weight="800" font-size="150" class="carve-path" data-ar="أثر" data-en="Athar">أثر</text>
-      <text x="300" y="150" text-anchor="middle" font-family="Almarai, sans-serif" font-weight="800" font-size="150" class="carve-fill" data-ar="أثر" data-en="Athar">أثر</text>
-    </svg>
-
-    <h1 class="hero-headline" data-ar-html='من فكرة، إلى <span class="accent">منتج حقيقي</span>.' data-en-html='From an idea, to a <span class="accent">real product</span>.'>من فكرة، إلى <span class="accent">منتج حقيقي</span>.</h1>
-
-    <p class="hero-line" data-ar="بنحوّل الأفكار ومشاكل الشغل لمنتجات رقمية حقيقية — من مواقع وتطبيقات ويب لـ MVPs." data-en="We turn ideas and business problems into digital products — from websites and web apps to MVPs.">بنحوّل الأفكار ومشاكل الشغل لمنتجات رقمية حقيقية — من مواقع وتطبيقات ويب لـ MVPs.</p>
-
-    <div class="hero-actions">
-      <a href="#contact" class="magnet-btn">
-        <span data-ar="ابدأ مشروعك" data-en="Start a project">ابدأ مشروعك</span>
-        <span class="btn-arrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="transform:scaleX(-1)">
-            <path d="M5 12h13M13 6l6 6-6 6" stroke="#F5F3ED" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-      </a>
-      <a href="#work" class="hero-btn-secondary" data-ar="شوف شغلنا" data-en="See our work">شوف شغلنا</a>
+  <main>
+  <!-- 1. Hero — Signal in the Noise -->
+  <section class="hero" id="top">
+    <div class="hero-field field" data-signal-field="hero" aria-hidden="true"></div>
+    <div class="hero-body shell">
+      <div class="hero-eyebrow">A STUDIO THAT LEAVES A MARK</div>
+      <div class="grid">
+        <h1 class="hero-headline" data-ar-html='<span class="l1">ما تبلّش بشو بدك تبني.</span><span class="l2">بلّش بشو بدو ينحل.</span>' data-en-html='<span class="l1">Don&rsquo;t start with what you want to build.</span><span class="l2">Start with what needs to be solved.</span>'><span class="l1">ما تبلّش بشو بدك تبني.</span><span class="l2">بلّش بشو بدو ينحل.</span></h1>
+        <p class="hero-sub lede" data-ar="بنلاقي شو المهم داخل المشكلة، وبنحوّل هالوضوح لمنتج أو نظام أو تجربة رقمية مناسبة." data-en="We find what matters inside the problem, then turn that clarity into the right digital product, system or experience.">بنلاقي شو المهم داخل المشكلة، وبنحوّل هالوضوح لمنتج أو نظام أو تجربة رقمية مناسبة.</p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-primary">
+            <span data-ar="ابدأ من المشكلة" data-en="Start with the problem">ابدأ من المشكلة</span>
+            <span class="btn-arrow" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h13M13 6l6 6-6 6" stroke="#F5F3ED" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <a href="#work" class="text-link" data-ar="شوف شو بنينا" data-en="See what we&rsquo;ve built">شوف شو بنينا</a>
+        </div>
+      </div>
     </div>
-
-    <div class="scroll-cue"><span data-ar="مرر للأسفل" data-en="Scroll down">مرر للأسفل</span><div class="line"></div></div>
-  </section>
-
-  <!-- Problem -> Solution -->
-  <section id="problem-solution">
-    <div class="wrap" style="text-align:center;">
-      <h2 class="closing-title reveal" data-ar-html='ما تبلش بشو بدك تبني.<br><span class="accent">بلش بشو بدو ينحل.</span>' data-en-html='Don&rsquo;t start with what to build.<br><span class="accent">Start with what needs to be solved.</span>' style="font-size:clamp(24px,3.6vw,38px);">ما تبلش بشو بدك تبني.<br><span class="accent">بلش بشو بدو ينحل.</span></h2>
-      <p class="reveal" style="max-width:560px; margin:26px auto 0; font-size:15px; line-height:2; color:var(--paper-dim);" data-ar="كل مشروع بيبلش بمشكلة. بنفهمها الأول، بنلاقي أبسط حل مفيد، وبعدين بنبني المنتج الرقمي الصح حواليها." data-en="Every project starts with a problem. We understand it first, find the simplest useful solution, then build the right digital product around it.">كل مشروع بيبلش بمشكلة. بنفهمها الأول، بنلاقي أبسط حل مفيد، وبعدين بنبني المنتج الرقمي الصح حواليها.</p>
-      <div class="flow-row reveal">
-        <span class="flow-node" data-ar="المشكلة" data-en="Problem">المشكلة</span><span class="flow-arrow">→</span>
-        <span class="flow-node" data-ar="الفهم" data-en="Understand">الفهم</span><span class="flow-arrow">→</span>
-        <span class="flow-node accent" data-ar="الحل" data-en="Solution">الحل</span><span class="flow-arrow">→</span>
-        <span class="flow-node" data-ar="البناء" data-en="Build">البناء</span><span class="flow-arrow">→</span>
-        <span class="flow-node" data-ar="المنتج" data-en="Product">المنتج</span>
+    <div class="hero-foot">
+      <div class="shell">
+        <span>ATHAR — DIGITAL PRODUCT STUDIO</span>
+        <span class="scroll-cue"><span data-ar="مرر للأسفل" data-en="Scroll down">مرر للأسفل</span><span class="line"></span></span>
       </div>
     </div>
   </section>
 
-  <!-- Manifesto -->
-  <section class="manifesto" id="about">
-    <div class="wrap">
-      <div class="kicker">WHY ATHAR</div>
-      <h2 class="artifact-title reveal" style="margin-bottom:36px;" data-ar="ليش أثر؟" data-en="Why Athar?">ليش أثر؟</h2>
-      <p class="reveal-line" style="font-size:clamp(20px,3.2vw,32px);">
+  <!-- 2. Understanding -->
+  <section class="understanding" id="about">
+    <span id="problem-solution" aria-hidden="true"></span>
+    <div class="shell grid">
+      <div class="label reveal">UNDERSTANDING</div>
+      <div class="u-field field" data-signal-field="understanding" aria-hidden="true"><i></i><i></i><i></i></div>
+      <h2 class="u-display h2 reveal" data-ar="نبدأ بالفهم" data-en="We look deeper to find what actually matters.">نبدأ بالفهم</h2>
+      <p class="u-intro lede reveal" data-ar="كل مشروع بيبلش بمشكلة. بنفهمها الأول، بنلاقي أبسط حل مفيد، وبعدين بنبني المنتج الرقمي الصح حواليها." data-en="Every project starts with a problem. We understand it first, find the simplest useful solution, then build the right digital product around it.">كل مشروع بيبلش بمشكلة. بنفهمها الأول، بنلاقي أبسط حل مفيد، وبعدين بنبني المنتج الرقمي الصح حواليها.</p>
+      <p class="u-statement reveal-line">
         <span class="stagger-line" style="--d:0" data-ar="أغلب المشاريع الرقمية بتبلش بلستة مزايا." data-en="Most digital projects start with a list of features.">أغلب المشاريع الرقمية بتبلش بلستة مزايا.</span>
         <span class="stagger-line" style="--d:1" data-ar-html='إحنا بنفضل نبلش <strong>بمشكلة</strong>.' data-en-html='We prefer to start with a <strong>problem</strong>.'>إحنا بنفضل نبلش <strong>بمشكلة</strong>.</span>
         <span class="stagger-line" style="--d:2" data-ar-html='بأثر، بنساعد رواد الأعمال والشركات يحوّلوا الأفكار والمشاكل الحقيقية لـ<strong>منتجات رقمية مفيدة</strong> — مبنية حوالين اللي فعلاً مهم.' data-en-html='At Athar, we help founders and businesses turn ideas and real-world problems into <strong>useful digital products</strong> — built around what actually matters.'>بأثر، بنساعد رواد الأعمال والشركات يحوّلوا الأفكار والمشاكل الحقيقية لـ<strong>منتجات رقمية مفيدة</strong> — مبنية حوالين اللي فعلاً مهم.</span>
@@ -420,194 +470,197 @@
     </div>
   </section>
 
-  <!-- Stats -->
-  <section class="stats-strip">
-    <div class="wrap">
-      <div class="reveal">
-        <div class="stat-num">3</div>
-        <div class="stat-label" data-ar="مشاريع حقيقية شغالة اليوم" data-en="Real projects live today">مشاريع حقيقية شغالة اليوم</div>
+  <!-- 3. What can be built -->
+  <section class="build" id="services">
+    <div class="shell">
+      <div class="build-head grid">
+        <div class="label reveal">WHAT CAN BE BUILT</div>
+        <h2 class="h2 reveal" data-ar="الحل بيعتمد على المشكلة." data-en="The solution depends on the problem.">الحل بيعتمد على المشكلة.</h2>
       </div>
-      <div class="reveal">
-        <div class="stat-num">100%</div>
-        <div class="stat-label" data-ar="كود مكتوب يدويًا، بلا قوالب" data-en="Hand-built code, zero templates">كود مكتوب يدويًا، بلا قوالب</div>
+      <div class="route" data-signal-field="branches" aria-hidden="true"></div>
+      <div class="families">
+        <div class="family reveal">
+          <h3 class="family-name" data-ar="تجارب" data-en="Experiences">تجارب</h3>
+          <ul>
+            <li data-ar="مواقع إلكترونية" data-en="Websites">مواقع إلكترونية</li>
+            <li data-ar="تجارب رقمية" data-en="Digital Experiences">تجارب رقمية</li>
+          </ul>
+        </div>
+        <div class="family reveal">
+          <h3 class="family-name" data-ar="منتجات" data-en="Products">منتجات</h3>
+          <ul>
+            <li data-ar="تطبيقات ويب" data-en="Web Applications">تطبيقات ويب</li>
+            <li data-ar="منتجات رقمية" data-en="Digital Products">منتجات رقمية</li>
+            <li data-ar="مزايا مدعومة بالذكاء الاصطناعي" data-en="AI-powered Features">مزايا مدعومة بالذكاء الاصطناعي</li>
+          </ul>
+        </div>
+        <div class="family reveal">
+          <h3 class="family-name" data-ar="أنظمة" data-en="Systems">أنظمة</h3>
+          <ul>
+            <li data-ar="أنظمة داخلية" data-en="Internal Systems">أنظمة داخلية</li>
+            <li data-ar="لوحات تحكم" data-en="Dashboards">لوحات تحكم</li>
+            <li data-ar="بوابات للعملاء والموظفين" data-en="Client / Employee Portals">بوابات للعملاء والموظفين</li>
+          </ul>
+        </div>
+        <div class="family reveal">
+          <h3 class="family-name" data-ar="ربط وتكامل" data-en="Connections">ربط وتكامل</h3>
+          <ul>
+            <li data-ar="أتمتة" data-en="Automation">أتمتة</li>
+            <li data-ar="تكاملات وواجهات API" data-en="Integrations &amp; APIs">تكاملات وواجهات API</li>
+          </ul>
+        </div>
       </div>
-      <div class="reveal">
-        <div class="stat-num mono">AR / EN</div>
-        <div class="stat-label" data-ar="بنبني ونسلّم باللغتين" data-en="We build and ship in both languages">بنبني ونسلّم باللغتين</div>
+      <div class="build-note">
+        <p class="reveal" data-ar="مش متأكد شو محتاج بالضبط؟ ولا يهمك، بنساعدك تحددها." data-en="Not sure what you need? That&rsquo;s okay. We&rsquo;ll help you figure it out.">مش متأكد شو محتاج بالضبط؟ ولا يهمك، بنساعدك تحددها.</p>
       </div>
     </div>
   </section>
 
-  <!-- Services index -->
-  <section id="services">
-    <div class="wrap">
-      <div class="kicker reveal">SERVICES</div>
-      <h2 class="artifact-title reveal" style="margin-bottom:60px;" data-ar="شو نقدر نبنيلك؟" data-en="What can we build for you?">شو نقدر نبنيلك؟</h2>
-      <div class="index-list">
-        <div class="index-row reveal">
-          <div class="index-num mono">01</div>
-          <div class="index-name" data-ar="مواقع الويب" data-en="Websites">مواقع الويب</div>
-          <div class="index-desc" data-ar="تجارب رقمية مصمّمة تساعد شغلك يتواصل، يبيع، ويكبر." data-en="Digital experiences designed to help your business communicate, convert and grow.">تجارب رقمية مصمّمة تساعد شغلك يتواصل، يبيع، ويكبر.</div>
-        </div>
-        <div class="index-row reveal">
-          <div class="index-num mono">02</div>
-          <div class="index-name" data-ar="تطبيقات ويب" data-en="Web Apps">تطبيقات ويب</div>
-          <div class="index-desc" data-ar="أدوات، لوحات تحكم، وسير عمل مبنية حسب طريقة شغل بزنسك الحقيقية." data-en="Custom tools, dashboards and workflows built around how your business actually works.">أدوات، لوحات تحكم، وسير عمل مبنية حسب طريقة شغل بزنسك الحقيقية.</div>
-        </div>
-        <div class="index-row reveal">
-          <div class="index-num mono">03</div>
-          <div class="index-name">PWA</div>
-          <div class="index-desc" data-ar="تجربة تطبيق متكاملة جوا المتصفح — بلا تعقيد متاجر التطبيقات." data-en="A full app experience inside the browser — without the app-store friction.">تجربة تطبيق متكاملة جوا المتصفح — بلا تعقيد متاجر التطبيقات.</div>
-        </div>
-        <div class="index-row reveal">
-          <div class="index-num mono">04</div>
-          <div class="index-name" data-ar="MVP" data-en="MVP">MVP</div>
-          <div class="index-desc" data-ar="أصغر نسخة مفيدة من فكرتك — مبنية عشان تنطلق، تتعلم، وتتأكد منها." data-en="The smallest useful version of your idea — built to launch, learn and validate.">أصغر نسخة مفيدة من فكرتك — مبنية عشان تنطلق، تتعلم، وتتأكد منها.</div>
-        </div>
+  <!-- 4. Built by Athar -->
+  <section class="built" id="work">
+    <div class="shell">
+      <div class="built-head grid">
+        <div class="label reveal">BUILT BY ATHAR</div>
+        <h2 class="h2 reveal" data-ar="بنيناها في أثر." data-en="Built by Athar.">بنيناها في أثر.</h2>
+        <p class="built-line reveal" data-ar-html='من فكرة، إلى <span class="accent">منتج حقيقي</span>.' data-en-html='From an idea, to a <span class="accent">real product</span>.'>من فكرة، إلى <span class="accent">منتج حقيقي</span>.</p>
       </div>
-      <p class="reveal" style="text-align:center; margin-top:44px; font-size:14px; color:var(--paper-dim);" data-ar="مش متأكد شو محتاج بالضبط؟ ولا يهمك، بنساعدك تحددها." data-en="Not sure what you need? That&rsquo;s okay. We&rsquo;ll help you figure it out.">مش متأكد شو محتاج بالضبط؟ ولا يهمك، بنساعدك تحددها.</p>
+
+      <!-- KHZNTI -->
+      <article class="product grid">
+        <div class="product-visual reveal">
+          <div class="display display-phones">
+            <img class="ph-a" src="images/case-khznti-welcome.jpg" loading="lazy" width="560" height="1153" alt="صفحة الترحيب — خزنتي">
+            <img class="ph-b" src="images/case-khznti-dashboard.jpg" loading="lazy" width="463" height="872" alt="لوحة العمليات الفعلية — خزنتي">
+          </div>
+        </div>
+        <div class="product-text reveal">
+          <div class="p-index"><bdi dir="ltr">01 / 03</bdi></div>
+          <h3 class="p-name" data-ar="خزنتي" data-en="KHZNTI">خزنتي</h3>
+          <p class="p-headline" data-ar-html='من فوضى مصاريف، لتطبيق <span class="accent">واضح</span>' data-en-html='From messy expenses, to a <span class="accent">clear app</span>'>من فوضى مصاريف، لتطبيق <span class="accent">واضح</span></p>
+          <dl class="p-facts">
+            <div>
+              <dt>THE PROBLEM</dt>
+              <dd data-ar="أصحاب المشاريع الصغيرة تايهين بمصاريفهم اليومية، وما في أداة عربية بسيطة تعطيهم صورة واضحة عن وضعهم المالي." data-en="Small business owners lose track of daily expenses, with no simple Arabic tool giving them a clear picture of their finances.">أصحاب المشاريع الصغيرة تايهين بمصاريفهم اليومية، وما في أداة عربية بسيطة تعطيهم صورة واضحة عن وضعهم المالي.</dd>
+            </div>
+            <div>
+              <dt>THE SOLUTION</dt>
+              <dd data-ar="بدل تطبيق معقّد بكل الميزات، بنينا أصغر نسخة ممكنة تشتغل فعليًا: تسجيل دخول حقيقي، رصيد، وتصنيفات — بس." data-en="Instead of a feature-heavy app, we built the smallest version that actually works: real login, balance, and categories — nothing more.">بدل تطبيق معقّد بكل الميزات، بنينا أصغر نسخة ممكنة تشتغل فعليًا: تسجيل دخول حقيقي، رصيد، وتصنيفات — بس.</dd>
+            </div>
+            <div>
+              <dt>WHAT WE BUILT</dt>
+              <dd data-ar="تطبيق حقيقي، متصل بسحابة فعلية، كل مستخدم يشوف بياناته الخاصة بس — جاهز يستخدمه ناس حقيقيين اليوم." data-en="A real app, connected to a live cloud backend, where each user only sees their own data — ready for real people to use today.">تطبيق حقيقي، متصل بسحابة فعلية، كل مستخدم يشوف بياناته الخاصة بس — جاهز يستخدمه ناس حقيقيين اليوم.</dd>
+            </div>
+          </dl>
+          <div class="p-tags"><span>MVP</span><span>React</span><span>Supabase</span><span>REAL AUTH</span><span>ARABIC-FIRST</span></div>
+          <div class="p-link"><a class="text-link" href="https://khznti.app" target="_blank" rel="noopener" data-ar="شوف المشروع الحقيقي ↗" data-en="Explore KHZNTI ↗">شوف المشروع الحقيقي ↗</a></div>
+        </div>
+      </article>
+
+      <!-- Solution Indicator -->
+      <article class="product flip grid">
+        <div class="product-visual reveal">
+          <div class="display display-screen">
+            <div class="display-bar"><span>studioathar.studio/solution-indicator</span><i></i></div>
+            <img class="screen only-ar" src="images/built-si-intro-ar.webp" loading="lazy" width="1200" height="750" alt="مؤشر الحلول — شاشة البداية">
+            <img class="screen only-en" src="images/built-si-intro-en.webp" loading="lazy" width="1200" height="750" alt="Solution Indicator — start screen">
+            <div class="si-phone">
+              <img class="only-ar" src="images/built-si-question-ar.webp" loading="lazy" width="540" height="1080" alt="مؤشر الحلول — سؤال من التقييم">
+              <img class="only-en" src="images/built-si-question-en.webp" loading="lazy" width="540" height="1080" alt="Solution Indicator — an assessment question">
+            </div>
+          </div>
+        </div>
+        <div class="product-text reveal">
+          <div class="p-index"><bdi dir="ltr">02 / 03</bdi></div>
+          <h3 class="p-name" data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</h3>
+          <p class="p-desc" data-ar="أداة تشخيص تفاعلية تحوّل إجاباتك عن المشكلة وسياق العمل إلى اتجاه رقمي منظّم وأوضح." data-en="An interactive diagnostic tool that turns answers about a business problem and context into a structured digital direction.">أداة تشخيص تفاعلية تحوّل إجاباتك عن المشكلة وسياق العمل إلى اتجاه رقمي منظّم وأوضح.</p>
+          <div class="p-link"><a class="text-link" href="/solution-indicator/" data-indicator-link><span data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</span><span class="arrow arrow-flip" aria-hidden="true">→</span></a></div>
+        </div>
+      </article>
+
+      <!-- Digital Clue -->
+      <article class="product grid">
+        <div class="product-visual reveal">
+          <!-- VISUAL PENDING: internal placeholder. Replace with an unbranded
+               Digital Clue / Clue Engine screen before release; never a client brand. -->
+          <div class="display display-pending" data-pending="digital-clue-visual" role="img" aria-label="Visual pending">
+            <b>VISUAL PENDING</b>
+            <span>Unbranded Digital Clue / Clue Engine screen required before release</span>
+          </div>
+        </div>
+        <div class="product-text reveal">
+          <div class="p-index"><bdi dir="ltr">03 / 03</bdi></div>
+          <h3 class="p-name">Digital Clue</h3>
+          <div class="p-sub">ATHAR CLUE ENGINE</div>
+          <p class="p-desc" data-ar="تجربة تفاعلية تُبنى حول ملاحظة محددة في البزنس، وتحول فرصة رقمية واحدة إلى فكرة ملموسة يمكن استكشافها." data-en="An interactive concept experience built around a specific business observation — designed to make one digital opportunity tangible enough to explore.">تجربة تفاعلية تُبنى حول ملاحظة محددة في البزنس، وتحول فرصة رقمية واحدة إلى فكرة ملموسة يمكن استكشافها.</p>
+        </div>
+      </article>
     </div>
   </section>
 
-  <!-- Case study: artifact -->
-  <section id="work">
-    <div class="wrap">
-      <div class="artifact-head reveal">
-        <div class="kicker" style="justify-content:center; display:flex;">CASE STUDY — 01</div>
-        <h2 class="artifact-title" data-ar-html='من فوضى مصاريف، لتطبيق <span class="accent">واضح</span>' data-en-html='From messy expenses, to a <span class="accent">clear app</span>'>من فوضى مصاريف، لتطبيق <span class="accent">واضح</span></h2>
+  <!-- 5. How Athar thinks -->
+  <section class="thinks" id="process">
+    <div class="shell">
+      <div class="thinks-head grid">
+        <div class="label reveal">HOW ATHAR THINKS</div>
+        <h2 class="h2 reveal" data-ar="كيف بتفكّر أثر." data-en="How Athar thinks.">كيف بتفكّر أثر.</h2>
       </div>
-
-      <div class="vitrine reveal">
-        <img src="images/case-khznti-welcome.jpg" class="artifact-shot secondary" loading="lazy" width="560" height="1153" alt="صفحة الترحيب — خزنتي">
-        <img src="images/case-khznti-dashboard.jpg" class="artifact-shot" loading="lazy" width="463" height="872" alt="لوحة العمليات الفعلية — خزنتي">
-      </div>
-
-      <div class="case-narrative reveal">
-        <div class="case-block">
-          <div class="k mono">THE PROBLEM</div>
-          <p data-ar="أصحاب المشاريع الصغيرة تايهين بمصاريفهم اليومية، وما في أداة عربية بسيطة تعطيهم صورة واضحة عن وضعهم المالي." data-en="Small business owners lose track of daily expenses, with no simple Arabic tool giving them a clear picture of their finances.">أصحاب المشاريع الصغيرة تايهين بمصاريفهم اليومية، وما في أداة عربية بسيطة تعطيهم صورة واضحة عن وضعهم المالي.</p>
-        </div>
-        <div class="case-block">
-          <div class="k mono">THE SOLUTION</div>
-          <p data-ar="بدل تطبيق معقّد بكل الميزات، بنينا أصغر نسخة ممكنة تشتغل فعليًا: تسجيل دخول حقيقي، رصيد، وتصنيفات — بس." data-en="Instead of a feature-heavy app, we built the smallest version that actually works: real login, balance, and categories — nothing more.">بدل تطبيق معقّد بكل الميزات، بنينا أصغر نسخة ممكنة تشتغل فعليًا: تسجيل دخول حقيقي، رصيد، وتصنيفات — بس.</p>
-        </div>
-        <div class="case-block">
-          <div class="k mono">WHAT WE BUILT</div>
-          <p data-ar="تطبيق حقيقي، متصل بسحابة فعلية، كل مستخدم يشوف بياناته الخاصة بس — جاهز يستخدمه ناس حقيقيين اليوم." data-en="A real app, connected to a live cloud backend, where each user only sees their own data — ready for real people to use today.">تطبيق حقيقي، متصل بسحابة فعلية، كل مستخدم يشوف بياناته الخاصة بس — جاهز يستخدمه ناس حقيقيين اليوم.</p>
-        </div>
-      </div>
-
-      <div class="case-tags reveal">
-        <span class="case-tag">MVP</span>
-        <span class="case-tag">React</span>
-        <span class="case-tag">Supabase</span>
-        <span class="case-tag">REAL AUTH</span>
-        <span class="case-tag">ARABIC-FIRST</span>
-      </div>
-      <div class="view-case reveal"><a href="https://khznti.app" target="_blank" rel="noopener" data-ar="شوف المشروع الحقيقي ↗" data-en="View case study ↗">شوف المشروع الحقيقي ↗</a></div>
+      <ol class="sequence reveal" data-signal-field="process">
+        <li class="stage">
+          <div class="stage-i">01</div>
+          <h3 class="stage-name" data-ar="نلاحظ" data-en="Observe">نلاحظ</h3>
+          <p data-ar="نشوف المشكلة كما هي — سياقها، مستخدميها، والقيود المحيطة فيها." data-en="We look at the problem as it is — its context, users and constraints.">نشوف المشكلة كما هي — سياقها، مستخدميها، والقيود المحيطة فيها.</p>
+        </li>
+        <li class="stage">
+          <div class="stage-i">02</div>
+          <h3 class="stage-name" data-ar="نبسّط" data-en="Reduce">نبسّط</h3>
+          <p data-ar="نشيل الافتراضات والضجيج ونركّز على اللي فعلًا مهم." data-en="We remove assumptions and noise to focus on what actually matters.">نشيل الافتراضات والضجيج ونركّز على اللي فعلًا مهم.</p>
+        </li>
+        <li class="stage">
+          <div class="stage-i">03</div>
+          <h3 class="stage-name" data-ar="ننظّم" data-en="Structure">ننظّم</h3>
+          <p data-ar="نرتّب اللي بقي ضمن أولويات وعلاقات واتجاه واضح." data-en="We organise what remains into clear priorities, relationships and direction.">نرتّب اللي بقي ضمن أولويات وعلاقات واتجاه واضح.</p>
+        </li>
+        <li class="stage">
+          <div class="stage-i">04</div>
+          <h3 class="stage-name" data-ar="نربط" data-en="Connect">نربط</h3>
+          <p data-ar="نربط الاحتياجات، التدفقات، البيانات والقرارات ضمن نظام واحد واضح." data-en="We connect needs, flows, data and decisions into one coherent system.">نربط الاحتياجات، التدفقات، البيانات والقرارات ضمن نظام واحد واضح.</p>
+        </li>
+        <li class="stage">
+          <div class="stage-i">05</div>
+          <h3 class="stage-name" data-ar="نبني" data-en="Build">نبني</h3>
+          <p data-ar="نحوّل الاتجاه إلى منتج أو نظام أو تجربة رقمية مفيدة." data-en="We turn that direction into a useful digital product, system or experience.">نحوّل الاتجاه إلى منتج أو نظام أو تجربة رقمية مفيدة.</p>
+        </li>
+        <li class="stage">
+          <div class="stage-i">06</div>
+          <h3 class="stage-name" data-ar="نطلق ونتعلّم" data-en="Release / Learn">نطلق ونتعلّم</h3>
+          <p data-ar="نطلقه للاستخدام، نتعلّم من الواقع، ونحسّن الخطوة اللي بعدها." data-en="We put it into use, learn from reality and improve what comes next.">نطلقه للاستخدام، نتعلّم من الواقع، ونحسّن الخطوة اللي بعدها.</p>
+        </li>
+      </ol>
     </div>
   </section>
 
-  <!-- Case study: Athar itself -->
-  <section id="work-3">
-    <div class="wrap">
-      <div class="artifact-head reveal">
-        <div class="kicker" style="justify-content:center; display:flex;">CASE STUDY — 03</div>
-        <h2 class="artifact-title" data-ar-html='الموقع يلي عم <span class="accent">تتصفحه هلق</span>' data-en-html='The site you&rsquo;re <span class="accent">looking at right now</span>'>الموقع يلي عم <span class="accent">تتصفحه هلق</span></h2>
-      </div>
-
-      <div class="case-narrative reveal">
-        <div class="case-block">
-          <div class="k mono">THE DECISION</div>
-          <p data-ar="قررنا نبني موقعنا بنفس المعايير يلي منلتزم فيها لعملائنا — مش أقل." data-en="We decided to hold our own site to the exact same standard we build for clients — not less.">قررنا نبني موقعنا بنفس المعايير يلي منلتزم فيها لعملائنا — مش أقل.</p>
-        </div>
-        <div class="case-block">
-          <div class="k mono">THE APPROACH</div>
-          <p data-ar="بنيناه ثنائي اللغة فعليًا — مش بس ترجمة نص — مع SEO حقيقي وهوية جاهزة عالميًا." data-en="Built it genuinely bilingual — not just translated text — with real SEO and a globally-ready identity.">بنيناه ثنائي اللغة فعليًا — مش بس ترجمة نص — مع SEO حقيقي وهوية جاهزة عالميًا.</p>
-        </div>
-        <div class="case-block">
-          <div class="k mono">WHAT WE BUILT</div>
-          <p data-ar="نفس الموقع يلي عم تتصفحه هلق — دليل حي إنه أثر بيطبق يلي بيوعد فيه." data-en="This very site — living proof that Athar practices what it promises.">نفس الموقع يلي عم تتصفحه هلق — دليل حي إنه أثر بيطبق يلي بيوعد فيه.</p>
-        </div>
-      </div>
-
-      <div class="case-tags reveal">
-        <span class="case-tag">BILINGUAL</span>
-        <span class="case-tag">REAL SEO</span>
-        <span class="case-tag">GLOBAL-READY</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stack -->
-  <section id="stack">
-    <div class="wrap">
-      <h2 class="kicker reveal" style="justify-content:center; display:flex;">STACK</h2>
-      <div class="stack-badges reveal">
-        <span class="case-tag">HTML / CSS / JS</span>
-        <span class="case-tag">React</span>
-        <span class="case-tag">Supabase</span>
-        <span class="case-tag">Vercel</span>
-        <span class="case-tag">PWA</span>
-        <span class="case-tag">EmailJS</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Process -->
-  <section id="process">
-    <div class="wrap">
-      <h2 class="kicker reveal">PROCESS</h2>
-      <div class="process-row reveal">
-        <div class="ghost-num">01</div>
-        <h4 data-ar="نفهم" data-en="Understand">نفهم</h4>
-        <p data-ar="نفهم المشكلة، المستخدمين، والهدف." data-en="Understand the problem, users and goals.">نفهم المشكلة، المستخدمين، والهدف.</p>
-      </div>
-      <div class="process-row reveal">
-        <div class="ghost-num">02</div>
-        <h4 data-ar="نبسّط" data-en="Simplify">نبسّط</h4>
-        <p data-ar="نبسّط الفكرة لأصل الشي المهم بس." data-en="Strip the idea down to what actually matters.">نبسّط الفكرة لأصل الشي المهم بس.</p>
-      </div>
-      <div class="process-row reveal">
-        <div class="ghost-num">03</div>
-        <h4 data-ar="نبني" data-en="Build">نبني</h4>
-        <p data-ar="نصمم ونطوّر أول نسخة مفيدة." data-en="Design and develop the first useful version.">نصمم ونطوّر أول نسخة مفيدة.</p>
-      </div>
-      <div class="process-row reveal">
-        <div class="ghost-num">04</div>
-        <h4 data-ar="نطلق" data-en="Launch">نطلق</h4>
-        <p data-ar="نحطها قدام مستخدمين حقيقيين." data-en="Put it in front of real users.">نحطها قدام مستخدمين حقيقيين.</p>
-      </div>
-      <div class="process-row reveal">
-        <div class="ghost-num">05</div>
-        <h4 data-ar="نكبر" data-en="Grow">نكبر</h4>
-        <p data-ar="نتعلم، نحسّن، ونبني يلي بعده." data-en="Learn, improve and build what comes next.">نتعلم، نحسّن، ونبني يلي بعده.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq">
-    <div class="wrap">
-      <h2 class="kicker reveal" style="justify-content:center; display:flex;">FAQ</h2>
+  <!-- 6. FAQ -->
+  <section class="faq" id="faq">
+    <div class="shell grid">
+      <h2 class="label">FAQ</h2>
       <div class="faq-list">
-        <details class="faq-item reveal">
+        <details class="faq-item">
           <summary data-ar="قديش بياخد الوقت تسليم مشروع؟" data-en="How long does a project take?">قديش بياخد الوقت تسليم مشروع؟</summary>
           <p data-ar="بيعتمد على الحجم — موقع بسيط ممكن ياخد أسبوع لأسبوعين، وتطبيق ويب متكامل شهر لشهرين. منحدد الجدول الزمني الحقيقي بعد ما نفهم المشروع بالضبط." data-en="It depends on scope — a simple site can take one to two weeks, a full web app one to two months. We set a real timeline once we understand the project.">بيعتمد على الحجم — موقع بسيط ممكن ياخد أسبوع لأسبوعين، وتطبيق ويب متكامل شهر لشهرين. منحدد الجدول الزمني الحقيقي بعد ما نفهم المشروع بالضبط.</p>
         </details>
-        <details class="faq-item reveal">
+        <details class="faq-item">
           <summary data-ar="بتشتغلوا مع عملاء برا فلسطين؟" data-en="Do you work with clients outside Palestine?">بتشتغلوا مع عملاء برا فلسطين؟</summary>
           <p data-ar="إيه أكيد. كل الشغل عن بعد، منحكي عربي أو إنجليزي، ومنرتب أوقات التواصل حسب فرق التوقيت." data-en="Yes, definitely. All work is remote, we communicate in Arabic or English, and we schedule around time zone differences.">إيه أكيد. كل الشغل عن بعد، منحكي عربي أو إنجليزي، ومنرتب أوقات التواصل حسب فرق التوقيت.</p>
         </details>
-        <details class="faq-item reveal">
+        <details class="faq-item">
           <summary data-ar="كيف بتحددوا السعر؟" data-en="How do you price a project?">كيف بتحددوا السعر؟</summary>
           <p data-ar="التسعير حسب المشروع مش بالساعة — منحدد سعر ثابت بعد ما نفهم نطاق الشغل بالضبط، بلا مفاجآت ولا رسوم خفية." data-en="Pricing is project-based, not hourly — we quote a fixed price after scoping the work with you, no surprises or hidden fees.">التسعير حسب المشروع مش بالساعة — منحدد سعر ثابت بعد ما نفهم نطاق الشغل بالضبط، بلا مفاجآت ولا رسوم خفية.</p>
         </details>
-        <details class="faq-item reveal">
+        <details class="faq-item">
           <summary data-ar="شو بتستخدموا من تقنيات؟" data-en="What technologies do you use?">شو بتستخدموا من تقنيات؟</summary>
           <p data-ar="حسب احتياج المشروع — مواقع بسيطة بـHTML/CSS/JS خفيف، وتطبيقات حقيقية بـReact وSupabase منشورة على Vercel." data-en="Depends on what the project needs — simple sites in lightweight HTML/CSS/JS, real apps in React and Supabase, deployed on Vercel.">حسب احتياج المشروع — مواقع بسيطة بـHTML/CSS/JS خفيف، وتطبيقات حقيقية بـReact وSupabase منشورة على Vercel.</p>
         </details>
-        <details class="faq-item reveal">
+        <details class="faq-item">
           <summary data-ar="بتقدموا صيانة بعد التسليم؟" data-en="Do you offer support after launch?">بتقدموا صيانة بعد التسليم؟</summary>
           <p data-ar="إيه — وهاد بالضبط الفرق يلي بنحكي عنه. بنبني مشاريع تضل شغالة، مش بنسلم ونختفي. تواصلوا معنا أي وقت بعد الإطلاق." data-en="Yes — that is the whole point. We build projects meant to keep working, not ship-and-disappear. Reach out anytime after launch.">إيه — وهاد بالضبط الفرق يلي بنحكي عنه. بنبني مشاريع تضل شغالة، مش بنسلم ونختفي. تواصلوا معنا أي وقت بعد الإطلاق.</p>
         </details>
@@ -615,51 +668,56 @@
     </div>
   </section>
 
-  <!-- Closing -->
-  <section class="closing" id="contact">
-    <div class="wrap">
-      <h2 class="closing-title reveal" data-ar-html='عندك فكرة تستاهل <span class="accent">تتبنى</span>؟' data-en-html='Have an idea worth <span class="accent">building</span>?'>عندك فكرة تستاهل <span class="accent">تتبنى</span>؟</h2>
-      <p class="reveal" style="max-width:480px; margin:22px auto 0; font-size:15px; line-height:1.9; color:var(--paper-dim);" data-ar="احكيلنا شو بدك تحل. بنساعدك تحدد شو الخطوة الجاية." data-en="Tell us what you&rsquo;re trying to solve. We&rsquo;ll help you figure out what to build next.">احكيلنا شو بدك تحل. بنساعدك تحدد شو الخطوة الجاية.</p>
-      <div class="view-case" style="margin-top:18px;"><a href="#work" data-ar="أو شوف شغلنا" data-en="Or see our work">أو شوف شغلنا</a></div>
+  <!-- 7. One clear path — Tell us the problem -->
+  <section class="path" id="contact">
+    <div class="path-axis" data-signal-field="path" aria-hidden="true"></div>
+    <div class="shell">
+      <h2 class="path-title reveal" data-ar="احكيلنا شو المشكلة." data-en="Tell us the problem.">احكيلنا شو المشكلة.</h2>
+      <p class="path-sub reveal" data-ar="من هون بيبدأ اتجاه أوضح." data-en="A clearer direction starts here.">من هون بيبدأ اتجاه أوضح.</p>
+      <div class="path-primary reveal">
+        <a href="/solution-indicator/" class="btn btn-primary" data-indicator-link>
+          <span data-ar="ابدأ بمؤشر الحلول" data-en="Start with the Solution Indicator">ابدأ بمؤشر الحلول</span>
+          <span class="btn-arrow" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h13M13 6l6 6-6 6" stroke="#F5F3ED" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+      </div>
 
-      <form class="contact-form reveal" id="contactForm">
-        <label class="sr-only" for="cfName" data-ar="اسمك" data-en="Your name">اسمك</label>
-        <input type="text" id="cfName" placeholder="اسمك" data-ar-placeholder="اسمك" data-en-placeholder="Your name" required>
-        <label class="sr-only" for="cfEmail" data-ar="بريدك الإلكتروني" data-en="Your email">بريدك الإلكتروني</label>
-        <input type="email" id="cfEmail" placeholder="بريدك الإلكتروني" data-ar-placeholder="بريدك الإلكتروني" data-en-placeholder="Your email" required>
-        <label class="sr-only" for="cfDetails" data-ar="احكيلنا عن فكرتك أو مشروعك" data-en="Tell us about your idea or project">احكيلنا عن فكرتك أو مشروعك</label>
-        <textarea id="cfDetails" placeholder="احكيلنا عن فكرتك أو مشروعك..." data-ar-placeholder="احكيلنا عن فكرتك أو مشروعك..." data-en-placeholder="Tell us about your idea or project..." required></textarea>
-        <!-- Honeypot. .sr-only alone hides it: a left:-9999px offset turned into
-             ~10,000px of scrollable width in RTL and broke the mobile layout. -->
-        <div class="sr-only" aria-hidden="true">
-          <label for="cfWebsite">Website</label>
-          <input type="text" id="cfWebsite" name="website" tabindex="-1" autocomplete="off">
-        </div>
-        <button type="submit" class="magnet-btn" id="cfSubmit">
-          <span data-ar="ابدأ مشروعك" data-en="Start a project">ابدأ مشروعك</span>
-          <span class="btn-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="transform:scaleX(-1)">
-              <path d="M5 12h13M13 6l6 6-6 6" stroke="#F5F3ED" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-        </button>
-        <div class="contact-status" id="cfStatus" role="status" aria-live="polite"></div>
-      </form>
-      <noscript>
-        <div class="contact-noscript" role="note">
-          <p lang="ar" dir="rtl">نموذج التواصل أونلاين بيحتاج JavaScript، وهو مش مفعّل عندكم هلق. راسلونا مباشرة على <a href="mailto:hello@studioathar.studio">hello@studioathar.studio</a></p>
-          <p lang="en" dir="ltr">The online form needs JavaScript, which is currently turned off. You can email us directly at <a href="mailto:hello@studioathar.studio">hello@studioathar.studio</a></p>
-        </div>
-      </noscript>
+      <div class="path-secondary reveal">
+        <p class="form-intro" data-ar="احكيلنا شو بدك تحل. بنساعدك تحدد شو الخطوة الجاية." data-en="Tell us what you&rsquo;re trying to solve. We&rsquo;ll help you figure out what to build next.">احكيلنا شو بدك تحل. بنساعدك تحدد شو الخطوة الجاية.</p>
+        <form class="contact-form" id="contactForm">
+          <label class="sr-only" for="cfName" data-ar="اسمك" data-en="Your name">اسمك</label>
+          <input type="text" id="cfName" placeholder="اسمك" data-ar-placeholder="اسمك" data-en-placeholder="Your name" required>
+          <label class="sr-only" for="cfEmail" data-ar="بريدك الإلكتروني" data-en="Your email">بريدك الإلكتروني</label>
+          <input type="email" id="cfEmail" placeholder="بريدك الإلكتروني" data-ar-placeholder="بريدك الإلكتروني" data-en-placeholder="Your email" required>
+          <label class="sr-only" for="cfDetails" data-ar="احكيلنا عن فكرتك أو مشروعك" data-en="Tell us about your idea or project">احكيلنا عن فكرتك أو مشروعك</label>
+          <textarea id="cfDetails" placeholder="احكيلنا عن فكرتك أو مشروعك..." data-ar-placeholder="احكيلنا عن فكرتك أو مشروعك..." data-en-placeholder="Tell us about your idea or project..." required></textarea>
+          <!-- Honeypot. .sr-only alone hides it: a left:-9999px offset turned into
+               ~10,000px of scrollable width in RTL and broke the mobile layout. -->
+          <div class="sr-only" aria-hidden="true">
+            <label for="cfWebsite">Website</label>
+            <input type="text" id="cfWebsite" name="website" tabindex="-1" autocomplete="off">
+          </div>
+          <button type="submit" class="btn btn-quiet" id="cfSubmit">
+            <span data-ar="ابدأ مشروعك" data-en="Start a project">ابدأ مشروعك</span>
+          </button>
+          <div class="contact-status" id="cfStatus" role="status" aria-live="polite"></div>
+        </form>
+        <noscript>
+          <div class="contact-noscript" role="note">
+            <p lang="ar" dir="rtl">نموذج التواصل أونلاين بيحتاج JavaScript، وهو مش مفعّل عندكم هلق. راسلونا مباشرة على <a href="mailto:hello@studioathar.studio">hello@studioathar.studio</a></p>
+            <p lang="en" dir="ltr">The online form needs JavaScript, which is currently turned off. You can email us directly at <a href="mailto:hello@studioathar.studio">hello@studioathar.studio</a></p>
+          </div>
+        </noscript>
+      </div>
     </div>
   </section>
+  </main>
 
   <footer>
     <div class="foot-mark">
-      <img src="images/athar-logo-wordmark-official.png" alt="Athar" class="brand-logo-footer">
+      <img src="images/athar-logo-wordmark-official.png" alt="Athar" class="brand-logo-footer" width="1463" height="370" loading="lazy">
     </div>
-    <div class="l1 mono">ATHAR — DIGITAL PRODUCT STUDIO</div>
-    <div class="l1 mono" style="margin-top:6px; opacity:0.6;" data-ar="ويب • موبايل • أنظمة • نمو" data-en="Web • Mobile • Systems • Growth">ويب • موبايل • أنظمة • نمو</div>
+    <div class="l1">ATHAR — DIGITAL PRODUCT STUDIO</div>
+    <div class="l1" style="margin-top:6px; opacity:0.7;" data-ar="ويب • موبايل • أنظمة • نمو" data-en="Web • Mobile • Systems • Growth">ويب • موبايل • أنظمة • نمو</div>
     <div class="foot-links">
       <a href="https://www.linkedin.com/company/atharstudio/" target="_blank" rel="noopener">LinkedIn</a>
       <a href="mailto:hello@studioathar.studio">hello@studioathar.studio</a>
@@ -704,8 +762,10 @@
 
     document.title = lang === 'ar' ? 'أثر — Athar | Digital Studio' : 'Athar — أثر | Digital Studio';
 
-    var indicatorLink = document.querySelector('.nav-indicator-link');
-    if (indicatorLink) indicatorLink.href = lang === 'en' ? '/solution-indicator/?lang=en' : '/solution-indicator/';
+    var indicatorLinks = document.querySelectorAll('[data-indicator-link]');
+    for (var n = 0; n < indicatorLinks.length; n++) {
+      indicatorLinks[n].href = lang === 'en' ? '/solution-indicator/?lang=en' : '/solution-indicator/';
+    }
 
     if (!skipPersist) {
       try { localStorage.setItem('athar_lang', lang); } catch (e) {}
@@ -796,7 +856,7 @@
         referrer: attr.referrer,
         landing_page: attr.landing_page,
       }, extra || {});
-      if (ATHAR_LOCAL_DEV) { console.debug('[athar dev] tracking not sent:', payload); return; }
+      if (ATHAR_LOCAL_DEV) { console.debug('[athar dev] tracking not sent: ' + eventType, payload); return; }
       fetch(TRACKING_URL, {
         method: 'POST',
         headers: {
@@ -813,9 +873,11 @@
 
   window.trackEvent('site_page_view');
 
-  var indicatorCta = document.querySelector('.nav-indicator-link');
-  if (indicatorCta) {
-    indicatorCta.addEventListener('click', function(){
+  // Every Solution Indicator entry point (nav, Built by Athar, final CTA)
+  // reports the same existing event.
+  var indicatorCtas = document.querySelectorAll('[data-indicator-link]');
+  for (var c = 0; c < indicatorCtas.length; c++) {
+    indicatorCtas[c].addEventListener('click', function(){
       window.trackEvent('indicator_cta_click');
     });
   }
