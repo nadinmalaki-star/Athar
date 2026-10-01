@@ -164,6 +164,7 @@
   .nav-mark{ display:flex; align-items:center; background:var(--void); padding:8px 10px; margin:-8px -10px; border-radius:2px; }
   .brand-logo-header{ display:block; height:24px; width:auto; }
   .nav-actions{ display:flex; align-items:center; gap:22px; }
+  .nav-dests{ display:contents; }   /* destinations group: groups peers without changing the header layout */
   .nav-indicator-link{ font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--paper); padding:6px 0; border-bottom:1px solid var(--line-strong); transition:border-color .25s ease; }
   .nav-indicator-link:hover{ border-color:var(--ember); }
   .nav-en{ font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--paper-mute); }
@@ -636,7 +637,16 @@
       <img src="images/athar-logo-wordmark-official.png" alt="Athar" class="brand-logo-header" width="1463" height="370">
     </div>
     <div class="nav-actions">
-      <a href="/solution-indicator/" class="nav-indicator-link" data-indicator-link data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</a>
+      <!-- Destinations: peers of the main site. Solution Indicator is live; Athar Lab is
+           RESERVED (inert template: never rendered, no href, no route) until the Athar Lab
+           Integration / Route Audit decides its route. Phones: both destinations will move
+           into a compact menu button when Lab is activated. See ATHAR_DESTINATIONS below. -->
+      <div class="nav-dests" data-destinations="nav">
+        <a href="/solution-indicator/" class="nav-indicator-link" data-indicator-link data-dest="solution-indicator" data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</a>
+        <template data-dest-reserved="athar-lab">
+          <a class="nav-indicator-link" data-dest="athar-lab" data-en="Athar Lab">Athar Lab</a>
+        </template>
+      </div>
       <div class="nav-en">ATHAR — 2026</div>
       <button id="langToggle" class="lang-toggle" onclick="toggleLang()">EN</button>
     </div>
@@ -1041,6 +1051,14 @@
     </div>
     <div class="l1">ATHAR — DIGITAL PRODUCT STUDIO</div>
     <div class="l1" style="margin-top:6px; opacity:0.7;" data-ar="ويب • موبايل • أنظمة • نمو" data-en="Web • Mobile • Systems • Growth">ويب • موبايل • أنظمة • نمو</div>
+    <!-- Reserved footer Destinations group (Solution Indicator + Athar Lab as peers, separate
+         from the contact links). Inert until Athar Lab is activated; then mounted here. -->
+    <template data-dest-reserved="footer-destinations">
+      <nav class="foot-links foot-dests" aria-label="Athar destinations" data-destinations="footer">
+        <a href="/solution-indicator/" data-indicator-link data-dest="solution-indicator" data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</a>
+        <a data-dest="athar-lab" data-en="Athar Lab">Athar Lab</a>
+      </nav>
+    </template>
     <div class="foot-links">
       <a href="https://www.linkedin.com/company/atharstudio/" target="_blank" rel="noopener">LinkedIn</a>
       <a href="mailto:hello@studioathar.studio">hello@studioathar.studio</a>
@@ -1204,6 +1222,42 @@
       window.trackEvent('indicator_cta_click');
     });
   }
+
+  // Athar destinations — peers of the main site (not resources). Athar Lab is
+  // reserved: disabled, with no href, so nothing is rendered or routed. Enabling it
+  // (after the Athar Lab Integration / Route Audit: route, service worker, vercel.json,
+  // Arabic name) mounts the inert templates in the nav and footer; the phone header's
+  // compact menu button for both destinations ships in the same change.
+  var ATHAR_DESTINATIONS = {
+    'solution-indicator': { enabled: true },
+    'athar-lab': { enabled: false, href: null, ar: null },
+  };
+  (function mountReservedDestinations(){
+    var lab = ATHAR_DESTINATIONS['athar-lab'];
+    if (!lab.enabled || !lab.href || !lab.ar) return;   // reserved: never expose an inactive link
+    var navTpl = document.querySelector('template[data-dest-reserved="athar-lab"]');
+    var footTpl = document.querySelector('template[data-dest-reserved="footer-destinations"]');
+    var fill = function(root){
+      var a = root.querySelectorAll('[data-dest="athar-lab"]');
+      for (var i = 0; i < a.length; i++) { a[i].href = lab.href; a[i].setAttribute('data-ar', lab.ar); }
+      var si = root.querySelectorAll('[data-indicator-link]');
+      for (var j = 0; j < si.length; j++) si[j].addEventListener('click', function(){ window.trackEvent('indicator_cta_click'); });
+      return root;
+    };
+    // self-contained (applyLang lives in another script): set the current language on the
+    // mounted nodes; later language switches reach them through the usual data-ar/data-en pass
+    var lang = document.documentElement.lang === 'en' ? 'en' : 'ar';
+    var mount = function(tpl){
+      var frag = fill(tpl.content.cloneNode(true));
+      var t = frag.querySelectorAll('[data-ar]');
+      for (var i = 0; i < t.length; i++) { var v = t[i].getAttribute('data-' + lang); if (v !== null) t[i].textContent = v; }
+      var si = frag.querySelectorAll('[data-indicator-link]');
+      for (var j = 0; j < si.length; j++) si[j].href = lang === 'en' ? '/solution-indicator/?lang=en' : '/solution-indicator/';
+      tpl.parentNode.insertBefore(frag, tpl);
+    };
+    if (navTpl) mount(navTpl);
+    if (footTpl) mount(footTpl);
+  })();
 })();
 </script>
 
