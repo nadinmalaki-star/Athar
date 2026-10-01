@@ -226,34 +226,26 @@
   /* =====================================================================
      3. WHAT CAN BE BUILT — one origin opening into four directions
      ===================================================================== */
-  .build{ background:var(--char); padding:clamp(120px, 13vw, 190px) 0; border-top:1px solid var(--line); }
+  .build{ background:var(--char); padding:clamp(120px, 13vw, 190px) 0 clamp(90px, 10vw, 150px); border-top:1px solid var(--line); }
   .build-head .label{ grid-column:1 / span 6; }
   .build-head .h2{ grid-column:1 / span 8; margin-top:32px; }
-  .build-map{ position:relative; display:grid; grid-template-columns:minmax(0,1fr) clamp(120px, 14vw, 220px) minmax(0,1fr); grid-template-rows:auto auto; margin-top:clamp(72px, 8vw, 120px); }
-  /* the two axes through the origin */
-  .build-map::before{ content:''; position:absolute; top:0; bottom:0; left:50%; width:1px; background:var(--line-strong); }
-  .build-map::after{ content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--line-strong); }
-  .origin{ grid-column:2; grid-row:1 / span 2; align-self:center; justify-self:center; position:relative; z-index:1; width:56px; height:56px; border:1px solid var(--paper-faint); background:var(--char); display:grid; place-items:center; }
-  .origin::before{ content:''; width:8px; height:8px; background:var(--paper); }
-  .origin::after{ content:''; position:absolute; inset:-14px; border:1px solid var(--line); }
-  .zone{ position:relative; padding:clamp(28px, 3vw, 44px) clamp(20px, 2.4vw, 40px); }
-  .zone.z1{ grid-column:1; grid-row:1; padding-bottom:clamp(48px, 5vw, 72px); }
-  .zone.z2{ grid-column:3; grid-row:1; padding-top:clamp(72px, 8vw, 120px); padding-bottom:clamp(40px, 4vw, 56px); }
-  .zone.z3{ grid-column:1; grid-row:2; padding-top:clamp(40px, 4vw, 60px); }
-  .zone.z4{ grid-column:3; grid-row:2; padding-top:clamp(56px, 6vw, 88px); }
-  /* a precise corner on each zone, facing the origin */
-  .zone::before{ content:''; position:absolute; width:14px; height:14px; border-color:var(--paper-faint); border-style:solid; border-width:0; }
-  .zone.z1::before{ bottom:0; inset-inline-end:0; border-bottom-width:1px; border-inline-end-width:1px; }
-  .zone.z2::before{ bottom:0; inset-inline-start:0; border-bottom-width:1px; border-inline-start-width:1px; }
-  .zone.z3::before{ top:0; inset-inline-end:0; border-top-width:1px; border-inline-end-width:1px; }
-  .zone.z4::before{ top:0; inset-inline-start:0; border-top-width:1px; border-inline-start-width:1px; }
-  .zone.z1, .zone.z3{ text-align:end; }
-  .family-name{ font-family:var(--display); font-weight:800; font-size:clamp(30px, 3.2vw, 52px); line-height:1.08; }
-  html[lang="ar"] .family-name{ line-height:1.35; }
-  .zone ul{ list-style:none; margin-top:22px; display:flex; flex-direction:column; gap:10px; }
-  .zone li{ font-size:16px; line-height:1.45; color:var(--paper-dim); }
-  .build-note{ margin-top:clamp(72px, 8vw, 110px); }
-  .build-note p{ grid-column:7 / span 6; font-family:var(--display); font-weight:700; font-size:clamp(19px, 1.6vw, 24px); line-height:1.6; color:var(--paper-dim); padding-top:24px; border-top:1px solid var(--line); }
+  /* What should actually be built: the outcome rows read on one side while one
+     structure (sticky stage) re-forms beside them; RTL swaps the columns itself. */
+  .build-flow{ position:relative; display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); column-gap:clamp(16px, 2vw, 32px); margin-top:clamp(48px, 5vw, 80px); }
+  .outcomes{ grid-column:1 / span 5; grid-row:1; list-style:none; padding:26vh 0 34vh; }
+  .build-stage{ grid-column:6 / span 7; grid-row:1; align-self:start; position:sticky; top:16vh; height:68vh; }
+  .build-fb{ position:absolute; inset:0; width:100%; height:100%; color:var(--paper); }
+  .build-fb-m{ display:none; }
+  .build-fb .build-fb-sig{ stroke:var(--ember); }
+  [dir="rtl"] .build-fb-d{ transform:scaleX(-1); }
+  .outcome{ min-height:16vh; display:flex; flex-direction:column; justify-content:center; transition:opacity .45s ease; }
+  .outcome-name{ font-family:var(--display); font-weight:800; font-size:clamp(28px, 2.9vw, 46px); line-height:1.1; }
+  html[lang="ar"] .outcome-name{ line-height:1.4; }
+  .outcome-ex{ list-style:none; display:flex; flex-wrap:wrap; gap:4px 0; margin-top:12px; font-size:13.5px; line-height:1.5; color:var(--paper-mute); }
+  .outcome-ex li + li::before{ content:'·'; padding:0 .6em; color:var(--paper-faint); }
+  .outcomes.has-current .outcome:not(.is-current){ opacity:.34; }
+  .build-exit{ min-height:20vh; display:flex; align-items:center; }
+  .build-exit p{ font-family:var(--display); font-weight:700; font-size:clamp(19px, 1.6vw, 24px); line-height:1.6; color:var(--paper-dim); padding-top:24px; border-top:1px solid var(--line); }
 
   /* =====================================================================
      4. BUILT BY ATHAR — three product stages, real UI as the hero
@@ -442,18 +434,6 @@
   [dir="rtl"] .u-optics-d{ transform:scaleX(-1); }
 
   /* What can be built: one arriving direction, four measured routes */
-  .sig-branches{ position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; }
-  .sig-branches path{ fill:none; }
-  .sig-branches .route{ stroke:var(--paper-faint); stroke-width:1; }
-  .sig-branches .incoming{ stroke:var(--ember); stroke-width:1.4; }
-  .sig-branches .br{ stroke:var(--ember); stroke-width:1.4; stroke-dasharray:1 1; stroke-dashoffset:1; transition:stroke-dashoffset .7s cubic-bezier(.45,0,.2,1); }
-  .sig-branches .br.is-active{ stroke-dashoffset:0; }
-  .sig-branches .end{ fill:var(--char); stroke:var(--paper-faint); transition:fill .4s ease, stroke .4s ease; }
-  .sig-branches .end.is-active{ fill:var(--ember); stroke:var(--ember); }
-  .origin::before{ transition:background .6s ease; }
-  .build-map.sig-arrived .origin::before{ background:var(--ember); }
-  .zone{ outline:none; }
-  .zone:focus-visible{ outline:1px solid var(--ember); outline-offset:6px; }
 
   /* Built by Athar: a calm guide and one marker per product, lit when it is in view */
   .p-index{ position:relative; display:flex; align-items:center; gap:12px; }
@@ -486,9 +466,9 @@
      per-breakpoint section heights; once a section has rendered, the browser
      keeps its real size (contain-intrinsic-size: auto). No visual change. */
   main > section:not(.hero), footer{ content-visibility:auto; contain-intrinsic-size:auto var(--cis, 1200px); }
-  #about{ --cis:1760px; } #services{ --cis:1500px; } #work{ --cis:3530px; } #process{ --cis:1040px; } #faq{ --cis:736px; } #contact{ --cis:1420px; } footer{ --cis:280px; }
-  @media (max-width:1100px){ #about{ --cis:1200px; } #services{ --cis:1080px; } #work{ --cis:3000px; } #process{ --cis:1330px; } #faq{ --cis:660px; } #contact{ --cis:1170px; } }
-  @media (max-width:600px){ #about{ --cis:1580px; } #services{ --cis:1380px; } #work{ --cis:3080px; } #process{ --cis:1410px; } #faq{ --cis:620px; } #contact{ --cis:1150px; } }
+  #about{ --cis:1760px; } #services{ --cis:2150px; } #work{ --cis:3530px; } #process{ --cis:1040px; } #faq{ --cis:736px; } #contact{ --cis:1420px; } footer{ --cis:280px; }
+  @media (max-width:1100px){ #about{ --cis:1200px; } #services{ --cis:2000px; } #work{ --cis:3000px; } #process{ --cis:1330px; } #faq{ --cis:660px; } #contact{ --cis:1170px; } }
+  @media (max-width:600px){ #about{ --cis:1580px; } #services{ --cis:2550px; } #work{ --cis:3080px; } #process{ --cis:1410px; } #faq{ --cis:620px; } #contact{ --cis:1150px; } }
 
   /* WebGL enhancement hook (Phase 4): only a scene that declares it replaces
      its SVG state may hide it, and only with visibility — never layout. */
@@ -544,7 +524,6 @@
     .u-display, .u-intro, .build-head .h2, .built-head .h2, .built-head .built-line, .thinks-head .h2{ grid-column:1 / -1; }
     .u-statement{ grid-column:1 / -1; }
     .u-clarity .corner-note{ display:none; }
-    .build-note p{ grid-column:1 / -1; }
     .kh-lens{ display:none; }
     .kh-spec{ grid-template-columns:1fr; }
     .kh-top{ flex-direction:column; align-items:flex-start; }
@@ -591,20 +570,16 @@
     .u-clarity{ margin-top:80px; }
     .u-statement{ font-size:24px; }
 
-    .build{ padding:110px 0 100px; }
-    .build-map{ display:block; margin-top:56px; padding-inline-start:28px; }
-    .build-map::after{ display:none; }
-    .build-map::before{ left:auto; inset-inline-start:0; top:32px; }
-    [dir="rtl"] .build-map::before{ right:0; }
-    .origin{ position:absolute; top:0; inset-inline-start:-16px; width:32px; height:32px; background:var(--char); }
-    .origin::before{ width:6px; height:6px; }
-    .origin::after{ display:none; }
-    [dir] .zone{ padding:0; text-align:start; margin-top:0; }
-    .zone + .zone{ margin-top:56px; }
-    .zone.z1{ padding-top:64px; }
-    .zone::before{ display:none; }
-    .zone .family-name::before{ content:''; display:inline-block; vertical-align:middle; width:18px; height:1px; background:var(--paper-faint); margin-inline-end:12px; margin-inline-start:-28px; }
-    .family-name{ font-size:clamp(34px, 10vw, 44px); }
+    .build{ padding:110px 0 90px; }
+    /* phones: the stage sticks at the top, the rows pass beneath it (own composition) */
+    .build-flow{ display:block; margin-top:40px; }
+    .build-stage{ position:sticky; top:62px; height:42vh; z-index:2; background:var(--char); margin-inline:calc(var(--gutter) * -1); }
+    .build-fb-d{ display:none; }
+    .build-fb-m{ display:block; }
+    .outcomes{ position:relative; z-index:1; padding:8vh 0 4vh; }
+    .outcome{ min-height:26vh; }
+    .outcome-name{ font-size:clamp(30px, 9vw, 40px); }
+    .build-exit{ min-height:30vh; }
 
     .built{ padding:110px 0 90px; }
     .kh-stage, .dc-frame{ margin-inline:calc(var(--gutter) * -1); }
@@ -769,45 +744,43 @@
   <section class="build" id="services">
     <div class="shell">
       <div class="build-head grid">
-        <div class="label reveal">WHAT CAN BE BUILT</div>
+        <div class="label reveal">WHAT SHOULD ACTUALLY BE BUILT?</div>
         <h2 class="h2 reveal" data-ar="الحل بيعتمد على المشكلة." data-en="The solution depends on the problem.">الحل بيعتمد على المشكلة.</h2>
       </div>
-      <div class="build-map" data-signal-field="branches" data-sig>
-        <svg class="sig sig-branches" aria-hidden="true" focusable="false"></svg>
-        <div class="origin" aria-hidden="true"></div>
-        <div class="zone z1 reveal" tabindex="0" data-branch="0">
-          <h3 class="family-name" data-ar="تجارب" data-en="Experiences">تجارب</h3>
-          <ul>
-            <li data-ar="مواقع إلكترونية" data-en="Websites">مواقع إلكترونية</li>
-            <li data-ar="تجارب رقمية" data-en="Digital Experiences">تجارب رقمية</li>
-          </ul>
+      <div class="build-flow" data-signal-field="build">
+        <div class="build-stage" aria-hidden="true">
+          <svg data-signal-fallback class="build-fb build-fb-d" viewBox="-2.174 -1.667 4.348 3.333" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path d="M-1.502 -0.769L-1.871 -0.578M-1.871 -0.578L-1.871 0.607M-1.871 0.607L-1.502 0.416M-1.502 0.416L-1.502 -0.769M-0.818 -0.788L-1.166 -0.608M-1.166 -0.608L-1.166 0.508M-1.166 0.508L-0.818 0.328M-0.818 0.328L-0.818 -0.788M-0.134 -0.778L-0.461 -0.609M-0.461 -0.609L-0.461 0.438M-0.461 0.438L-0.134 0.269M-0.134 0.269L-0.134 -0.778M0.55 -0.722L0.244 -0.564M0.244 -0.564L0.244 0.414M0.244 0.414L0.55 0.256M0.55 0.256L0.55 -0.722M1.233 -0.617L0.95 -0.471M0.95 -0.471L0.95 0.439M0.95 0.439L1.233 0.292M1.233 0.292L1.233 -0.617M1.917 -0.479L1.655 -0.343M1.655 -0.343L1.655 0.498M1.655 0.498L1.917 0.362M1.917 0.362L1.917 -0.479M-1.687 -0.033L-1.371 -0.062M-1.371 -0.062L-1.055 -0.087M-1.055 -0.087L-0.74 -0.108M-0.74 -0.108L-0.424 -0.12M-0.424 -0.12L-0.108 -0.123M-0.108 -0.123L0.208 -0.116M0.208 -0.116L0.523 -0.098M0.523 -0.098L0.839 -0.07M0.839 -0.07L1.155 -0.034M1.155 -0.034L1.47 0.01M1.47 0.01L1.786 0.057" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-0.557 0.326L1.005 0.59M-0.557 -0.821L1.005 -0.556M-1.005 0.556L0.557 0.821M-1.005 -0.59L0.557 -0.326M-0.557 0.326L-0.557 -0.821M1.005 0.59L1.005 -0.556M-1.005 0.556L-1.005 -0.59M0.557 0.821L0.557 -0.326M-0.557 0.326L-1.005 0.556M1.005 0.59L0.557 0.821M-0.557 -0.821L-1.005 -0.59M1.005 -0.556L0.557 -0.326M-0.749 0.412L-0.402 0.471M-0.749 0.412L-0.749 0.157M-0.402 0.471L-0.055 0.529M-0.402 0.471L-0.402 0.216M-0.055 0.529L0.292 0.588M-0.055 0.529L-0.055 0.275M0.292 0.588L0.292 0.333M-0.749 0.157L-0.402 0.216M-0.749 0.157L-0.749 -0.098M-0.402 0.216L-0.055 0.275M-0.402 0.216L-0.402 -0.039M-0.055 0.275L0.292 0.333M-0.055 0.275L-0.055 0.02M0.292 0.333L0.292 0.079M-0.749 -0.098L-0.402 -0.039M-0.749 -0.098L-0.749 -0.352M-0.402 -0.039L-0.055 0.02M-0.402 -0.039L-0.402 -0.294M-0.055 0.02L0.292 0.079M-0.055 0.02L-0.055 -0.235M0.292 0.079L0.292 -0.176M-0.749 -0.352L-0.402 -0.294M-0.402 -0.294L-0.055 -0.235M-0.055 -0.235L0.292 -0.176" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-0.694 0.361L0.001 0.478M-0.694 0.361L-1.041 0.54M0.001 0.478L0.695 0.596M0.001 0.478L-0.347 0.658M0.695 0.596L1.389 0.713M0.695 0.596L0.347 0.775M1.389 0.713L1.041 0.893M-1.041 0.54L-0.347 0.658M-1.041 0.54L-1.389 0.72M-0.347 0.658L0.347 0.775M-0.347 0.658L-0.695 0.837M0.347 0.775L1.041 0.893M0.347 0.775L-0.001 0.955M1.041 0.893L0.694 1.072M-1.389 0.72L-0.695 0.837M-0.695 0.837L-0.001 0.955M-0.001 0.955L0.694 1.072M-0.694 -0.356L0.001 -0.238M-0.694 -0.356L-1.041 -0.176M0.001 -0.238L0.695 -0.121M0.001 -0.238L-0.347 -0.059M0.695 -0.121L1.389 -0.003M0.695 -0.121L0.347 0.059M1.389 -0.003L1.041 0.176M-1.041 -0.176L-0.347 -0.059M-1.041 -0.176L-1.389 0.003M-0.347 -0.059L0.347 0.059M-0.347 -0.059L-0.695 0.121M0.347 0.059L1.041 0.176M0.347 0.059L-0.001 0.238M1.041 0.176L0.694 0.356M-1.389 0.003L-0.695 0.121M-0.695 0.121L-0.001 0.238M-0.001 0.238L0.694 0.356M-0.694 -1.072L0.001 -0.955M-0.694 -1.072L-1.041 -0.893M0.001 -0.955L0.695 -0.837M0.001 -0.955L-0.347 -0.775M0.695 -0.837L1.389 -0.72M0.695 -0.837L0.347 -0.658M1.389 -0.72L1.041 -0.54M-1.041 -0.893L-0.347 -0.775M-1.041 -0.893L-1.389 -0.713M-0.347 -0.775L0.347 -0.658M-0.347 -0.775L-0.695 -0.596M0.347 -0.658L1.041 -0.54M0.347 -0.658L-0.001 -0.478M1.041 -0.54L0.694 -0.361M-1.389 -0.713L-0.695 -0.596M-0.695 -0.596L-0.001 -0.478M-0.001 -0.478L0.694 -0.361M0.001 0.478L0.001 -0.238M0.001 -0.238L0.001 -0.955M0.347 0.775L0.347 0.059M0.347 0.059L0.347 -0.658M-0.695 0.837L-0.695 0.121M-0.695 0.121L-0.695 -0.596" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M0.33 0.056L0.233 -0.217M0.233 -0.217L0 -0.363M0 -0.363L-0.233 -0.296M-0.233 -0.296L-0.33 -0.056M-0.33 -0.056L-0.233 0.217M-0.233 0.217L0 0.363M0 0.363L0.233 0.296M0.233 0.296L0.33 0.056M0.33 0.056L0.641 -0.363M0.641 -0.363L0.854 -0.342M0.641 -0.363L0.707 -0.514M0.641 -0.363L0.545 -0.561M0.641 -0.363L0.446 -0.393M0.641 -0.363L0.566 -0.208M0.641 -0.363L0.743 -0.168M0 -0.363L-0.641 -0.921M-0.641 -0.921L-0.433 -0.897M-0.641 -0.921L-0.565 -1.077M-0.641 -0.921L-0.758 -1.108M-0.641 -0.921L-0.846 -0.946M-0.641 -0.921L-0.746 -0.75M-0.641 -0.921L-0.575 -0.707M-0.33 -0.056L-1.138 0.619M-1.138 0.619L-0.954 0.655M-1.138 0.619L-1.057 0.461M-1.138 0.619L-1.261 0.435M-1.138 0.619L-1.328 0.587M-1.138 0.619L-1.218 0.777M-1.138 0.619L-1.048 0.82M0 0.363L1.138 0.664M1.138 0.664L1.312 0.705M1.138 0.664L1.213 0.509M1.138 0.664L1.061 0.456M1.138 0.664L0.944 0.633M1.138 0.664L1.044 0.829M1.138 0.664L1.232 0.863" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-1.326 0.275L-1.096 0.232M-1.096 0.232L-0.865 0.19M-0.865 0.19L-0.635 0.147M-0.635 0.147L-0.404 0.104M-0.404 0.104L-0.174 0.061M-0.174 0.061L0 0M-1.624 0.028L-1.334 0.022M-1.334 0.022L-1.044 0.017M-1.044 0.017L-0.754 0.012M-0.754 0.012L-0.464 0.006M-0.464 0.006L-0.174 0.001M-0.174 0.001L0 0M-1.326 -0.527L-1.096 -0.434M-1.096 -0.434L-0.865 -0.34M-0.865 -0.34L-0.635 -0.247M-0.635 -0.247L-0.404 -0.153M-0.404 -0.153L-0.174 -0.059M-0.174 -0.059L0 0M-1.624 -0.775L-1.334 -0.644M-1.334 -0.644L-1.044 -0.513M-1.044 -0.513L-0.754 -0.382M-0.754 -0.382L-0.464 -0.251M-0.464 -0.251L-0.174 -0.12M-0.174 -0.12L0 0M0 0L0.138 0.023M0.138 0.023L0.276 0.047M0.276 0.047L0.414 0.07M0.414 0.07L0.552 0.093M0.552 0.093L0.69 0.117M0.69 0.117L0.828 0.14M0.828 0.14L0.966 0.164M0.966 0.164L1.104 0.187M1.104 0.187L1.243 0.21M1.243 0.21L1.381 0.234M1.381 0.234L1.519 0.257" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-0.712 0.245L-0.278 0.318M-0.712 0.245L-0.961 0.373M-0.278 0.318L0.156 0.392M-0.278 0.318L-0.527 0.447M0.156 0.392L0.59 0.465M0.156 0.392L-0.093 0.52M0.59 0.465L1.024 0.539M0.59 0.465L0.341 0.594M1.024 0.539L1.457 0.612M1.024 0.539L0.775 0.667M1.457 0.612L1.209 0.74M-0.961 0.373L-0.527 0.447M-0.961 0.373L-1.209 0.502M-0.527 0.447L-0.093 0.52M-0.527 0.447L-0.775 0.575M-0.093 0.52L0.341 0.594M-0.093 0.52L-0.341 0.648M0.341 0.594L0.775 0.667M0.341 0.594L0.093 0.722M0.775 0.667L1.209 0.74M0.775 0.667L0.527 0.795M1.209 0.74L0.961 0.869M-1.209 0.502L-0.775 0.575M-1.209 0.502L-1.457 0.63M-0.775 0.575L-0.341 0.648M-0.775 0.575L-1.024 0.703M-0.341 0.648L0.093 0.722M-0.341 0.648L-0.59 0.777M0.093 0.722L0.527 0.795M0.093 0.722L-0.156 0.85M0.527 0.795L0.961 0.869M0.527 0.795L0.278 0.923M0.961 0.869L0.712 0.997M-1.457 0.63L-1.024 0.703M-1.024 0.703L-0.59 0.777M-0.59 0.777L-0.156 0.85M-0.156 0.85L0.278 0.923M0.278 0.923L0.712 0.997M-0.402 -0.764L0.031 -0.69M-0.402 -0.764L-0.651 -0.636M0.031 -0.69L0.465 -0.617M0.031 -0.69L-0.217 -0.562M0.465 -0.617L0.899 -0.544M0.465 -0.617L0.217 -0.489M0.899 -0.544L0.651 -0.415M-0.651 -0.636L-0.217 -0.562M-0.651 -0.636L-0.899 -0.507M-0.217 -0.562L0.217 -0.489M-0.217 -0.562L-0.465 -0.434M0.217 -0.489L0.651 -0.415M0.217 -0.489L-0.031 -0.36M0.651 -0.415L0.402 -0.287M-0.899 -0.507L-0.465 -0.434M-0.465 -0.434L-0.031 -0.36M-0.031 -0.36L0.402 -0.287M-0.402 -0.764L-0.278 0.318M0.465 -0.617L0.59 0.465M-0.651 -0.636L-0.527 0.447M0.217 -0.489L0.341 0.594M-0.899 -0.507L-0.775 0.575M-0.031 -0.36L0.093 0.722" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-1.5 -0.281L-0.972 -0.572M-0.972 -0.572L-1.137 -0.408M-0.881 -0.456L-0.876 -0.596M0.441 -1.315L0.775 -0.829M0.775 -0.829L0.278 -0.888M0.485 -0.654L0.446 -1.022M1.06 0.356L0.862 0.07M0.862 0.07L0.618 -0.097M0.622 0.194L0.949 -0.003M-0.015 0.473L-0.117 0.418M-0.117 0.418L-0.24 0.165M-0.277 0.387L-0.566 0.355M0.505 0.461L0.768 0.392M0.768 0.392L0.536 0.781M0.478 0.578L0.646 0.455M-0.485 0.275L-0.881 -0.029M-0.881 -0.029L-0.501 0.524M-0.632 0.176L-0.694 -0.059" stroke="currentColor" stroke-opacity=".4" stroke-width=".008" fill="none"/><rect x="-1.52" y="-0.301" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.992" y="-0.592" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-1.157" y="-0.428" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.901" y="-0.476" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.896" y="-0.616" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-1.203" y="-0.47" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.421" y="-1.335" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.755" y="-0.849" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.258" y="-0.908" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.465" y="-0.674" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.426" y="-1.042" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.569" y="-0.97" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="1.04" y="0.336" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.842" y="0.05" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.598" y="-0.117" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.602" y="0.174" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.929" y="-0.023" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.807" y="0.231" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.035" y="0.453" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.137" y="0.398" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.26" y="0.145" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.297" y="0.367" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.586" y="0.335" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.239" y="0.185" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.485" y="0.441" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.748" y="0.372" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.516" y="0.761" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.458" y="0.558" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.626" y="0.435" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="0.634" y="0.51" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.505" y="0.255" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.901" y="-0.049" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.521" y="0.504" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.652" y="0.156" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.714" y="-0.079" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><rect x="-0.494" y="0.202" width="0.04" height="0.04" fill="currentColor" fill-opacity=".7"/><path class="build-fb-sig" d="M-2.139 -0.437L-0.485 0.275L-0.881 -0.029L1.06 0.356L0.862 0.07" fill="none" stroke-width=".012"/></svg>
+          <svg data-signal-fallback class="build-fb build-fb-m" viewBox="-1.389 -2.5 2.778 5" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path d="M0.533 -1.476L0.327 -1.32M0.327 -1.32L-0.864 -1.395M-0.864 -1.395L-0.659 -1.551M-0.659 -1.551L0.533 -1.476M0.716 -0.522L0.53 -0.381M0.53 -0.381L-0.547 -0.448M-0.547 -0.448L-0.361 -0.589M-0.361 -0.589L0.716 -0.522M0.787 0.426L0.621 0.552M0.621 0.552L-0.34 0.492M-0.34 0.492L-0.174 0.366M-0.174 0.366L0.787 0.426M0.737 1.366L0.591 1.477M0.591 1.477L-0.254 1.424M-0.254 1.424L-0.108 1.313M-0.108 1.313L0.737 1.366M-0.214 -1.439L-0.099 -1.031M-0.099 -1.031L0.006 -0.623M0.006 -0.623L0.09 -0.217M0.09 -0.217L0.15 0.187M0.15 0.187L0.184 0.59M0.184 0.59L0.196 0.991M0.196 0.991L0.193 1.392" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-0.452 -1.009L-0.452 0.748M0.701 -0.937L0.701 0.82M-0.701 -0.82L-0.701 0.937M0.452 -0.748L0.452 1.009M-0.452 -1.009L0.701 -0.937M-0.452 0.748L0.701 0.82M-0.701 -0.82L0.452 -0.748M-0.701 0.937L0.452 1.009M-0.452 -1.009L-0.701 -0.82M-0.452 0.748L-0.701 0.937M0.701 -0.937L0.452 -0.748M0.701 0.82L0.452 1.009M-0.512 -0.513L-0.512 -0.123M-0.512 -0.513L0.257 -0.465M-0.512 -0.123L-0.512 0.268M-0.512 -0.123L0.257 -0.075M-0.512 0.268L-0.512 0.658M-0.512 0.268L0.257 0.316M-0.512 0.658L0.257 0.706M0.257 -0.465L0.257 -0.075M0.257 -0.075L0.257 0.316M0.257 0.316L0.257 0.706" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-0.527 -1.363L-0.527 -0.582M-0.527 -1.363L-0.914 -1.069M-0.527 -0.582L-0.527 0.198M-0.527 -0.582L-0.914 -0.289M-0.527 0.198L-0.527 0.979M-0.527 0.198L-0.914 0.492M-0.527 0.979L-0.914 1.273M-0.914 -1.069L-0.914 -0.289M-0.914 -0.289L-0.914 0.492M-0.914 0.492L-0.914 1.273M0.193 -1.318L0.193 -0.537M0.193 -1.318L-0.193 -1.024M0.193 -0.537L0.193 0.244M0.193 -0.537L-0.193 -0.244M0.193 0.244L0.193 1.024M0.193 0.244L-0.193 0.537M0.193 1.024L-0.193 1.318M-0.193 -1.024L-0.193 -0.244M-0.193 -0.244L-0.193 0.537M-0.193 0.537L-0.193 1.318M0.914 -1.273L0.914 -0.492M0.914 -1.273L0.527 -0.979M0.914 -0.492L0.914 0.289M0.914 -0.492L0.527 -0.198M0.914 0.289L0.914 1.069M0.914 0.289L0.527 0.582M0.914 1.069L0.527 1.363M0.527 -0.979L0.527 -0.198M0.527 -0.198L0.527 0.582M0.527 0.582L0.527 1.363M-0.527 -0.582L0.193 -0.537M0.193 -0.537L0.914 -0.492M-0.914 0.492L-0.193 0.537M-0.193 0.537L0.527 0.582" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M0 0.371L0.258 0.278M0.258 0.278L0.365 0.023M0.365 0.023L0.258 -0.246M0.258 -0.246L0 -0.371M0 -0.371L-0.258 -0.278M-0.258 -0.278L-0.365 -0.023M-0.365 -0.023L-0.258 0.246M-0.258 0.246L0 0.371M0 0.371L0.507 1.146M0.507 1.146L0.503 1.364M0.507 1.146L0.686 1.053M0.507 1.146L0.337 1.018M0.365 0.023L0.784 -1.065M0.784 -1.065L0.788 -0.854M0.784 -1.065L0.971 -1.164M0.784 -1.065L0.586 -1.173M0 -0.371L-0.784 -0.936M-0.784 -0.936L-0.795 -0.713M-0.784 -0.936L-0.605 -1.029M-0.784 -0.936L-0.964 -1.057M-0.365 -0.023L-0.507 0.855M-0.507 0.855L-0.521 1.08M-0.507 0.855L-0.327 0.762M-0.507 0.855L-0.688 0.735" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-0.523 -1.76L-0.379 -1.24M-0.379 -1.24L-0.235 -0.721M-0.235 -0.721L-0.091 -0.201M-0.091 -0.201L0 0M-0.285 -1.609L-0.2 -1.138M-0.2 -1.138L-0.115 -0.668M-0.115 -0.668L-0.03 -0.197M-0.03 -0.197L0 0M0.285 -1.709L0.2 -1.204M0.2 -1.204L0.115 -0.699M0.115 -0.699L0.03 -0.193M0.03 -0.193L0 0M0.523 -1.558L0.379 -1.102M0.379 -1.102L0.235 -0.646M0.235 -0.646L0.091 -0.189M0.091 -0.189L0 0M0 0L0 0.244M0 0.244L0 0.488M0 0.488L0 0.732M0 0.732L0 0.976M0 0.976L0 1.22M0 1.22L0 1.464M0 1.464L0 1.708" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M-0.417 -1.416L-0.417 -0.603M-0.417 -1.416L-0.556 -1.312M-0.417 -0.603L-0.417 0.21M-0.417 -0.603L-0.556 -0.498M-0.417 0.21L-0.417 1.023M-0.417 0.21L-0.556 0.315M-0.417 1.023L-0.556 1.128M-0.556 -1.312L-0.556 -0.498M-0.556 -1.312L-0.694 -1.207M-0.556 -0.498L-0.556 0.315M-0.556 -0.498L-0.694 -0.393M-0.556 0.315L-0.556 1.128M-0.556 0.315L-0.694 0.42M-0.556 1.128L-0.694 1.233M-0.694 -1.207L-0.694 -0.393M-0.694 -1.207L-0.832 -1.102M-0.694 -0.393L-0.694 0.42M-0.694 -0.393L-0.832 -0.289M-0.694 0.42L-0.694 1.233M-0.694 0.42L-0.832 0.525M-0.694 1.233L-0.832 1.338M-0.832 -1.102L-0.832 -0.289M-0.832 -0.289L-0.832 0.525M-0.832 0.525L-0.832 1.338M0.667 -0.804L0.667 -0.316M0.667 -0.804L0.39 -0.594M0.667 -0.316L0.667 0.172M0.667 -0.316L0.39 -0.106M0.667 0.172L0.667 0.66M0.667 0.172L0.39 0.382M0.667 0.66L0.39 0.87M0.39 -0.594L0.39 -0.106M0.39 -0.106L0.39 0.382M0.39 0.382L0.39 0.87M0.667 -0.804L-0.417 -0.603M0.667 0.172L-0.417 0.21M0.39 -0.594L-0.694 -0.393M0.39 0.382L-0.694 0.42" stroke="currentColor" stroke-opacity=".07" stroke-width=".006" fill="none"/><path d="M0.397 -0.959L0.594 -0.91M0.594 -0.91L0.397 -1.212M1.099 0.106L0.883 -0.115M0.883 -0.115L0.946 0.069M0.202 1.291L-0.072 1.454M-0.072 1.454L-0.242 1.157M-0.563 -0.562L-0.208 -0.693M-0.208 -0.693L-0.262 -0.504M-0.483 0.763L-0.333 0.75M-0.333 0.75L-0.789 0.853M-0.259 0.009L-0.338 0.258M-0.338 0.258L-0.192 -0.043" stroke="currentColor" stroke-opacity=".4" stroke-width=".008" fill="none"/><rect x="0.38" y="-0.976" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="0.577" y="-0.927" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="0.38" y="-1.229" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="0.312" y="-0.984" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="1.082" y="0.089" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="0.866" y="-0.132" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="0.929" y="0.052" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="1.057" y="-0.098" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="0.185" y="1.274" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.089" y="1.437" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.259" y="1.14" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.022" y="1.499" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.58" y="-0.579" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.225" y="-0.71" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.279" y="-0.521" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.784" y="-0.973" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.5" y="0.746" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.35" y="0.733" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.806" y="0.836" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.262" y="0.863" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.276" y="-0.008" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.355" y="0.241" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.209" y="-0.06" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><rect x="-0.398" y="0.214" width="0.034" height="0.034" fill="currentColor" fill-opacity=".7"/><path class="build-fb-sig" d="M0.089 -2.242L-0.259 0.009L-0.338 0.258L0.202 1.291L-0.072 1.454" fill="none" stroke-width=".012"/></svg>
         </div>
-        <div class="zone z2 reveal" tabindex="0" data-branch="1">
-          <h3 class="family-name" data-ar="منتجات" data-en="Products">منتجات</h3>
-          <ul>
-            <li data-ar="تطبيقات ويب" data-en="Web Applications">تطبيقات ويب</li>
-            <li data-ar="منتجات رقمية" data-en="Digital Products">منتجات رقمية</li>
-            <li data-ar="مزايا مدعومة بالذكاء الاصطناعي" data-en="AI-powered Features">مزايا مدعومة بالذكاء الاصطناعي</li>
-          </ul>
-        </div>
-        <div class="zone z3 reveal" tabindex="0" data-branch="2">
-          <h3 class="family-name" data-ar="أنظمة" data-en="Systems">أنظمة</h3>
-          <ul>
-            <li data-ar="أنظمة داخلية" data-en="Internal Systems">أنظمة داخلية</li>
-            <li data-ar="لوحات تحكم" data-en="Dashboards">لوحات تحكم</li>
-            <li data-ar="بوابات للعملاء والموظفين" data-en="Client / Employee Portals">بوابات للعملاء والموظفين</li>
-          </ul>
-        </div>
-        <div class="zone z4 reveal" tabindex="0" data-branch="3">
-          <h3 class="family-name" data-ar="ربط وتكامل" data-en="Connections">ربط وتكامل</h3>
-          <ul>
-            <li data-ar="أتمتة" data-en="Automation">أتمتة</li>
-            <li data-ar="تكاملات وواجهات API" data-en="Integrations &amp; APIs">تكاملات وواجهات API</li>
-          </ul>
-        </div>
-      </div>
-      <div class="build-note grid">
-        <p class="reveal" data-ar="مش متأكد شو محتاج بالضبط؟ ولا يهمك، بنساعدك تحددها." data-en="Not sure what you need? That&rsquo;s okay. We&rsquo;ll help you figure it out.">مش متأكد شو محتاج بالضبط؟ ولا يهمك، بنساعدك تحددها.</p>
+        <ol class="outcomes">
+          <li class="outcome" data-outcome="experience">
+            <h3 class="outcome-name" data-ar="تجربة رقمية" data-en="Experience">تجربة رقمية</h3>
+            <ul class="outcome-ex"><li data-ar="مواقع إلكترونية" data-en="Websites">مواقع إلكترونية</li><li data-ar="تجارب رقمية" data-en="Digital Experiences">تجارب رقمية</li></ul>
+          </li>
+          <li class="outcome" data-outcome="product">
+            <h3 class="outcome-name" data-ar="منتج" data-en="Product">منتج</h3>
+            <ul class="outcome-ex"><li data-ar="تطبيقات ويب" data-en="Web Applications">تطبيقات ويب</li><li data-ar="منتجات رقمية" data-en="Digital Products">منتجات رقمية</li></ul>
+          </li>
+          <li class="outcome" data-outcome="system">
+            <h3 class="outcome-name" data-ar="نظام" data-en="System">نظام</h3>
+            <ul class="outcome-ex"><li data-ar="أنظمة داخلية" data-en="Internal Systems">أنظمة داخلية</li><li data-ar="لوحات تحكم" data-en="Dashboards">لوحات تحكم</li></ul>
+          </li>
+          <li class="outcome" data-outcome="portal">
+            <h3 class="outcome-name" data-ar="بوابة" data-en="Portal">بوابة</h3>
+            <ul class="outcome-ex"><li data-ar="بوابات للعملاء والموظفين" data-en="Client / Employee Portals">بوابات للعملاء والموظفين</li></ul>
+          </li>
+          <li class="outcome" data-outcome="automation">
+            <h3 class="outcome-name" data-ar="أتمتة" data-en="Automation">أتمتة</h3>
+            <ul class="outcome-ex"><li data-ar="أتمتة" data-en="Automation">أتمتة</li><li data-ar="تكاملات وواجهات API" data-en="Integrations &amp; APIs">تكاملات وواجهات API</li></ul>
+          </li>
+          <li class="outcome" data-outcome="ai">
+            <h3 class="outcome-name" data-ar="طبقة ذكاء اصطناعي" data-en="AI Layer">طبقة ذكاء اصطناعي</h3>
+            <ul class="outcome-ex"><li data-ar="مزايا مدعومة بالذكاء الاصطناعي" data-en="AI-powered Features">مزايا مدعومة بالذكاء الاصطناعي</li></ul>
+          </li>
+          <li class="build-exit">
+            <p data-ar="مش متأكد شو محتاج بالضبط؟ ولا يهمك، بنساعدك تحددها." data-en="Not sure what you need? That&rsquo;s okay. We&rsquo;ll help you figure it out.">مش متأكد شو محتاج بالضبط؟ ولا يهمك، بنساعدك تحددها.</p>
+          </li>
+        </ol>
       </div>
     </div>
   </section>
@@ -1475,9 +1448,6 @@
 
     function arrive(el){
       el.classList.add('sig-in');
-      if (el.classList.contains('build-map')) {
-        setTimeout(function(){ el.classList.add('sig-arrived'); }, canAnimate ? 1300 : 0);
-      }
     }
     if (canAnimate) {
       for (s = 0; s < sigEls.length; s++) sigEls[s].classList.add('sig-pending');
@@ -1504,83 +1474,24 @@
       for (s = 0; s < products.length; s++) products[s].classList.add('is-live');
     }
 
-    // What can be built: one arriving direction, four measured routes.
-    var map = document.querySelector('.build-map');
-    if (!map) return;
-    var svg = map.querySelector('.sig-branches');
-    var origin = map.querySelector('.origin');
-    var zones = map.querySelectorAll('.zone');
-    var NS = 'http://www.w3.org/2000/svg';
-    var active = null;
-    function node(tag, attrs){ var n = document.createElementNS(NS, tag); for (var a in attrs) n.setAttribute(a, attrs[a]); return n; }
-    function applyActive(){
-      var items = svg.querySelectorAll('[data-branch]');
-      for (var i = 0; i < items.length; i++) items[i].classList.toggle('is-active', items[i].getAttribute('data-branch') === active);
-    }
-    function draw(){
-      var r = map.getBoundingClientRect();
-      if (!r.width) return;
-      var o = origin.getBoundingClientRect();
-      var ox = o.left + o.width / 2 - r.left, oy = o.top + o.height / 2 - r.top;
-      var stacked = getComputedStyle(map).display !== 'grid';
-      var rtl = document.documentElement.dir === 'rtl';
-      while (svg.firstChild) svg.removeChild(svg.firstChild);
-      svg.setAttribute('viewBox', '0 0 ' + r.width + ' ' + r.height);
-      var top = oy - o.height / 2;
-      svg.appendChild(node('path', { 'class': 'incoming sig-draw', pathLength: 1, d: stacked ? ('M' + ox + ' ' + (top - 48) + 'V' + top) : ('M' + ox + ' 0V' + top) }));
-      for (var z = 0; z < zones.length; z++) {
-        var b = zones[z].getBoundingClientRect();
-        var x0 = b.left - r.left, x1 = b.right - r.left, cx, cy;
-        // aim at the family name itself: its text edge nearest the axis, at its middle
-        var name = zones[z].querySelector('.family-name');
-        var range = document.createRange(); range.selectNodeContents(name);
-        var t = range.getBoundingClientRect();
-        var tx0 = t.left - r.left, tx1 = t.right - r.left;
-        cy = t.top - r.top + t.height / 2;
-        if (stacked) {
-          cx = rtl ? x1 : x0;
-        } else {
-          var gap = 14;
-          cx = Math.abs(tx0 - ox) < Math.abs(tx1 - ox) ? tx0 - gap : tx1 + gap;
-        }
-        var d = 'M' + ox + ' ' + oy + 'V' + cy + 'H' + cx;
-        var id = String(z);
-        svg.appendChild(node('path', { 'class': 'route', d: d }));
-        svg.appendChild(node('path', { 'class': 'br', 'data-branch': id, pathLength: 1, d: d }));
-        svg.appendChild(node('rect', { 'class': 'end', 'data-branch': id, x: cx - 3.5, y: cy - 3.5, width: 7, height: 7 }));
-      }
-      applyActive();
-    }
-    function setActive(v){ active = v; applyActive(); }
-    for (k = 0; k < zones.length; k++) {
-      (function(zone){
-        var id = zone.getAttribute('data-branch');
-        zone.addEventListener('mouseenter', function(){ setActive(id); });
-        zone.addEventListener('mouseleave', function(){ if (document.activeElement !== zone) setActive(null); });
-        zone.addEventListener('focus', function(){ setActive(id); });
-        zone.addEventListener('blur', function(){ setActive(null); });
-      })(zones[k]);
-    }
-    // Measure only once the map approaches the viewport: measuring earlier
-    // would force layout of content the browser is deliberately skipping.
-    function startDrawing(){
-      draw();
-      if ('ResizeObserver' in window) {
-        var ro = new ResizeObserver(function(){ draw(); });
-        ro.observe(map);
-        for (var q = 0; q < zones.length; q++) ro.observe(zones[q]);
-      } else {
-        window.addEventListener('resize', draw);
-      }
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
-    }
-    if ('IntersectionObserver' in window) {
-      var mio = new IntersectionObserver(function(entries){
-        if (entries[0].isIntersecting) { mio.disconnect(); startDrawing(); }
-      }, { rootMargin: '50% 0px' });
-      mio.observe(map);
-    } else {
-      startDrawing();
+    // What should actually be built: the outcome row at the reading line is the
+    // current one (the WebGL structure follows the same line). DOM only, so it
+    // works without WebGL; with reduced motion nothing dims.
+    var flow = document.querySelector('.build-flow');
+    if (flow && canAnimate) {
+      var list = flow.querySelector('.outcomes'), rows = flow.querySelectorAll('.outcome');
+      var phone = matchMedia('(max-width:600px)'), rio = null;
+      var watchRows = function(){
+        if (rio) rio.disconnect();
+        var line = phone.matches ? 66 : 50;
+        rio = new IntersectionObserver(function(entries){
+          for (var e = 0; e < entries.length; e++) entries[e].target.classList.toggle('is-current', entries[e].isIntersecting);
+          list.classList.toggle('has-current', !!list.querySelector('.outcome.is-current'));
+        }, { rootMargin: '-' + line + '% 0px -' + (99 - line) + '% 0px' });
+        for (var r = 0; r < rows.length; r++) rio.observe(rows[r]);
+      };
+      watchRows();
+      if (phone.addEventListener) phone.addEventListener('change', watchRows);
     }
   })();
 

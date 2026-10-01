@@ -18,6 +18,7 @@ const SCENES = [
   // until then scenes run only in local debug mode (diagnostic primitive).
   { name: 'hero',           selector: '.hero',          module: './scenes/hero.js',           tiers: 'ABC', productionReady: false },
   { name: 'understanding',  selector: '.u-optics-wrap', module: './scenes/understanding.js',  tiers: 'ABC', productionReady: false },
+  { name: 'build',          selector: '.build-flow',    module: './scenes/build.js',          tiers: 'ABC', productionReady: false },
   { name: 'process-states', selector: '.t-system',      module: './scenes/process-states.js', tiers: 'AB',  productionReady: false }, // Tier C keeps the SVG
   { name: 'threshold',      selector: '#contact',       module: './scenes/threshold.js',      tiers: 'ABC', productionReady: false },
 ];
@@ -269,7 +270,7 @@ export function start(boot) {
   function contextFor(rec) {
     return {
       THREE, renderer, tier: state.tier, tierConfig: TIER[state.tier], mode: state.mode,
-      viewport: { width: innerWidth, height: innerHeight }, mount: rec.el, dpr: renderer ? renderer.getPixelRatio() : 1, dprCap: TIER[state.tier].dprCap,
+      viewport: { width: innerWidth, height: innerHeight }, mount: mountFor(rec), dpr: renderer ? renderer.getPixelRatio() : 1, dprCap: TIER[state.tier].dprCap,
       rtl, reducedMotion: false, debug, section: rec.el,
       track(obj) { rec.disposables.push(obj); return obj; },
       listen(target, type, fn, opts) { target.addEventListener(type, fn, opts); rec.listeners.push([target, type, fn, opts]); },
@@ -302,7 +303,7 @@ export function start(boot) {
     rec.disposables = []; rec.listeners = [];
     rec.api = rec.factory(contextFor(rec));
     rec.api.init();
-    rec.api.resize(rec.el.clientWidth || innerWidth, rec.el.clientHeight || innerHeight, renderer.getPixelRatio(), contextFor(rec));
+    rec.api.resize(mountFor(rec).clientWidth || innerWidth, mountFor(rec).clientHeight || innerHeight, renderer.getPixelRatio(), contextFor(rec));
   }
   function disposeScene(name) {
     const rec = scenes.get(name);
@@ -380,8 +381,11 @@ export function start(boot) {
   // ---------- canvas mount: one canvas, moved into the active section ----------
   let mountEl = null;
   const mountRO = new ResizeObserver(() => sizeToMount());
+  // A scene may host its canvas in an element inside its section (meta.mount,
+  // e.g. a sticky stage) while visibility and progress still come from the section.
+  function mountFor(rec) { return (rec.meta && rec.meta.mount && rec.el.querySelector(rec.meta.mount)) || rec.el; }
   function mountCanvas(rec) {
-    const el = rec.el;
+    const el = mountFor(rec);
     if (mountEl !== el) {
       if (mountEl) mountRO.unobserve(mountEl);
       if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
@@ -400,7 +404,7 @@ export function start(boot) {
     renderer.setPixelRatio(dprFor(state.tier));
     renderer.setSize(w, h, false);
     const rec = scenes.get(state.active);
-    if (rec && rec.api && rec.el === mountEl) rec.api.resize(w, h, renderer.getPixelRatio(), contextFor(rec));
+    if (rec && rec.api && mountFor(rec) === mountEl) rec.api.resize(w, h, renderer.getPixelRatio(), contextFor(rec));
     requestFrame('resize');
   }
 
