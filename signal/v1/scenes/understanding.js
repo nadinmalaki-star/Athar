@@ -147,23 +147,35 @@ export function create(ctx) {
             float leg = pi < 0.5 ? uLegible.x : (pi < 1.5 ? uLegible.y : uLegible.z);
             float stage = 0.85 + 0.15 * pi;                       // first → third: a touch more legible
             vec3 col = uResin; float a;
-            if (vFace > 1.5) {
-              // the thickness strip at the leading edge: where the edge catches
-              a = (0.085 + 0.05 * leg) * stage;
+            if (vFace > 2.5) {
+              // top / bottom thickness returns: thin, catching a little light, fading into depth
+              a = mix(0.07, 0.025, vUv.x) * stage;
+            } else if (vFace > 1.5) {
+              // the leading thickness strip: where the edge catches. Its slight top-to-base
+              // falloff keeps it a physical edge, not an outline
+              a = (0.11 + 0.05 * leg) * stage * mix(1.15, 0.8, vUv.y);
+              // the Signal passes through here: a tiny, edge-local response at the crossing
+              float hc = exp(-pow((vUv.y - 0.5) * uHL.y * 1.4, 2.0)) * leg;
+              a += 0.1 * hc;
+              col = mix(col, uEmber, 0.3 * hc);
             } else {
-              // body: present at the leading edge, thinning as it recedes into depth
-              a = mix(0.05, 0.018, smoothstep(0.0, 1.0, vUv.x)) * (vFace > 0.5 ? 0.55 : 1.0);
+              // body: present at the leading edge, thinning as it recedes into depth, with a
+              // restrained top-to-base falloff so the resin never reads as one flat tone
+              a = mix(0.062, 0.022, smoothstep(0.0, 1.0, vUv.x)) * (vFace > 0.5 ? 0.6 : 1.0);
+              a *= mix(1.22, 0.8, vUv.y);
+              col *= mix(1.04, 0.94, vUv.y);
               // top / bottom edges catch a little light
               float e = min(vUv.y, 1.0 - vUv.y);
               a += 0.028 * (1.0 - smoothstep(0.0, 0.02, e));
-              // one faint internal reflection, parallel to the leading edge (front face)
-              if (vFace < 0.5 && uLite < 0.5) a += 0.03 * (1.0 - smoothstep(0.0, 0.03, abs(vUv.x - 0.2)));
+              // ONE internal reflection, parallel to the leading edge (front face only):
+              // crisp up close, almost gone at section scale
+              if (vFace < 0.5 && uLite < 0.5) a += 0.042 * (1.0 - smoothstep(0.0, 0.016, abs(vUv.x - 0.2)));
               a *= stage * mix(0.75, 1.0, leg);
-              // where the Signal crosses (mid depth, centre): a tiny local response, warm only there
-              vec2 d = (vUv - 0.5) * uHL;
+              // where the Signal crosses (mid depth, centre): a smaller, tighter body response
+              vec2 d = (vUv - 0.5) * uHL * 1.4;
               float h = exp(-dot(d, d) * 1.6) * leg;
-              a += 0.045 * h;
-              col = mix(col, uEmber, 0.35 * h);
+              a += 0.03 * h;
+              col = mix(col, uEmber, 0.3 * h);
             }
             gl_FragColor = vec4(col, a);
           }`,
@@ -367,7 +379,8 @@ export function create(ctx) {
     // Thickness: the back face sits a few units downstream along the Signal's
     // axis (mirror-aware through P), so the slab reads as a double edge.
     const lite = !horiz || c.tier === 'C';
-    const TH = horiz ? 5 : 4;
+    const TH = horiz ? 8 : 6;                    // U3.1: a little deeper (the front face is unchanged)
+    const EPP = lite ? 10 : 14;                  // edge-line vertices per plane
     const FP = [], FU = [], FF = [], FI = [], EP = [];
     pl.forEach((p, i) => {
       const zc = DEPTH.planes[i], dz = DEPTH.planeDz[i], zn = zc + dz / 2, zf = zc - dz / 2;
@@ -391,7 +404,12 @@ export function create(ctx) {
       face(n0, n1, f0, f1, 0);                                         // front face
       if (!lite) face(off(n0), off(n1), off(f0), off(f1), 1);          // back face (desktop A/B)
       face(n0, n1, off(n0), off(n1), 2);                               // leading thickness strip
+      if (!lite) {                                                     // thin top / bottom returns
+        face(n0, off(n0), f0, off(f0), 3);
+        face(n1, off(n1), f1, off(f1), 3);
+      }
       EP.push(...n0, ...n1, ...n0, ...f0, ...n1, ...f1, ...f0, ...f1, ...off(n0), ...off(n1));
+      if (!lite) EP.push(...off(n0), ...off(f0), ...off(n1), ...off(f1));   // back edges, where perspective shows them
     });
     const fGeo = new THREE.BufferGeometry();
     fGeo.setAttribute('position', new THREE.Float32BufferAttribute(FP, 3));
@@ -420,7 +438,7 @@ export function create(ctx) {
     nGeo.setAttribute('position', dyn(nodes.length * 6, 3)); nGeo.setAttribute('color', dyn(nodes.length * 6, 4));
     add(new THREE.Mesh(nGeo, mats.node), 4);
 
-    story = { C, P, s, ox, oy, horiz, zAt, sig, sGeo, marks, mGeo, nodes, nGeo, fGeo, eGeo, pl, R };
+    story = { C, P, s, ox, oy, horiz, zAt, sig, sGeo, marks, mGeo, nodes, nGeo, fGeo, eGeo, pl, R, EPP };
 
     if (ctx.debug) window.__signalU = { comp: horiz ? 'desktop' : 'mobile', mirror, marks: marks.length, kept: marks.filter((m) => m.kind === 'kept').length, transient: marks.filter((m) => m.kind === 'gone').length, svgRect: { x: Math.round(ox), y: Math.round(oy), w: Math.round(C.vb[0] * s), h: Math.round(C.vb[1] * s) } };
   }
@@ -472,7 +490,10 @@ export function create(ctx) {
       const v = [[-hx, hy], [-hx, -hy], [hx, hy], [hx, hy], [-hx, -hy], [hx, -hy]];
       v.forEach(([dx, dy], k) => { mp[o + k * 3] = c3[0] + dx; mp[o + k * 3 + 1] = c3[1] + dy; mp[o + k * 3 + 2] = z; });
       // graphite by stage (never white), and quieter the deeper it sits
-      const tone = lerp(m.tone[0], m.tone[1], u), fade = 0.7 + 0.3 * clamp01((z + 420) / 410);
+      // depth reads in two ways: overall distance, and in front of / behind the Signal's own
+      // plane at that point (in front a little clearer, behind a little veiled)
+      const rel = Math.max(-1, Math.min(1, (z - S.zAt(ca)) / 45));
+      const tone = lerp(m.tone[0], m.tone[1], u) * (1 + 0.07 * rel), fade = (0.66 + 0.34 * clamp01((z + 420) / 410)) * (1 + 0.24 * rel);
       for (let k = 0; k < 6; k++) { const c = i * 24 + k * 4; mc[c] = tone; mc[c + 1] = tone; mc[c + 2] = tone * 0.985; mc[c + 3] = A * fade; }
     });
     S.mGeo.attributes.position.needsUpdate = true; S.mGeo.attributes.color.needsUpdate = true;
@@ -484,8 +505,10 @@ export function create(ctx) {
       const u = done(p.a, R * 0.6);
       leg.setComponent(i, u);
       // front leading edge firm, back leading edge (thickness) softer, the rest structural
-      const lead = lerp(0.3, 0.4, u), rest = lerp(0.75, 1, u), back = lerp(0.12, 0.2, u);
-      [lead, lead, 0.2 * rest, 0.12 * rest, 0.2 * rest, 0.12 * rest, 0.1 * rest, 0.1 * rest, back, back].forEach((al, k) => ec.set([1, 1, 1, al], (i * 10 + k) * 4));
+      const lead = lerp(0.34, 0.44, u), rest = lerp(0.75, 1, u), back = lerp(0.2, 0.28, u);
+      const al = [lead, lead, 0.2 * rest, 0.12 * rest, 0.2 * rest, 0.12 * rest, 0.1 * rest, 0.1 * rest, back, back];
+      if (S.EPP > 10) al.push(0.09 * rest, 0.04 * rest, 0.09 * rest, 0.04 * rest);   // back top / bottom edges
+      al.forEach((v, k) => ec.set([1, 1, 1, v], (i * S.EPP + k) * 4));
     });
     S.eGeo.attributes.color.needsUpdate = true;
 
