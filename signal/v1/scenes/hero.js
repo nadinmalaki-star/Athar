@@ -6,6 +6,12 @@
  * Signal and its meaningful intersections. One soft key, a faint low edge light, near-
  * zero ambient. No refraction, bloom, post-processing or environment maps.
  *
+ * Milestone 4: SCROLL + POINTER. The layers live in four groups (rear, field,
+ * Signal, foreground). Hero progress opens them a few pixels — compressed and
+ * obscured → slightly separated → Signal identified, never fully resolved.
+ * Fine pointers add a bounded optical parallax that settles in well under a
+ * second and then stops requesting frames. Nothing idles, pulses or drifts.
+ *
  * Camera is pixel-aligned to the hero section: elements are authored in the
  * section's CSS-pixel layout, then pushed into depth. Three readable layers
  * on desktop (two on phones):
@@ -71,12 +77,20 @@ export function create(ctx) {
   const THREE = ctx.THREE;
   let scene, camera, D = 1000, W = 1, H = 1;
   const built = [];                 // geometries rebuilt on every layout
+  const slabs = [];                 // { pivot, yaw }: foreground slabs, for the opening turn
+  let G = null, into = null;        // layer groups; 'into' = where helpers add objects
+  let story = 0;                    // scroll story 0 -> 1 (Hero progress)
+  let pivotRear = [0, 0];           // world XY the rear structure opens from
+  let mobileMode = false;
+  // pointer parallax: target and settled value (normalised -1..1), time-based settling
+  const ptr = { tx: 0, ty: 0, x: 0, y: 0, last: 0, settling: false };
   let mats = null;
   const params = new URLSearchParams(location.search);
   const depthView = ctx.debug && params.get('signal-view') === 'depth';
   // local debug only: pin the discovery state (0 = at rest, 1 = discovered) for review
   const forcedT = ctx.debug && params.has('signal-state') ? Math.min(1, Math.max(0, parseFloat(params.get('signal-state')) || 0)) : null;
   let discovery = forcedT != null ? forcedT : 0;
+  if (forcedT != null) story = forcedT;   // (debug) a pinned state pins the scroll story too
   let lastCtx = null, fontsHooked = false;
 
   function rectIn(el, host) {
@@ -88,10 +102,23 @@ export function create(ctx) {
   // Screen position (section px) + depth → world position that projects to the same pixel.
   function place(sx, sy, z) { const k = (D - z) / D; return [(sx - W / 2) * k, (H / 2 - sy) * k, z]; }
 
+  function strandMaterial() {
+    const m = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false });
+    m.userData.uOpen = { value: 0 };
+    m.onBeforeCompile = (sh) => {
+      sh.uniforms.uOpen = m.userData.uOpen;
+      sh.vertexShader = 'attribute float aOpen;\nuniform float uOpen;\n' + sh.vertexShader
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed.y += aOpen * uOpen;');
+    };
+    return m;
+  }
+
   function materials() {
     return {
       // technical lines: soft graphite / charcoal, alpha carries the depth fade
       lines:     ctx.track(new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false })),
+      // strands: same line look; selected strands ease away from the Signal line (aOpen x uOpen)
+      strands:   ctx.track(strandMaterial()),
       // precision black metal: black anodized, semi-matte, no chrome (opaque: it truly occludes)
       metal:     ctx.track(new THREE.MeshStandardMaterial({ color: 0x1c1c21, roughness: 0.5, metalness: 0.35, vertexColors: true })),
       metalEdge: ctx.track(new THREE.LineBasicMaterial({ color: 0x2b2b30 })),
@@ -135,14 +162,14 @@ export function create(ctx) {
     };
   }
 
-  function clearBuilt() { for (const o of built) { scene.remove(o); o.geometry.dispose(); } built.length = 0; }
+  function clearBuilt() { for (const o of built) { o.removeFromParent(); if (o.geometry) o.geometry.dispose(); } built.length = 0; slabs.length = 0; }
   function addLines(points, mat, colors) {
     if (!points.length) return null;
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
     if (colors) g.setAttribute('color', new THREE.Float32BufferAttribute(colors, 4));
     const l = new THREE.LineSegments(g, mat);
-    scene.add(l); built.push(l); return l;
+    into.add(l); built.push(l); return l;
   }
   // Screen-space ribbon along a list of segments: { a:[sx,sy,z], b:[sx,sy,z], ua, ub, base: [a,b], lit }.
   function addRibbon(segs, widthPx, mat) {
@@ -166,7 +193,7 @@ export function create(ctx) {
     g.setAttribute('aLit', new THREE.Float32BufferAttribute(lit, 1));
     g.setIndex(idx);
     const m = new THREE.Mesh(g, mat);
-    scene.add(m); built.push(m); return m;
+    into.add(m); built.push(m); return m;
   }
 
   // A precision slab: thin black-metal box centred on a screen rect, slight yaw.
@@ -190,13 +217,16 @@ export function create(ctx) {
     g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     const m = new THREE.Mesh(g, mats.metal);
     // The FRONT face sits exactly on the authored rect at depth z; the body extends behind it.
+    // Everything hangs from one pivot (the front-face centre), so the slab turns as a unit.
     const f = place(x + w / 2, y + h / 2, z), k = (D - z) / D, a = yaw || 0;
-    m.position.set(f[0] - Math.sin(a) * thick / 2, f[1], f[2] - Math.cos(a) * thick / 2);
-    m.scale.set(w * k, h * k, thick); m.rotation.y = a;
-    scene.add(m); built.push(m);
+    const pivot = new THREE.Group();
+    pivot.position.set(f[0], f[1], f[2]); pivot.rotation.y = a;
+    into.add(pivot); built.push(pivot);
+    m.position.set(0, 0, -thick / 2); m.scale.set(w * k, h * k, thick);
+    pivot.add(m); built.push(m);
     const e = new THREE.LineSegments(new THREE.EdgesGeometry(g), mats.metalEdge);
-    e.position.copy(m.position); e.scale.copy(m.scale); e.rotation.copy(m.rotation);
-    scene.add(e); built.push(e);
+    e.position.copy(m.position); e.scale.copy(m.scale);
+    pivot.add(e); built.push(e);
     // Controlled edge response, one draw: the top-front edge where the key lands
     // (strongest at the key side, easing off across), and a faint catch down the
     // key-side front edge that fades out before the base.
@@ -211,8 +241,9 @@ export function create(ctx) {
       1, 1, 1, 0.3, 1, 1, 1, 0,
     ], 4));
     const l = new THREE.LineSegments(hl, mats.metalLit);
-    l.position.copy(m.position); l.scale.copy(m.scale); l.rotation.copy(m.rotation);
-    scene.add(l); built.push(l);
+    l.position.copy(m.position); l.scale.copy(m.scale);
+    pivot.add(l); built.push(l);
+    slabs.push({ pivot, yaw: a });
     return m;
   }
 
@@ -231,7 +262,7 @@ export function create(ctx) {
     const m = new THREE.Mesh(g, mats.sheet);
     const c = place(x + w / 2, y + h / 2, z), k = (D - z) / D;
     m.position.set(c[0], c[1], c[2]); m.scale.set(w * k, h * k, 1);
-    scene.add(m); built.push(m);
+    into.add(m); built.push(m);
     return m;
   }
 
@@ -241,13 +272,13 @@ export function create(ctx) {
     const m = new THREE.Mesh(g, material);
     const c = place(x + w / 2, y + h / 2, z), k = (D - z) / D;
     m.position.set(c[0], c[1], c[2]); m.scale.set(w * k, h * k, 1); m.rotation.y = yaw || 0;
-    scene.add(m); built.push(m);
+    into.add(m); built.push(m);
     if (withEdge) {
       const eg = new THREE.EdgesGeometry(g);
       const e = new THREE.LineSegments(eg, mats.metalEdge);
       e.position.copy(m.position); e.scale.copy(m.scale); e.rotation.copy(m.rotation);
       e.position.z += 0.5;
-      scene.add(e); built.push(e);
+      into.add(e); built.push(e);
     }
     return m;
   }
@@ -293,7 +324,10 @@ export function create(ctx) {
     }
     const L = path.lit.map(toPx);                   // brightest where the glass reveals it
     segs.push({ a: [L[0][0], L[0][1], -40], b: [L[1][0], L[1][1], -34], ua: along(L[0][0]), ub: along(L[1][0]), base: [0.95, 0.95], lit: true });
+    mobileMode = mobile;
+    into = G.signal;
     addRibbon(segs, mobile ? 2.2 : 2.4, mats.signal);
+    into = G.fore;
 
     // ================= 3. FOREGROUND — what the Signal is hidden behind =================
     const H0 = P.hidden[P.hidden.length - 1], M0 = P.mid[0], M1 = P.mid[P.mid.length - 1], E0 = P.emerging[0];
@@ -338,10 +372,12 @@ export function create(ctx) {
       const q0 = place(mx - mw / 2, my - mh / 2, mz), q1 = place(mx + mw / 2, my - mh / 2, mz), q2 = place(mx - mw / 2, my + mh / 2, mz), q3 = place(mx + mw / 2, my + mh / 2, mz);
       mk.push(...q0, ...q2, ...q1, ...q1, ...q2, ...q3);   // CCW facing the camera
     }
+    into = G.signal;
     const mg = new THREE.BufferGeometry(); mg.setAttribute('position', new THREE.Float32BufferAttribute(mk, 3));
-    const mm = new THREE.Mesh(mg, mats.mark); scene.add(mm); built.push(mm);
+    const mm = new THREE.Mesh(mg, mats.mark); into.add(mm); built.push(mm);
 
     // optical plane on the DOM glass sliver (translucent; the Signal is revealed through it)
+    into = G.fore;
     const lite = mobile || c.tier === 'C';           // phones / low tier: no transparent layer
     if (glassR) {
       const gx = rtl ? glassR.x + glassR.w : glassR.x, gx2 = rtl ? glassR.x : glassR.x + glassR.w;
@@ -364,7 +400,8 @@ export function create(ctx) {
     const region = mobile
       ? { x: 8, y: Math.max(navBottom, box.y - 120), w: W - 16, h: Math.min(200, box.y + box.h + 40 - Math.max(navBottom, box.y - 120)) }
       : { x: stage.x, y: Math.max(navBottom + 30, stage.y + stage.h * 0.13), w: stage.w * 0.97, h: stage.h * 0.46 };
-    const S = [], SC = []; let tries = 0, n = 0;
+    const S = [], SC = [], SO = []; let tries = 0, n = 0;
+    const openBand = region.h * 0.36;
     const tone = (z) => {                           // depth fading: rear quiet, front firmer
       const t = Math.min(1, Math.max(0, (z - Z.field[0]) / (Z.front[1] - Z.field[0])));
       return [0.44 + 0.14 * t, 0.16 + 0.44 * t];      // [grey level, alpha]: soft graphite, rear quiet
@@ -390,11 +427,18 @@ export function create(ctx) {
       const [g, al] = tone(z);
       S.push(...place(x - dx, y - dy, z), ...place(x + dx, y + dy, z));
       SC.push(g, g, g * 0.98, al, g, g, g * 0.98, al);
+      // the complex end's strands nearest the line are the ones that ease apart
+      const wgt = t < 0.62 ? Math.max(0, 1 - Math.abs(y - lineY) / openBand) : 0;
+      const o = (y < lineY ? 1 : -1) * wgt;           // world +y is screen up
+      SO.push(o, o);
       n++;
     }
-    addLines(S, mats.lines, SC);
+    into = G.field;
+    const sl = addLines(S, mats.strands, SC);
+    if (sl) sl.geometry.setAttribute('aOpen', new THREE.Float32BufferAttribute(SO, 1));
 
     // ================= 1. REAR STRUCTURE — faint, deepest, perspective-reduced =================
+    into = G.rear;
     const F = [], FC = []; tries = 0; let made = 0;
     while (made < counts.frames && tries++ < 2000) {
       const w = (mobile ? 36 : 60) + rnd() * (mobile ? 50 : 110), h = w * (0.45 + rnd() * 0.5);
@@ -416,6 +460,8 @@ export function create(ctx) {
     addLines(F, mats.lines, FC);
 
     // optional deepest plane (Tier A only)
+    // the rear opens from the Signal's centre, at rear depth
+    const pr = place((x0 + x1) / 2, lineY, (Z.rear[0] + Z.rear[1]) / 2); pivotRear = [pr[0], pr[1]];
     if (!mobile && counts.planes >= 3) addPanel(stage.x + stage.w * 0.55, stage.y + stage.h * 0.58, stage.w * 0.38, stage.h * 0.24, Z.rear[0], 0.12 * -dir, mats.glass, false);
   }
 
@@ -426,7 +472,58 @@ export function create(ctx) {
     // (fin at z -18, emerging start at z -55): the Hero never fully resolves the Signal
     mats.signal.uniforms.uForward.value = discovery * 30;
     mats.lines.opacity = 1 - 0.35 * discovery;                 // the complexity quietens, it does not vanish
+    mats.strands.opacity = mats.lines.opacity;
     mats.mark.opacity = 0.45 + 0.45 * discovery;               // intersections sharpen as the Signal is found
+  }
+
+  // ---------- motion: scroll story + pointer parallax, composed into group transforms ----------
+  // Amounts are screen pixels at each layer's depth (converted to world units), so
+  // they mean the same on every viewport. Mobile runs the story smaller, no pointer.
+  const MOTION = {
+    desktop: { rearSpread: 0.03, rearZ: -18, fieldZ: -12, open: [-3, 9], foreZ: 6, foreYaw: 0.021,
+               par: { rear: [2, 1.5], field: [4.5, 3], signal: [1.5, 1], fore: [-1, -0.8] }, parYaw: 0.012 },
+    // (the Signal stays registered to the interruptions: relative shift ≤ 2.5 px, under
+    //  the ~6 px between each slab edge and its re-emergence tick, so ticks never slip under)
+    mobile:  { rearSpread: 0.02, rearZ: -10, fieldZ: -7, open: [-2, 5], foreZ: 3, foreYaw: 0.012 },
+  };
+  const kz = (z) => (D - z) / D;                               // screen px -> world units at depth z
+  function applyMotion() {
+    if (!G) return;
+    const M = mobileMode ? MOTION.mobile : MOTION.desktop;
+    const s = story, px = ptr.x, py = ptr.y, P = mobileMode ? null : M.par;
+    // rear: compressed toward the Signal at rest, opens to its authored spacing; recedes a little
+    const sc = 1 - M.rearSpread * (1 - s);
+    G.rear.scale.set(sc, sc, 1);
+    const zr = (Z.rear[0] + Z.rear[1]) / 2;
+    G.rear.position.set(pivotRear[0] * (1 - sc) + (P ? P.rear[0] * px * kz(zr) : 0),
+                        pivotRear[1] * (1 - sc) + (P ? P.rear[1] * py * kz(zr) : 0), M.rearZ * s);
+    // field: a shallow step back; the related strands ease apart from the line
+    const zf = (Z.field[0] + Z.near[1]) / 2;
+    G.field.position.set(P ? P.field[0] * px * kz(zf) : 0, P ? P.field[1] * py * kz(zf) : 0, M.fieldZ * s);
+    mats.strands.userData.uOpen.value = M.open[0] + (M.open[1] - M.open[0]) * s;
+    // Signal plane: pointer only (its clarity comes from discovery, not movement)
+    const zs = Z.signal.mid[0];
+    G.signal.position.set(P ? P.signal[0] * px * kz(zs) : 0, P ? P.signal[1] * py * kz(zs) : 0, 0);
+    // foreground: a hair forward and a degree further turned, so the gap reads as depth
+    G.fore.position.set(P ? P.fore[0] * px : 0, P ? P.fore[1] * py : 0, M.foreZ * s);
+    for (const sl of slabs) sl.pivot.rotation.y = sl.yaw + Math.sign(sl.yaw || 1) * M.foreYaw * s + (P ? M.parYaw * px : 0);
+  }
+  // Pointer settling: exponential approach (~110 ms time constant); frames are
+  // requested only until within 0.1 px of the target, then the scheduler is released.
+  const TAU = 110;
+  function stepPointer(now) {
+    const dt = Math.min(34, Math.max(0, now - (ptr.last || now)));
+    ptr.last = now;
+    const f = 1 - Math.exp(-dt / TAU);
+    ptr.x += (ptr.tx - ptr.x) * f; ptr.y += (ptr.ty - ptr.y) * f;
+    if (Math.abs(ptr.tx - ptr.x) * 5 < 0.1 && Math.abs(ptr.ty - ptr.y) * 5 < 0.1) { ptr.x = ptr.tx; ptr.y = ptr.ty; ptr.settling = false; }
+  }
+  const finePointer = matchMedia('(pointer: fine)').matches;
+  function aimPointer(x, y) {
+    if (mobileMode || !finePointer || depthView) return;
+    ptr.tx = x; ptr.ty = y;
+    if (!ptr.settling) { ptr.settling = true; ptr.last = performance.now(); }
+    ctx.requestFrame('pointer');
   }
 
   function setCamera() {
@@ -451,28 +548,39 @@ export function create(ctx) {
       scene.add(key, rim, new THREE.AmbientLight(0xffffff, 0.06));
       camera = new THREE.PerspectiveCamera(30, 1, 1, 6000);
       mats = materials();
+      G = { rear: new THREE.Group(), field: new THREE.Group(), signal: new THREE.Group(), fore: new THREE.Group() };
+      scene.add(G.rear, G.field, G.signal, G.fore);
+      into = G.fore;
+      // pointer leaves the window: the field returns to neutral (and settles)
+      ctx.listen(document.documentElement, 'mouseleave', () => aimPointer(0, 0));
+      // local debug only: lets the review tooling measure on-screen movement per layer
+      if (ctx.debug) window.__signalHero = { groups: () => G, camera: () => camera, uOpen: () => mats.strands.userData.uOpen.value, ptr };
     },
     activate() {},
     deactivate() {},
-    // Hero progress runs 0.5 (at the top) → 1 (scrolled past). Discovery completes
-    // after about half the hero has scrolled; camera/depth motion is Milestone 4.
+    // Hero progress runs 0.5 (at the top) → 1 (scrolled past). The story (and
+    // discovery) completes after about half the hero has scrolled. Scroll-driven
+    // directly: one frame per scroll change, nothing eases on afterwards.
     setProgress(p) {
       if (forcedT != null) return;
       const t = Math.min(1, Math.max(0, (p - 0.5) / 0.25));
-      discovery = t * t * (3 - 2 * t);
-      applyDiscovery();
+      story = discovery = t * t * (3 - 2 * t);
+      applyDiscovery(); applyMotion();
     },
-    setPointer() {},         // pointer parallax: Milestone 4
+    setPointer(x, y) { aimPointer(x, y); },
     resize(w, h, dpr, c) {
-      W = w; H = h; lastCtx = c; setCamera(); layout(c); applyDiscovery();
+      W = w; H = h; lastCtx = c; setCamera(); layout(c); applyDiscovery(); applyMotion();
       // the text's clear space depends on the web fonts: re-measure once they are in
       if (!fontsHooked && document.fonts && document.fonts.status !== 'loaded') {
         fontsHooked = true;
-        document.fonts.ready.then(() => { if (scene && lastCtx) { layout(lastCtx); ctx.requestFrame('fonts'); } });
+        document.fonts.ready.then(() => { if (scene && lastCtx) { layout(lastCtx); applyMotion(); ctx.requestFrame('fonts'); } });
       }
     },
-    render(renderer) { renderer.render(scene, camera); },
-    wantsFrame() { return false; },
+    render(renderer) {
+      if (ptr.settling) { stepPointer(performance.now()); applyMotion(); }
+      renderer.render(scene, camera);
+    },
+    wantsFrame() { return ptr.settling; },     // true only while the pointer response settles
     dispose() { clearBuilt(); scene = null; },
   };
 }
