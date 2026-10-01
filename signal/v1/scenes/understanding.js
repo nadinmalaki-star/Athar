@@ -1,5 +1,5 @@
 /*
- * Scene: understanding  —  Milestone U1: SPATIAL + OPTICAL BLOCKOUT.
+ * Scene: understanding  —  U1 spatial blockout (approved, locked) + U2 scroll filtering.
  *
  * Complexity is filtered into clarity. The Hero's Ember Signal enters a field
  * of fragmented information, passes through three optical filtering stages,
@@ -20,10 +20,21 @@
  * Arabic desktop runs right → left (the Hero's RTL narrative), mirrored exactly
  * as the fallback SVG is mirrored in CSS; phones stay vertical in both languages.
  *
+ * U2 — SCROLL FILTERING. The approved U1 layout is the processed ("understood")
+ * state and is generated exactly as approved (same seed, same call order). U2
+ * adds, from a second fixed seed, where every element comes FROM: survivors
+ * start fragmented, scattered and deep, and are processed into their rows;
+ * transient marks exist only before a filter and are removed by it (they
+ * collapse onto the nearest row); the noise field itself quietens and settles
+ * once the Signal has been filtered. A "filter front" moves along the Signal
+ * with section progress and processes each element as it passes — position,
+ * depth, alignment, length and opacity together, never opacity alone. Pure
+ * function of progress: deterministic, reversible, nothing re-seeded on scroll,
+ * and it renders only when progress changes (no frame loop).
+ *
  * Contract: init() activate() setProgress(p) setPointer(x, y) resize(w, h, dpr, ctx)
  *           render(renderer) wantsFrame() deactivate() dispose()
- * U1 is static: no scroll story, no pointer (setPointer returns false so the
- * core does not render frames for pointer movement over this section).
+ * No pointer response (setPointer returns false: the core renders nothing for it).
  */
 
 export const meta = {
@@ -55,6 +66,9 @@ const COMP = {
     ],
     exitTicks: [960, 1010, 1060, 1110],
     width: [1.7, 2.0, 2.2, 2.4],
+    // U2: the story. R = how long (axis units) an element takes to be processed;
+    // transient = marks that only exist before each filter; raw = how unprocessed things start
+    story: { R: 150, transient: [22, 12, 6], scatter: [18, 34, 20], rawSignal: 3.4, quietRow: 22 },
   },
   mobile: {
     svg: '.u-optics-m', vb: [360, 640], axis: 'y', mid: 180, end: 626,
@@ -66,12 +80,19 @@ const COMP = {
     ],
     exitTicks: [536, 566, 596],
     width: [1.6, 1.8, 2.0, 2.2],
+    // phones: shorter processing distance (short scroll), fewer transients, the
+    // scatter runs ACROSS the vertical Signal (marks lie across it)
+    story: { R: 70, transient: [10, 6, 3], scatter: [26, 30, 14], rawSignal: 3.0, quietRow: 14 },
   },
 };
 // Depth: the Signal rises from deep (entry) to near (exit); each plane sits at
 // its own depth and the Signal crosses it halfway through its thickness.
 const DEPTH = { entry: -340, planes: [-250, -160, -70], planeDz: [140, 124, 108], exit: -12 };
 const TIER_SCALE = { A: 1, B: 1, C: 0.62 };
+// Desktop: the story runs over this part of the section's progress (the field
+// is fully on screen through it). Phones: a reading line in the viewport — a
+// plane processes as it reaches that line while scrolling down.
+const DESKTOP_RANGE = [0.27, 0.6], PHONE_READ_LINE = 0.66;
 
 export function create(ctx) {
   const THREE = ctx.THREE;
@@ -79,7 +100,12 @@ export function create(ctx) {
   const built = [];
   const params = new URLSearchParams(location.search);
   const depthView = ctx.debug && params.get('signal-view') === 'depth';
+  // local debug only: pin the story (0 = entry/noise … 1 = exit) for review
+  const forcedT = ctx.debug && params.has('signal-state') ? clamp01(parseFloat(params.get('signal-state')) || 0) : null;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;   // → the resolved state, no filtering motion
   let lastCtx = null, fontsHooked = false, dirWatch = null;
+  let story = null;                 // built per layout: everything the story needs
+  let lastP = 0.5;
 
   function place(sx, sy, z) { const k = (D - z) / D; return [(sx - W / 2) * k, (H / 2 - sy) * k, z]; }
 
@@ -89,7 +115,7 @@ export function create(ctx) {
       marks: ctx.track(new THREE.MeshBasicMaterial({ color: 0xe9e6df, vertexColors: true, transparent: true, depthWrite: false })),
       plane: ctx.track(new THREE.MeshBasicMaterial({ color: 0xe9e6df, vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide })),
       edges: ctx.track(new THREE.LineBasicMaterial({ color: 0xe9e6df, vertexColors: true, transparent: true, depthWrite: false })),
-      node: ctx.track(new THREE.MeshBasicMaterial({ color: 0xff5a36, transparent: true, opacity: 0.9, depthWrite: false })),
+      node: ctx.track(new THREE.MeshBasicMaterial({ color: 0xff5a36, vertexColors: true, transparent: true, depthWrite: false })),
       // THE SIGNAL — same Ember language and thickness family as the Hero:
       // a thin screen-space trace, soft edges, no bloom. Depth-written so a
       // plane drawn afterwards veils only the part of the Signal behind it.
@@ -109,22 +135,13 @@ export function create(ctx) {
 
   function clearBuilt() { for (const o of built) { o.removeFromParent(); if (o.geometry) o.geometry.dispose(); } built.length = 0; }
   function add(o, order) { o.renderOrder = order; scene.add(o); built.push(o); return o; }
-  function mesh(pos, col, mat, order) {
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    if (col) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
-    return add(new THREE.Mesh(g, mat), order);
-  }
-  function lines(pos, col, mat, order) {
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
-    return add(new THREE.LineSegments(g, mat), order);
-  }
+  // dynamic buffers: rewritten in place when progress changes (no reallocation)
+  function dyn(n, size) { const a = new THREE.BufferAttribute(new Float32Array(n * size), size); a.setUsage(THREE.DynamicDrawUsage); return a; }
 
   // ---------------------------------------------------------------------------
   function layout(c) {
     clearBuilt();
+    story = null;
     const host = c.mount.getBoundingClientRect();
     // the visible fallback SVG decides the composition (desktop/tablet vs phone)
     const pick = ['.u-optics-m', '.u-optics-d'].map((sel) => c.mount.querySelector(sel))
@@ -141,8 +158,9 @@ export function create(ctx) {
     // (a = along the Signal, b = across, in viewBox units) → section pixels
     const P = (a, b) => horiz ? [ox + (mirror ? C.vb[0] - a : a) * s, oy + b * s] : [ox + b * s, oy + a * s];
     const scale = TIER_SCALE[c.tier] || 1;
-    const rnd = prng(horiz ? 23 : 29);
-    const pl = C.planes;
+    const rnd = prng(horiz ? 23 : 29);          // U1 (approved layout) — call order must never change
+    const rnd2 = prng(horiz ? 1023 : 1029);     // U2 (where things come from) — separate, so U1 stays exact
+    const pl = C.planes, ST = C.story;
     const mids = pl.map((p) => p.a + p.t / 2);
 
     // Signal depth along the axis: entry → crossing each plane mid → exit
@@ -151,9 +169,7 @@ export function create(ctx) {
     // which stage a point on the axis is in (0 noise … 3 clear), fractional across a plane
     const stageAt = (a) => { let st = 0; for (let i = 0; i < pl.length; i++) st += smooth((a - pl[i].a) / pl[i].t); return st; };
 
-    // ===================== 1. THE SIGNAL =====================
-    // irregular at entry; each stage reduces the irregularity; still not
-    // perfectly straight at exit (full resolution belongs to the clarity slab)
+    // ===================== 1. THE SIGNAL (U1 path, exactly) =====================
     const AMP = [5.2, 2.4, 0.9, 0.35], STEP = [17, 27, 42, 64], ALPHA = [0.46, 0.64, 0.8, 0.94];
     const pts = []; let a = 0, sign = 1;
     while (a < C.end) {
@@ -167,39 +183,34 @@ export function create(ctx) {
       a += step * lerp(0.8 + 0.4 * rnd(), 0.5 + 1.0 * rnd(), noisy);
     }
     pts.push({ a: C.end, b: C.mid + 0.3, z: DEPTH.exit, al: ALPHA[3], w: C.width[3] });
-    {
-      const pos = [], al = [], acr = [], idx = []; let v = 0;
-      for (let i = 0; i < pts.length - 1; i++) {
-        const p0 = pts[i], p1 = pts[i + 1];
-        const [x0, y0] = P(p0.a, p0.b), [x1, y1] = P(p1.a, p1.b);
-        const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy) || 1;
-        for (const [x, y, z, w, A] of [[x0, y0, p0.z, p0.w, p0.al], [x1, y1, p1.z, p1.w, p1.al]]) {
-          const nx = -dy / len * w / 2, ny = dx / len * w / 2;
-          pos.push(...place(x - nx, y - ny, z), ...place(x + nx, y + ny, z));
-          al.push(A, A); acr.push(-1, 1);
-        }
-        idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2); v += 4;
+    // U2: subdivide the approved polyline (identical shape) so irregularity can be
+    // added back point by point; each point knows its unprocessed offset.
+    const sig = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i], p1 = pts[i + 1], n = Math.max(1, Math.ceil((p1.a - p0.a) / 16));
+      for (let k = 0; k < n; k++) {
+        const t = k / n;
+        sig.push({ a: lerp(p0.a, p1.a, t), b: lerp(p0.b, p1.b, t), z: lerp(p0.z, p1.z, t), al: lerp(p0.al, p1.al, t), w: lerp(p0.w, p1.w, t) });
       }
-      const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-      g.setAttribute('aA', new THREE.Float32BufferAttribute(al, 1));
-      g.setAttribute('aAcross', new THREE.Float32BufferAttribute(acr, 1));
-      g.setIndex(idx);
-      add(new THREE.Mesh(g, mats.signal), 0);
+    }
+    sig.push({ ...pts[pts.length - 1] });
+    let sgn = 1;
+    for (const q of sig) {
+      // before processing, the stretch beyond filter 1 is as restless as the field
+      // it came from; the noisy entry itself is already at its approved irregularity
+      const amp = ST.rawSignal * smooth((q.a - pl[0].a) / pl[0].t) * (q.a >= C.end ? 0 : 1);
+      if (rnd2() < 0.85) sgn = -sgn;
+      q.rawB = q.b + sgn * amp * (0.3 + 0.7 * rnd2());
+      q.rawAl = Math.min(q.al, 0.5); q.rawW = Math.min(q.w, C.width[0] + 0.1);
     }
 
-    // ===================== 2. INFORMATION MARKS =====================
-    // Anchored where authored, sized in true perspective (deeper = smaller):
-    // the field reads as having depth even before anything moves.
-    const MP = [], MC = [];
-    const quad = (ca, cb, z, la, lb, A) => {     // centre (a,b), extents along/across, alpha
-      const [cx, cy] = P(ca, cb), c3 = place(cx, cy, z);
-      const hx = (horiz ? la : lb) * s / 2, hy = (horiz ? lb : la) * s / 2;
-      const q = [[-hx, hy], [hx, hy], [-hx, -hy], [hx, -hy]].map(([u, w]) => [c3[0] + u, c3[1] + w, z]);
-      MP.push(...q[0], ...q[2], ...q[1], ...q[1], ...q[2], ...q[3]);
-      for (let k = 0; k < 6; k++) MC.push(1, 1, 1, A);
-    };
+    // ===================== 2. INFORMATION MARKS (U1 layout, exactly) =====================
+    // Every mark: a state it comes FROM and the state it is processed TO, plus
+    // what drives it. kind: 'noise' (the field: quietens), 'kept' (processed into
+    // its approved row), 'gone' (exists only before the filter, then removed).
+    const marks = [];
     const thick = 1.6;
+    const quad = (ca, cb, z, la, lb, A, zone) => marks.push({ zone, to: { ca, cb, z, la, lb, A } });
     C.zones.forEach((Z, zi) => {
       const n = Math.round(Z.n * scale);
       let made = 0, tries = 0;
@@ -212,7 +223,7 @@ export function create(ctx) {
           const ca = Z.rows ? Z.a[0] + Math.round(rnd() * (Z.a[1] - Z.a[0]) / Z.rows) * Z.rows : Z.a[0] + rnd() * (Z.a[1] - Z.a[0]);
           const cb = Z.cols ? C.mid + (rnd() * 2 - 1) * 4 : C.mid + (rnd() * 2 - 1) * (Z.b - len / 2);
           if (ca < Z.a[0] || ca > Z.a[1]) continue;
-          quad(ca, cb, zAt(ca) + (rnd() * 2 - 1) * Z.dz, thick, Math.round(len / 2) * 2, lerp(Z.alpha[0], Z.alpha[1], rnd()));
+          quad(ca, cb, zAt(ca) + (rnd() * 2 - 1) * Z.dz, thick, Math.round(len / 2) * 2, lerp(Z.alpha[0], Z.alpha[1], rnd()), zi);
           made++; continue;
         }
         const vert = rnd() < Z.vert;
@@ -232,19 +243,71 @@ export function create(ctx) {
         if (ca < Z.a[0] || ca > Z.a[1]) continue;
         const z = zAt(ca) + (rnd() * 2 - 1) * Z.dz;
         const A = lerp(Z.alpha[0], Z.alpha[1], rnd());
-        if (vert) quad(ca, b, z, thick, len, A); else quad(ca, b, z, len, thick, A);
+        if (vert) quad(ca, b, z, thick, len, A, zi); else quad(ca, b, z, len, thick, A, zi);
         made++;
       }
     });
     // exit: only a few meaningful marks remain — registration ticks on the Signal's own depth
-    for (const t of C.exitTicks) quad(t, C.mid + (horiz ? 17 : 12), zAt(t), thick, 7, 0.42);
-    mesh(MP, MC, mats.marks, 1);
+    for (const t of C.exitTicks) quad(t, C.mid + (horiz ? 17 : 12), zAt(t), thick, 7, 0.42, 3);
 
-    // ===================== 3. FILTER PLANES =====================
-    // Real rectangles in depth: the leading edge is nearer, the trailing edge
-    // recedes (dz), so perspective draws the trapezoid. Each a little more
-    // turned and a little more present than the one before.
-    const FP = [], FC = [], EP = [], EC = [];
+    // ---- U2: where each mark comes from (rnd2 only) ----
+    const lenKey = (m) => (m.la >= m.lb ? 'la' : 'lb');      // which extent is the mark's length
+    const nearestRow = (b, pitch) => C.mid + Math.round((b - C.mid) / pitch) * pitch;
+    const zoneA = (zi) => (zi < 3 ? C.zones[zi].a : [pl[2].a + pl[2].t + 12, C.end - 24]);
+    const zoneB = (zi) => (zi < 3 ? C.zones[zi].b : (horiz ? 40 : 30));
+    const R = ST.R;
+    for (const m of marks) {
+      const T = m.to;
+      if (m.zone === 0) {
+        // the field: it IS the start state; once the Signal is filtered it quietens —
+        // about half is removed, the rest drops back, compresses in depth and
+        // half-aligns to rows (reorganised, not erased)
+        m.kind = 'noise'; m.from = { ...T };
+        const removed = rnd2() < 0.45, k = lenKey(T);
+        m.to = { ...T,
+          cb: lerp(T.cb, removed ? C.mid + (T.cb - C.mid) * 0.75 : nearestRow(T.cb, ST.quietRow), removed ? 1 : 0.45),
+          z: removed ? T.z - 40 : lerp(T.z, zAt(T.ca) - 30, 0.65),
+          A: removed ? 0 : T.A * 0.42 };
+        m.to[k] = removed ? 0 : T[k] * 0.85;
+        // each noise mark settles at its own moment, from filter 1 to the exit
+        m.at = pl[0].a + rnd2() * (C.end - pl[0].a - R * 0.5);
+      } else {
+        // survivors: fragmented, scattered, deeper and faint before their filter
+        m.kind = 'kept';
+        const sc = ST.scatter[Math.min(2, m.zone - 1)], k = lenKey(T);
+        m.from = { ...T,
+          ca: T.ca + (rnd2() * 2 - 1) * (horiz ? 14 : 8),
+          cb: T.cb + (rnd2() * 2 - 1) * sc,
+          z: T.z + (rnd2() * 2 - 1) * 60,
+          A: T.A * 0.4 };
+        m.from[k] = T[k] * (0.35 + 0.45 * rnd2());
+        m.at = T.ca;
+      }
+    }
+    // transients: information that only exists before each filter; the filter removes it
+    [1, 2, 3].forEach((zi) => {
+      const n = Math.round(ST.transient[zi - 1] * scale), [a0, a1] = zoneA(zi), bb = zoneB(zi);
+      for (let i = 0; i < n; i++) {
+        const len = lerp(6, zi === 1 ? 40 : 30, rnd2()), ca = lerp(a0, a1, rnd2());
+        const cb = C.mid + (rnd2() * 2 - 1) * bb;
+        if (horiz && Math.abs(cb - C.mid) < 8) continue;   // desktop keeps the Signal's lane clear
+        const from = horiz ? { ca, cb, z: zAt(ca) + (rnd2() * 2 - 1) * 60, la: len, lb: thick, A: 0.12 + 0.12 * rnd2() }
+                           : { ca, cb, z: zAt(ca) + (rnd2() * 2 - 1) * 50, la: thick, lb: len, A: 0.12 + 0.12 * rnd2() };
+        // removed: it collapses onto the structure it was filtered into (desktop: the
+        // nearest row; phones: toward the vertical Signal) — never just fades in place
+        const to = { ...from, cb: horiz ? nearestRow(cb, zi === 3 ? 17 : C.zones[Math.min(2, zi)].rows) : lerp(cb, C.mid, 0.45), z: zAt(ca), A: 0 };
+        to[horiz ? 'la' : 'lb'] = 0;
+        marks.push({ kind: 'gone', zone: zi, from, to, at: ca });
+      }
+    });
+
+    const mGeo = new THREE.BufferGeometry();
+    mGeo.setAttribute('position', dyn(marks.length * 6, 3));
+    mGeo.setAttribute('color', dyn(marks.length * 6, 4));
+    add(new THREE.Mesh(mGeo, mats.marks), 1);
+
+    // ===================== 3. FILTER PLANES (U1 geometry) =====================
+    const FP = [], EP = [];
     pl.forEach((p, i) => {
       const zc = DEPTH.planes[i], dz = DEPTH.planeDz[i], zn = zc + dz / 2, zf = zc - dz / 2;
       const [lx, ly] = P(p.a, C.mid), [tx, ty] = P(p.a + p.t, C.mid);
@@ -254,35 +317,111 @@ export function create(ctx) {
       const corners = horiz
         ? [[near[0], near[1] + hw, zn], [near[0], near[1] - hw, zn], [far[0], far[1] + hw + tilt, zf], [far[0], far[1] - hw + tilt, zf]]
         : [[near[0] - hw, near[1], zn], [near[0] + hw, near[1], zn], [far[0] - hw + tilt, far[1], zf], [far[0] + hw + tilt, far[1], zf]];
-      const [n0, n1, f0, f1] = corners, fill = 0.035 + 0.012 * i;
+      const [n0, n1, f0, f1] = corners;
       FP.push(...n0, ...n1, ...f0, ...f0, ...n1, ...f1);
-      for (let q = 0; q < 6; q++) FC.push(1, 1, 1, fill);
-      // leading edge firm, the rest structural and quiet
-      EP.push(...n0, ...n1); EC.push(1, 1, 1, 0.4, 1, 1, 1, 0.4);
-      EP.push(...n0, ...f0, ...n1, ...f1, ...f0, ...f1);
-      EC.push(1, 1, 1, 0.2, 1, 1, 1, 0.12, 1, 1, 1, 0.2, 1, 1, 1, 0.12, 1, 1, 1, 0.1, 1, 1, 1, 0.1);
+      EP.push(...n0, ...n1, ...n0, ...f0, ...n1, ...f1, ...f0, ...f1);
     });
-    mesh(FP, FC, mats.plane, 2);
-    lines(EP, EC, mats.edges, 3);
+    const fGeo = new THREE.BufferGeometry();
+    fGeo.setAttribute('position', new THREE.Float32BufferAttribute(FP, 3)); fGeo.setAttribute('color', dyn(FP.length / 3, 4));
+    add(new THREE.Mesh(fGeo, mats.plane), 2);
+    const eGeo = new THREE.BufferGeometry();
+    eGeo.setAttribute('position', new THREE.Float32BufferAttribute(EP, 3)); eGeo.setAttribute('color', dyn(EP.length / 3, 4));
+    add(new THREE.LineSegments(eGeo, mats.edges), 3);
 
-    // ===================== 4. CROSSING NODES =====================
-    // Ember only on the Signal: a small node where it meets each plane, a
-    // slightly larger one where it leaves the field.
-    const NP = [];
-    const node = (aa, size) => {
-      const z = (aa === C.end ? DEPTH.exit : zAt(aa)) + 1, [cx, cy] = P(aa, C.mid), h = size / 2;
-      const q = [place(cx - h, cy - h, z), place(cx + h, cy - h, z), place(cx - h, cy + h, z), place(cx + h, cy + h, z)];
-      NP.push(...q[0], ...q[2], ...q[1], ...q[1], ...q[2], ...q[3]);
-    };
-    pl.forEach((p) => node(p.a, horiz ? 4 : 3.5));
-    node(C.end, horiz ? 6 : 5);
-    mesh(NP, null, mats.node, 4);
+    // ===================== 4. SIGNAL + CROSSING NODES (dynamic) =====================
+    const sGeo = new THREE.BufferGeometry();
+    const nSeg = sig.length - 1;
+    sGeo.setAttribute('position', dyn(nSeg * 4, 3));
+    sGeo.setAttribute('aA', dyn(nSeg * 4, 1));
+    const acr = new Float32Array(nSeg * 4), idx = [];
+    for (let i = 0; i < nSeg; i++) { acr.set([-1, 1, -1, 1], i * 4); const v = i * 4; idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2); }
+    sGeo.setAttribute('aAcross', new THREE.BufferAttribute(acr, 1));
+    sGeo.setIndex(idx);
+    add(new THREE.Mesh(sGeo, mats.signal), 0);
+    const nodes = [...pl.map((p) => ({ a: p.a, size: horiz ? 4 : 3.5 })), { a: C.end, size: horiz ? 6 : 5, exit: true }];
+    const nGeo = new THREE.BufferGeometry();
+    nGeo.setAttribute('position', dyn(nodes.length * 6, 3)); nGeo.setAttribute('color', dyn(nodes.length * 6, 4));
+    add(new THREE.Mesh(nGeo, mats.node), 4);
 
-    // local debug: scene bounds for the review report
-    if (ctx.debug) {
-      const box = new THREE.Box3().setFromObject(scene);
-      window.__signalU = { comp: horiz ? 'desktop' : 'mobile', mirror, bounds: { min: box.min.toArray().map(Math.round), max: box.max.toArray().map(Math.round) }, marks: MC.length / 24, svgRect: { x: Math.round(ox), y: Math.round(oy), w: Math.round(C.vb[0] * s), h: Math.round(C.vb[1] * s) } };
+    story = { C, P, s, ox, oy, horiz, zAt, sig, sGeo, marks, mGeo, nodes, nGeo, fGeo, eGeo, pl, R };
+
+    if (ctx.debug) window.__signalU = { comp: horiz ? 'desktop' : 'mobile', mirror, marks: marks.length, kept: marks.filter((m) => m.kind === 'kept').length, transient: marks.filter((m) => m.kind === 'gone').length, svgRect: { x: Math.round(ox), y: Math.round(oy), w: Math.round(C.vb[0] * s), h: Math.round(C.vb[1] * s) } };
+  }
+
+  // ---------------------------------------------------------------------------
+  // The story: a filter front along the axis (viewBox units). Elements are
+  // processed as it passes them; everything is a pure function of the front.
+  function frontFor(p) {
+    const S = story, C = S.C, R = S.R;
+    // nothing is processed before filter 1 (the field is the source), so the
+    // front starts just ahead of it: ~1/3 = stage 1 done, ~2/3 = stage 2, 1 = exit
+    const span = (t) => lerp(S.pl[0].a - 20, C.end + R, t);
+    if (reduced) return span(1);
+    if (forcedT != null) return span(forcedT);
+    if (S.horiz) return span(clamp01((p - DESKTOP_RANGE[0]) / (DESKTOP_RANGE[1] - DESKTOP_RANGE[0])));
+    // phones: where the reading line falls on the scene, in viewBox units
+    const vh = innerHeight, wrapTop = vh - p * (H + vh);
+    return Math.max(-R, Math.min(C.end + R, (PHONE_READ_LINE * vh - wrapTop - S.oy) / S.s));
+  }
+
+  function applyStory(front) {
+    const S = story; if (!S) return;
+    const { C, P, s, horiz, sig, marks, nodes, pl, R } = S;
+    const done = (a, span) => smooth((front - a) / (span || R));   // 0 = untouched … 1 = processed
+
+    // Signal: irregularity is reduced where the front has passed; strength follows
+    const sp = S.sGeo.attributes.position.array, sa = S.sGeo.attributes.aA.array;
+    const xy = sig.map((q) => { const u = done(q.a); return { u, p: P(q.a, lerp(q.rawB, q.b, u)) }; });
+    for (let i = 0; i < sig.length - 1; i++) {
+      const q0 = sig[i], q1 = sig[i + 1], A = xy[i], B = xy[i + 1];
+      const [x0, y0] = A.p, [x1, y1] = B.p, dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy) || 1;
+      const ends = [[x0, y0, q0.z, lerp(q0.rawW, q0.w, A.u), lerp(q0.rawAl, q0.al, A.u)], [x1, y1, q1.z, lerp(q1.rawW, q1.w, B.u), lerp(q1.rawAl, q1.al, B.u)]];
+      ends.forEach(([x, y, z, w, al], e) => {
+        const nx = -dy / len * w / 2, ny = dx / len * w / 2, o = (i * 4 + e * 2) * 3;
+        sp.set(place(x - nx, y - ny, z), o); sp.set(place(x + nx, y + ny, z), o + 3);
+        sa[i * 4 + e * 2] = al; sa[i * 4 + e * 2 + 1] = al;
+      });
     }
+    S.sGeo.attributes.position.needsUpdate = true; S.sGeo.attributes.aA.needsUpdate = true;
+
+    // marks: position, depth, alignment, length and opacity together
+    const mp = S.mGeo.attributes.position.array, mc = S.mGeo.attributes.color.array;
+    marks.forEach((m, i) => {
+      const u = done(m.at), F = m.from, T = m.to;
+      const ca = lerp(F.ca, T.ca, u), cb = lerp(F.cb, T.cb, u), z = lerp(F.z, T.z, u);
+      const la = lerp(F.la, T.la, u), lb = lerp(F.lb, T.lb, u), A = lerp(F.A, T.A, u);
+      const [cx, cy] = P(ca, cb), c3 = place(cx, cy, z);
+      const hx = (horiz ? la : lb) * s / 2, hy = (horiz ? lb : la) * s / 2, o = i * 18;
+      const v = [[-hx, hy], [-hx, -hy], [hx, hy], [hx, hy], [-hx, -hy], [hx, -hy]];
+      v.forEach(([dx, dy], k) => { mp[o + k * 3] = c3[0] + dx; mp[o + k * 3 + 1] = c3[1] + dy; mp[o + k * 3 + 2] = z; });
+      for (let k = 0; k < 6; k++) { const c = i * 24 + k * 4; mc[c] = 1; mc[c + 1] = 1; mc[c + 2] = 1; mc[c + 3] = A; }
+    });
+    S.mGeo.attributes.position.needsUpdate = true; S.mGeo.attributes.color.needsUpdate = true;
+
+    // planes: quiet and neutral until the Signal crosses; then their approved
+    // (U1) presence — a slight edge/readability change, nothing more
+    const fc = S.fGeo.attributes.color.array, ec = S.eGeo.attributes.color.array;
+    pl.forEach((p, i) => {
+      const u = done(p.a, R * 0.6), fill = lerp(0.026, 0.035 + 0.012 * i, u);
+      for (let k = 0; k < 6; k++) fc.set([1, 1, 1, fill], (i * 6 + k) * 4);
+      const lead = lerp(0.3, 0.4, u), rest = lerp(0.75, 1, u);
+      [lead, lead, 0.2 * rest, 0.12 * rest, 0.2 * rest, 0.12 * rest, 0.1 * rest, 0.1 * rest].forEach((al, k) => ec.set([1, 1, 1, al], (i * 8 + k) * 4));
+    });
+    S.fGeo.attributes.color.needsUpdate = true; S.eGeo.attributes.color.needsUpdate = true;
+
+    // nodes: Ember only here — each crossing becomes legible once the Signal has
+    // been filtered there; the exit marker never moves (exactly where U1 places it)
+    const np = S.nGeo.attributes.position.array, nc = S.nGeo.attributes.color.array;
+    nodes.forEach((n, i) => {
+      const u = n.exit ? done(n.a - R * 0.6, R * 0.6) : done(n.a, R * 0.6);
+      const size = n.size * (n.exit ? 1 : lerp(0.7, 1, u)), al = lerp(n.exit ? 0.4 : 0.3, 0.9, u);
+      const z = (n.exit ? DEPTH.exit : S.zAt(n.a)) + 1, [cx, cy] = P(n.a, C.mid), h = size / 2;
+      const q = [place(cx - h, cy - h, z), place(cx + h, cy - h, z), place(cx - h, cy + h, z), place(cx + h, cy + h, z)];
+      [q[0], q[2], q[1], q[1], q[2], q[3]].forEach((v, k) => { np.set(v, (i * 6 + k) * 3); nc.set([1, 1, 1, al], (i * 6 + k) * 4); });
+    });
+    S.nGeo.attributes.position.needsUpdate = true; S.nGeo.attributes.color.needsUpdate = true;
+
+    if (ctx.debug && window.__signalU) window.__signalU.front = Math.round(front);
   }
 
   function setCamera() {
@@ -297,28 +436,32 @@ export function create(ctx) {
     camera.updateProjectionMatrix();
   }
 
+  function relayout(c) { layout(c); if (story) applyStory(frontFor(lastP)); }
+
   return {
     init() {
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(34, 1, 1, 6000);   // a touch more perspective than the Hero: the planes need it
       mats = materials();
       // a language switch flips the direction in place: re-lay out to stay on the (mirrored) fallback
-      dirWatch = new MutationObserver(() => { if (scene && lastCtx) { layout(lastCtx); ctx.requestFrame('direction'); } });
+      dirWatch = new MutationObserver(() => { if (scene && lastCtx) { relayout(lastCtx); ctx.requestFrame('direction'); } });
       dirWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
     },
     activate() {},
     deactivate() {},
-    setProgress() {},                 // U1: the resolved blockout state (scroll story comes after approval)
+    // Scroll-driven directly: one frame per progress change (the core requests
+    // it); nothing keeps animating afterwards.
+    setProgress(p) { lastP = p; if (story) applyStory(frontFor(p)); },
     setPointer() { return false; },   // no pointer response in Understanding
     resize(w, h, dpr, c) {
-      W = w; H = h; lastCtx = c; setCamera(); layout(c);
+      W = w; H = h; lastCtx = c; setCamera(); relayout(c);
       if (!fontsHooked && document.fonts && document.fonts.status !== 'loaded') {
         fontsHooked = true;
-        document.fonts.ready.then(() => { if (scene && lastCtx) { layout(lastCtx); ctx.requestFrame('fonts'); } });
+        document.fonts.ready.then(() => { if (scene && lastCtx) { relayout(lastCtx); ctx.requestFrame('fonts'); } });
       }
     },
     render(renderer) { renderer.render(scene, camera); },
     wantsFrame() { return false; },
-    dispose() { if (dirWatch) dirWatch.disconnect(); dirWatch = null; clearBuilt(); scene = null; },
+    dispose() { if (dirWatch) dirWatch.disconnect(); dirWatch = null; clearBuilt(); story = null; scene = null; },
   };
 }
