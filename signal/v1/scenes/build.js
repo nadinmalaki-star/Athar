@@ -34,81 +34,132 @@ const clamp01 = (t) => Math.min(1, Math.max(0, t));
 const smooth = (t) => { t = clamp01(t); return t * t * (3 - 2 * t); };
 function prng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
-export const ORDER = ['core', 'experience', 'product', 'system', 'portal', 'automation', 'ai', 'core'];
+export const ORDER = ['core', 'experience', 'product', 'system', 'portal', 'automation', 'ai', 'exit'];
+
+// A route is a list of node indices; [a, b] means the midpoint between two nodes
+// (e.g. the centre of the Portal's gateway, which no node occupies).
+export function routePoints(route, pos) {
+  return route.map((r) => (Array.isArray(r) ? [(pos[r[0]][0] + pos[r[1]][0]) / 2, (pos[r[0]][1] + pos[r[1]][1]) / 2, (pos[r[0]][2] + pos[r[1]][2]) / 2] : pos[r]));
+}
 
 // ---------------------------------------------------------------------------
-// The structure: N nodes (36 desktop, 24 phones). Every state places the SAME
-// nodes. Units: about -1.8 … 1.8; +x is the direction the problem travels.
-// Returns { name: { pos: [[x,y,z]], edges: [[a,b]], route: [i] } }.
+// The structure: N nodes (36 desktop, 24 phones / Tier C). Every state places
+// the SAME nodes. Units: about -1.8 … 1.8; +x is the direction the problem
+// travels. Returns { name: { pos: [[x,y,z]], edges: [[a,b]], route: [...] } }.
+// S03.1: silhouettes refined so each state reads on its own; the exit core is
+// its own, calmer, organised state (not the entry repeated).
 // ---------------------------------------------------------------------------
 export function makeStates(N) {
   const big = N >= 36, rnd = prng(big ? 7 : 11), jit = (s) => (rnd() - 0.5) * s;
   const chain = (a, b) => Array.from({ length: b - a }, (_, k) => [a + k, a + k + 1]);
   const S = {};
 
-  { // unresolved core: six loose modules, purpose not decided
-    const per = N / 6, C = [[-1.1, 0.5, 0.3], [0.2, 0.9, -0.6], [1.2, 0.2, 0.5], [-0.6, -0.6, -0.4], [0.8, -0.5, 0.2], [-0.1, 0.0, 0.9]];
+  { // ENTRY — unresolved: distributed modules, purpose not yet known
+    const per = N / 6, C = [[-1.35, 0.55, 0.5], [0.15, 1.05, -0.85], [1.45, 0.3, 0.6], [-0.8, -0.8, -0.65], [1.0, -0.7, 0.25], [-0.2, 0.05, 1.15]];
     const pos = [], edges = [];
-    for (let g = 0; g < 6; g++) for (let k = 0; k < per; k++) pos.push([C[g][0] + jit(0.6), C[g][1] + jit(0.6), C[g][2] + jit(0.6)]);
-    for (let g = 0; g < 6; g++) { const b = g * per; edges.push([b, b + 1], [b + 1, b + 2]); if (per > 4) edges.push([b + 3, b + 4]); }
-    S.core = { pos, edges, route: [5 * per, 5 * per + 1, 2 * per, 2 * per + 1] };
+    for (let g = 0; g < 6; g++) for (let k = 0; k < per; k++) pos.push([C[g][0] + jit(0.75), C[g][1] + jit(0.75), C[g][2] + jit(0.75)]);
+    for (let g = 0; g < 6; g++) { const b = g * per; edges.push([b, b + 1]); if (g % 2 === 0) edges.push([b + 1, b + 2]); if (per > 4 && g % 3 === 0) edges.push([b + 3, b + 4]); }
+    S.core = { pos, edges, route: [0, 1] };                       // the problem only reaches the nearest fragment
   }
-  { // Experience: a sequence of frames receding as one pathway
+  { // EXPERIENCE — a journey: a corridor of thresholds turning and receding through depth
     const F = big ? 6 : 4, P = N - 4 * F, pos = [], edges = [];
-    for (let f = 0; f < F; f++) { const t = f / (F - 1), x = -1.6 + t * 3.2, z = 0.6 - t * 1.4, y = 0.15 * Math.sin(t * 3), s = 0.62 - t * 0.18;
-      for (let c = 0; c < 4; c++) pos.push([x, y + (c < 2 ? s : -s), z + (c % 2 ? s : -s) * 0.6]);
-      const b = f * 4; edges.push([b, b + 1], [b + 1, b + 3], [b + 3, b + 2], [b + 2, b]); }
-    for (let k = 0; k < P; k++) { const t = k / (P - 1); pos.push([-1.6 + t * 3.2, -0.05 + 0.15 * Math.sin(t * 3), 0.6 - t * 1.4]); }
+    const path = (t) => {                                          // floor of the journey: from near-left to far-right, a gentle S
+      const x = -1.45 + 2.7 * t, z = 1.0 - 2.5 * t, lat = 0.28 * Math.sin(t * Math.PI * 2);
+      const dx = 2.7, dz = -2.5, l = Math.hypot(dx, dz), sx = -dz / l, sz = dx / l;   // side vector (cross(tangent, up))
+      return { p: [x + sx * lat, -0.55 + 0.1 * Math.sin(t * Math.PI), z + sz * lat], sx, sz };
+    };
+    for (let f = 0; f < F; f++) {
+      const t = 0.04 + 0.92 * f / (F - 1), { p, sx, sz } = path(t), w = 0.5 - 0.1 * t, h = 1.02 - 0.22 * t;
+      // threshold frame, square to the path: bottom-left, bottom-right, top-left, top-right
+      pos.push([p[0] - sx * w, p[1], p[2] - sz * w], [p[0] + sx * w, p[1], p[2] + sz * w], [p[0] - sx * w, p[1] + h, p[2] - sz * w], [p[0] + sx * w, p[1] + h, p[2] + sz * w]);
+      const b = f * 4; edges.push([b, b + 2], [b + 1, b + 3], [b + 2, b + 3]);   // open at the floor: a passage, not a fence
+      if (f < F - 1) edges.push([b + 2, b + 6], [b + 3, b + 7]);                  // the corridor's upper rails carry you through
+    }
+    for (let k = 0; k < P; k++) pos.push(path(k / (P - 1)).p);
     edges.push(...chain(4 * F, N - 1));
     S.experience = { pos, edges, route: Array.from({ length: P }, (_, k) => 4 * F + k) };
   }
-  { // Product: components lock into one coherent, bounded object
-    const E = big ? 12 : 8, per = E / 4, Rn = N - 8 - E, rows = Rn / 4, pos = [], edges = [];
-    for (let i = 0; i < 8; i++) pos.push([i & 1 ? 0.9 : -0.9, i & 2 ? 0.6 : -0.6, i & 4 ? 0.45 : -0.45]);
-    for (let e = 0; e < 4; e++) for (let k = 0; k < per; k++) { const t = (k + 1) / (per + 1); pos.push([-0.9 + t * 1.8, e & 1 ? 0.6 : -0.6, e & 2 ? 0.45 : -0.45]); }
-    for (let r = 0; r < rows; r++) for (let c = 0; c < 4; c++) pos.push([-0.6 + c * 0.4, rows > 1 ? -0.4 + r * (0.8 / (rows - 1)) : 0, 0.46]);
+  { // PRODUCT — components lock into one compact, coherent object (with a working face)
+    const E = big ? 12 : 8, per = E / 4, Rn = N - 8 - E, rows = Rn / 4, hx = 0.68, hy = 0.52, hz = 0.44, pos = [], edges = [];
+    for (let i = 0; i < 8; i++) pos.push([i & 1 ? hx : -hx, i & 2 ? hy : -hy, i & 4 ? hz : -hz]);
+    // the four vertical edges carry the joined components (subdivisions along y)
+    for (let e = 0; e < 4; e++) for (let k = 0; k < per; k++) { const t = (k + 1) / (per + 1); pos.push([e & 1 ? hx : -hx, -hy + 2 * hy * t, e & 2 ? hz : -hz]); }
+    // the front face: an inset working surface
+    for (let r = 0; r < rows; r++) for (let c = 0; c < 4; c++) pos.push([-0.42 + c * 0.28, rows > 1 ? 0.3 - r * (0.6 / (rows - 1)) : 0, hz + 0.001]);
     edges.push([0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]);
     const g0 = 8 + E;
     for (let r = 0; r < rows; r++) for (let c = 0; c < 4; c++) { const i = g0 + r * 4 + c; if (c < 3) edges.push([i, i + 1]); if (r < rows - 1) edges.push([i, i + 4]); }
-    const mid = g0 + Math.floor(rows / 2) * 4;
-    S.product = { pos, edges, route: [4, mid, mid + 1, mid + 2, mid + 3, 5] };
+    // components seated into the object: each edge-component ties across to its partner
+    for (let k = 0; k < per; k++) edges.push([8 + k, 8 + per + k], [8 + 2 * per + k, 8 + 3 * per + k]);
+    const midRow = g0 + Math.floor((rows - 1) / 2) * 4;
+    S.product = { pos, edges, route: [[0, 6], midRow, midRow + 1, midRow + 2] };   // in through the side, along the working face, to its centre
   }
-  { // System: modules connect into a structured operating network (three layers)
+  { // SYSTEM — modules connected into a structured operating network (three layers)
     const per = N / 3, cols = 4, rows = per / cols, pos = [], edges = [];
     for (let l = 0; l < 3; l++) for (let k = 0; k < per; k++) { const gx = k % cols, gy = Math.floor(k / cols);
-      pos.push([-1.2 + gx * 0.8, -0.75 + l * 0.75, rows > 1 ? -0.7 + gy * (1.4 / (rows - 1)) : 0]); }
+      pos.push([-1.15 + gx * 0.77, -0.8 + l * 0.8, rows > 1 ? -0.68 + gy * (1.36 / (rows - 1)) : 0]); }
     for (let l = 0; l < 3; l++) for (let k = 0; k < per; k++) { const i = l * per + k; if (k % cols < cols - 1) edges.push([i, i + 1]); if (k < per - cols) edges.push([i, i + cols]); }
     const hubs = big ? [1, 6, 9] : [1, 6];
     for (const h of hubs) edges.push([h, h + per], [h + per, h + 2 * per]);
-    S.system = { pos, edges, route: [0, 1, 1 + per, 2 + per, 2 + 2 * per, 3 + 2 * per] };
+    S.system = { pos, edges, route: [0, 1, 1 + per, 1 + 2 * per, 2 + 2 * per, 3 + 2 * per] };   // orthogonal: along, up through a hub, along
   }
-  { // Portal: one central access layer → distinct roles / destinations
-    const C = (N - 8) / 4, pos = [], edges = [];
-    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; pos.push([0.38 * Math.cos(a), 0.38 * Math.sin(a), 0]); }
-    for (let c = 0; c < 4; c++) { const a = c / 4 * Math.PI * 2 + Math.PI / 4, cx = 1.45 * Math.cos(a), cy = 0.95 * Math.sin(a), cz = c % 2 ? -0.5 : 0.5;
-      for (let k = 0; k < C; k++) { if (k === 0) { pos.push([cx, cy, cz]); continue; } const b = (k - 1) / (C - 1) * Math.PI * 2; pos.push([cx + 0.22 * Math.cos(b), cy + 0.22 * Math.sin(b), cz + jit(0.12)]); } }
+  { // PORTAL — one recognisable gateway → distinct role / destination structures behind it
+    const C = (N - 8) / 4, gx = -0.85, gz = 0.4, gy = 0.62, pos = [], edges = [];
+    // gateway frame, square to the direction of travel: bl, lm, tl, tm, tr, rm, br, bm
+    pos.push([gx, -gy, -gz], [gx, 0, -gz], [gx, gy, -gz], [gx, gy, 0], [gx, gy, gz], [gx, 0, gz], [gx, -gy, gz], [gx, -gy, 0]);
     edges.push(...chain(0, 7), [7, 0]);
-    for (let c = 0; c < 4; c++) { const h = 8 + c * C; edges.push([c * 2, h]); for (let k = 1; k < C; k++) edges.push([h, h + k]); }
-    S.portal = { pos, edges, route: [8 + 2 * C, 4, 3, 2, 8 + C] };
+    const HUB = [[0.7, 1.0, -0.4], [1.35, 0.35, 0.4], [1.2, -0.45, -0.55], [0.6, -1.0, 0.45]];   // four clearly separate roles
+    for (let c = 0; c < 4; c++) {
+      const h = HUB[c];
+      for (let k = 0; k < C; k++) { if (k === 0) { pos.push(h.slice()); continue; }
+        const b = (k - 1) / (C - 1) * Math.PI * 2, r = 0.22;            // each destination: a small module facing the gateway
+        pos.push([h[0] + r * Math.sin(b), h[1] + r * Math.cos(b), h[2]]); }   // module faces the viewer
+      const b = 8 + c * C; for (let k = 1; k < C; k++) edges.push([b + k, b + (k % (C - 1)) + 1]);   // ring around each hub
+      edges.push([b, b + 1]);
+    }
+    // the gateway distributes: its corners lead to the four destinations
+    edges.push([2, 8], [4, 8 + C], [6, 8 + 2 * C], [0, 8 + 3 * C]);
+    S.portal = { pos, edges, route: [[1, 5], 8 + C, 8 + C + 1] };   // through the gateway's centre, out to one role
   }
-  { // Automation: repeated parallel paths collapse into one controlled flow
+  { // AUTOMATION — repeated processes in depth converge into one controlled flow
     const L = big ? 6 : 4, Cn = N - 4 * L, pos = [], edges = [];
-    for (let p = 0; p < 4; p++) for (let k = 0; k < L; k++) { const t = k / (L - 1), lane = (p - 1.5) * 0.42; pos.push([-1.7 + t * 1.5, lane * (1 - t * 0.85), (p % 2 ? 0.3 : -0.3) * (1 - t)]); }
-    for (let k = 0; k < Cn; k++) { const t = k / (Cn - 1); pos.push([t * 1.75, 0, 0]); }
+    const START = [[0.78, 0.85], [0.78, -0.85], [-0.78, 0.85], [-0.78, -0.85]];     // (y, z): four parallel processes
+    for (let p = 0; p < 4; p++) for (let k = 0; k < L; k++) { const t = k / (L - 1), c = 1 - smooth(t);
+      pos.push([-1.75 + t * 1.65, START[p][0] * c, START[p][1] * c]); }
+    for (let k = 0; k < Cn; k++) { const t = k / (Cn - 1); pos.push([0.05 + t * 1.6, 0.1 * t, 0.9 * t]); }   // the single flow, coming forward
     for (let p = 0; p < 4; p++) { edges.push(...chain(p * L, p * L + L - 1)); edges.push([p * L + L - 1, 4 * L]); }
+    // the processes start as one bundle of repeated work (a square cross-section)
+    edges.push([0, L], [L, 3 * L], [3 * L, 2 * L], [2 * L, 0]);
     edges.push(...chain(4 * L, N - 1));
-    S.automation = { pos, edges, route: [...Array.from({ length: L }, (_, k) => L + k), ...Array.from({ length: Cn }, (_, k) => 4 * L + k)] };
+    S.automation = { pos, edges, route: [...Array.from({ length: L }, (_, k) => k), ...Array.from({ length: Cn }, (_, k) => 4 * L + k)] };
   }
-  { // AI Layer: an interpreting layer above an existing structure
-    const bx = big ? 6 : 4, by = 4, base = bx * by, lx = 4, ly = (N - base) / lx, pos = [], edges = [];
-    for (let i = 0; i < base; i++) { const gx = i % bx, gy = Math.floor(i / bx); pos.push([-1.25 + gx * (2.5 / (bx - 1)), -0.65, -0.75 + gy * 0.5]); }
-    for (let i = 0; i < N - base; i++) { const gx = i % lx, gy = Math.floor(i / lx); pos.push([-0.75 + gx * 0.5, 0.55, ly > 1 ? -0.5 + gy * (1 / (ly - 1)) : 0]); }
-    for (let i = 0; i < base; i++) { if (i % bx < bx - 1) edges.push([i, i + 1]); if (i < base - bx) edges.push([i, i + bx]); }
+  { // AI LAYER — an existing base (separate systems on the ground) and, above and across
+    // it, one interpreting layer that reaches down into each of them
+    const bm = big ? 6 : 4, base = 4 * bm, lx = 4, ly = (N - base) / lx, pos = [], edges = [];
+    const MC = [[-0.85, -0.55], [0.75, -0.6], [-0.7, 0.55], [0.85, 0.6]];           // module centres (x, z) on the ground
+    for (let m = 0; m < 4; m++) for (let k = 0; k < bm; k++) { const c = k % 2, r = Math.floor(k / 2), rr = bm / 2;
+      pos.push([MC[m][0] - 0.16 + c * 0.32, -0.78, MC[m][1] - 0.16 * (rr - 1) + r * 0.32]); }
+    for (let m = 0; m < 4; m++) { const b = m * bm; for (let k = 0; k < bm; k++) { if (k % 2 === 0) edges.push([b + k, b + k + 1]); if (k + 2 < bm) edges.push([b + k, b + k + 2]); } }
+    const rot = 0.5, cr = Math.cos(rot), sr = Math.sin(rot);                          // the layer runs ACROSS the base
+    for (let i = 0; i < N - base; i++) { const u = i % lx, v = Math.floor(i / lx);
+      const x = -0.9 + u * 0.6, z = ly > 1 ? -0.55 + v * (1.1 / (ly - 1)) : 0; pos.push([x * cr - z * sr, 0.72, x * sr + z * cr]); }
     for (let i = 0; i < N - base; i++) { const j = base + i; if (i % lx < lx - 1) edges.push([j, j + 1]); if (i < N - base - lx) edges.push([j, j + lx]); }
-    // fine verticals: the layer reads the structure beneath it
-    for (let i = 0; i < N - base; i += 2) { const p = pos[base + i]; let best = 0, bd = 1e9; for (let k = 0; k < base; k++) { const d = (pos[k][0] - p[0]) ** 2 + (pos[k][2] - p[2]) ** 2; if (d < bd) { bd = d; best = k; } } edges.push([base + i, best]); }
-    const top = base + Math.floor(ly / 2) * lx;
-    S.ai = { pos, edges, route: [bx, bx + 1, top + 1, top + 2, top + 3, bx + 3] };
+    // it reads every system beneath it: one fine vertical into each module, from the layer node nearest above
+    const above = [];
+    for (let m = 0; m < 4; m++) { const b = m * bm + 1; let best = base, bd = 1e9;
+      for (let k = base; k < N; k++) { const d = (pos[k][0] - pos[b][0]) ** 2 + (pos[k][2] - pos[b][2]) ** 2; if (d < bd) { bd = d; best = k; } }
+      edges.push([best, b]); above.push(best); }
+    S.ai = { pos, edges, route: [1, above[0], above[2], 2 * bm + 1, 2 * bm + 3] };   // up from one system, across the layer, down into another
+  }
+  { // EXIT — informed, still configurable: six tidy modules held calmly around one centre
+    const per = N / 6, pos = [], edges = [];
+    for (let g = 0; g < 6; g++) { const a = g / 6 * Math.PI * 2 + Math.PI / 6, cx = 1.3 * Math.cos(a), cz = 0.95 * Math.sin(a), ta = a + Math.PI / 2;
+      for (let k = 0; k < per; k++) { const c = k % 2, r = Math.floor(k / 2), rr = per / 2;
+        const u = -0.15 + c * 0.3, v = -0.15 * (rr - 1) + r * 0.3;              // a small, flat, aligned module
+        pos.push([cx + u * Math.cos(ta), v * 0.9, cz + u * Math.sin(ta)]); }
+      const b = g * per; for (let k = 0; k < per; k++) { if (k % 2 === 0) edges.push([b + k, b + k + 1]); if (k + 2 < per) edges.push([b + k, b + k + 2]); }
+    }
+    S.exit = { pos, edges, route: [3 * per, [3 * per, 0]] };       // arrives, and rests at the centre — nothing chosen
   }
   return S;
 }
@@ -154,15 +205,26 @@ export function create(ctx) {
     const S = makeStates(N);
     const V = VIEW[mode], yaw = (rtl && mode !== 'mobile' ? -1 : 1) * V.yaw, pitch = V.pitch;
     // world: structure units → px, fitted to the stage
-    const k = mode === 'mobile' ? Math.min(W * 0.36, H * 0.2) : Math.min(W * 0.23, H * 0.3);
     const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
-    const toWorld = (p0) => { const p = orient(p0, mode, rtl);
+    const rotate = (p0) => { const p = orient(p0, mode, rtl);
       const x = p[0] * cy - p[2] * sy, z = p[0] * sy + p[2] * cy;
-      const y = p[1] * cp - z * sp, z2 = p[1] * sp + z * cp;
-      return [x * k, y * k, z2 * k]; };
+      return [x, p[1] * cp - z * sp, p[1] * sp + z * cp]; };
+    // S03.1 framing: the largest state fills most of the stage (never clipped) — the structure is the
+    // protagonist; a margin for perspective (nearer parts read larger) keeps it off the stage edges
+    let bx0 = 1e9, bx1 = -1e9, by0 = 1e9, by1 = -1e9;
+    for (const n of ORDER) for (const q of S[n].pos.map(rotate)) { bx0 = Math.min(bx0, q[0]); bx1 = Math.max(bx1, q[0]); by0 = Math.min(by0, q[1]); by1 = Math.max(by1, q[1]); }
+    const sx = (bx1 - bx0) / 2, syy = (by1 - by0) / 2;          // half-spans of the whole structure (it is centred below)
+    const fit = mode === 'mobile' ? [0.45, 0.46] : [0.43, 0.42];
+    const k = Math.min(W * fit[0] / sx, H * fit[1] / syy);
+    const toWorld = (p0) => { const q = rotate(p0); return [q[0] * k, q[1] * k, q[2] * k]; };
     const states = ORDER.map((n) => S[n]);
     const W3 = states.map((st) => st.pos.map(toWorld));
-    const entry = toWorld(ENTRY);
+    // centre the structure (all states together) in the stage, so no state drifts
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (const st of W3) for (const p of st) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); }
+    const cxo = (x0 + x1) / 2, cyo = (y0 + y1) / 2;
+    for (const st of W3) for (const p of st) { p[0] -= cxo; p[1] -= cyo; }
+    const entry = toWorld(ENTRY); entry[0] -= cxo; entry[1] -= cyo;
     // all members across all states (the union), each knows the states it belongs to
     const key = (a, b) => (a < b ? a + '-' + b : b + '-' + a);
     const edgeIx = new Map(), edges = [];
@@ -196,7 +258,7 @@ export function create(ctx) {
     // desktop: the unresolved core holds while the stage comes fully into view, and
     // Experience resolves as it docks (1.5 row-steps before the first outcome)
     if (mode === 'desktop' && keys.every((v) => v != null)) keys[0] = keys[1] - 1.5 * (keys[2] - keys[1]);
-    L = { N, mode, k, W3, entry, edges, nodes, mGeo, sGeo, M, keys, secH: sec.height, tones: new Float32Array(N), q: new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ')) };
+    L = { N, mode, rtl, k, W3, entry, edges, nodes, mGeo, sGeo, M, keys, secH: sec.height, tones: new Float32Array(N), q: new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ')) };
     if (ctx.debug) window.__signalB = { N, states: ORDER, edges: edges.length, keys: keys.map((v) => v && Math.round(v)) };
   }
 
@@ -244,7 +306,9 @@ export function create(ctx) {
     // latent possibilities: only as the structure returns to its neutral core
     mats.latent.opacity = 0.07 * smooth((t - 6.3) / 0.6);
     // the Signal: the route through the state shown (both neighbours resampled, then blended)
-    const route = (si, pos) => [L.entry, ...SROUTES[si].map((n) => pos[n])];
+    const route = (si, pos) => { const pts = routePoints(SROUTES[si], pos), f = pts[0];
+      const from = L.mode === 'mobile' ? [f[0], H / 2 + 12, f[2]] : [L.rtl ? W / 2 + 12 : -W / 2 - 12, f[1], f[2]];
+      return [from, ...pts]; };
     const ra = resample(route(i0, A), L.M), rb = resample(route(i0 + 1, B), L.M);
     const R = ra.map((a, i) => [lerp(a[0], rb[i][0], e), lerp(a[1], rb[i][1], e), lerp(a[2], rb[i][2], e)]);
     const sp = L.sGeo.attributes.position.array, w = L.mode === 'mobile' ? 1.1 : 1.25;
