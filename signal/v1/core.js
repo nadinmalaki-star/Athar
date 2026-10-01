@@ -436,7 +436,8 @@ export function start(boot) {
       if (Math.abs(x - px) < 0.002 && Math.abs(y - py) < 0.002) return;
       px = x; py = y; state.pointer = [Math.round(x * 100) / 100, Math.round(y * 100) / 100];
       const rec = scenes.get(state.active);
-      if (rec && rec.api) { rec.api.setPointer(x, y); requestFrame('pointer'); }
+      // a scene that takes no pointer input returns false: no frame for pointer movement
+      if (rec && rec.api && rec.api.setPointer(x, y) !== false) requestFrame('pointer');
     };
     addEventListener('pointermove', pointerHandler, { passive: true });
   }
