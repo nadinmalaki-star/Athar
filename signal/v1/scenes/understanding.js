@@ -17,6 +17,8 @@
  * authored in that SVG's viewBox and laid onto the SVG's on-screen rect, so
  * replacing it after the first frame is seamless. Desktop/tablet use the
  * horizontal composition; phones use their own vertical one (as the SVG does).
+ * Arabic desktop runs right → left (the Hero's RTL narrative), mirrored exactly
+ * as the fallback SVG is mirrored in CSS; phones stay vertical in both languages.
  *
  * Contract: init() activate() setProgress(p) setPointer(x, y) resize(w, h, dpr, ctx)
  *           render(renderer) wantsFrame() deactivate() dispose()
@@ -77,7 +79,7 @@ export function create(ctx) {
   const built = [];
   const params = new URLSearchParams(location.search);
   const depthView = ctx.debug && params.get('signal-view') === 'depth';
-  let lastCtx = null, fontsHooked = false;
+  let lastCtx = null, fontsHooked = false, dirWatch = null;
 
   function place(sx, sy, z) { const k = (D - z) / D; return [(sx - W / 2) * k, (H / 2 - sy) * k, z]; }
 
@@ -135,8 +137,9 @@ export function create(ctx) {
     const s = Math.min(r.width / C.vb[0], r.height / C.vb[1]);
     const ox = r.left - host.left + (r.width - C.vb[0] * s) / 2, oy = r.top - host.top + (r.height - C.vb[1] * s) / 2;
     const horiz = C.axis === 'x';
+    const mirror = horiz && document.documentElement.dir === 'rtl';   // = [dir=rtl] .u-optics-d { scaleX(-1) }
     // (a = along the Signal, b = across, in viewBox units) → section pixels
-    const P = (a, b) => horiz ? [ox + a * s, oy + b * s] : [ox + b * s, oy + a * s];
+    const P = (a, b) => horiz ? [ox + (mirror ? C.vb[0] - a : a) * s, oy + b * s] : [ox + b * s, oy + a * s];
     const scale = TIER_SCALE[c.tier] || 1;
     const rnd = prng(horiz ? 23 : 29);
     const pl = C.planes;
@@ -278,7 +281,7 @@ export function create(ctx) {
     // local debug: scene bounds for the review report
     if (ctx.debug) {
       const box = new THREE.Box3().setFromObject(scene);
-      window.__signalU = { comp: horiz ? 'desktop' : 'mobile', bounds: { min: box.min.toArray().map(Math.round), max: box.max.toArray().map(Math.round) }, marks: MC.length / 24, svgRect: { x: Math.round(ox), y: Math.round(oy), w: Math.round(C.vb[0] * s), h: Math.round(C.vb[1] * s) } };
+      window.__signalU = { comp: horiz ? 'desktop' : 'mobile', mirror, bounds: { min: box.min.toArray().map(Math.round), max: box.max.toArray().map(Math.round) }, marks: MC.length / 24, svgRect: { x: Math.round(ox), y: Math.round(oy), w: Math.round(C.vb[0] * s), h: Math.round(C.vb[1] * s) } };
     }
   }
 
@@ -299,6 +302,9 @@ export function create(ctx) {
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(34, 1, 1, 6000);   // a touch more perspective than the Hero: the planes need it
       mats = materials();
+      // a language switch flips the direction in place: re-lay out to stay on the (mirrored) fallback
+      dirWatch = new MutationObserver(() => { if (scene && lastCtx) { layout(lastCtx); ctx.requestFrame('direction'); } });
+      dirWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
     },
     activate() {},
     deactivate() {},
@@ -313,6 +319,6 @@ export function create(ctx) {
     },
     render(renderer) { renderer.render(scene, camera); },
     wantsFrame() { return false; },
-    dispose() { clearBuilt(); scene = null; },
+    dispose() { if (dirWatch) dirWatch.disconnect(); dirWatch = null; clearBuilt(); scene = null; },
   };
 }

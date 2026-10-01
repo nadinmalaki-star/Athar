@@ -437,6 +437,9 @@
 
   /* Understanding: the Signal crosses the optical planes and comes out clean */
   .sig-u{ color:var(--ember); }
+  /* Arabic desktop follows the RTL narrative (as the Hero): noise on the right, clarity on the left.
+     The phone version stays vertical in both languages. */
+  [dir="rtl"] .u-optics-d{ transform:scaleX(-1); }
 
   /* What can be built: one arriving direction, four measured routes */
   .sig-branches{ position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; }
