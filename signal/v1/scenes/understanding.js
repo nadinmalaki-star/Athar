@@ -32,6 +32,16 @@
  * function of progress: deterministic, reversible, nothing re-seeded on scroll,
  * and it renders only when progress changes (no frame loop).
  *
+ * U3 — MATERIALS + OPTICAL DEPTH. Same geometry, same story. The planes become
+ * thin clear-resin filters: a front face, a back face and a lit thickness
+ * strip, shaded by one small shader (no textures, no lights): a body that
+ * fades into depth, a controlled edge catch, one faint internal reflection,
+ * and a tiny local response where the Signal crosses (from the U2 crossing
+ * legibility). Marks become graphite by stage — noise dim, structure clearer,
+ * aligned survivors cleanest, never white — fade with depth, and write depth
+ * so they sit physically in front of / behind the planes. Phones and Tier C:
+ * one face + edge definition only (fewer transparent layers).
+ *
  * Contract: init() activate() setProgress(p) setPointer(x, y) resize(w, h, dpr, ctx)
  *           render(renderer) wantsFrame() deactivate() dispose()
  * No pointer response (setPointer returns false: the core renders nothing for it).
@@ -112,8 +122,52 @@ export function create(ctx) {
   function materials() {
     return {
       // information marks + neutral structure: off-white, alpha carries the hierarchy
-      marks: ctx.track(new THREE.MeshBasicMaterial({ color: 0xe9e6df, vertexColors: true, transparent: true, depthWrite: false })),
-      plane: ctx.track(new THREE.MeshBasicMaterial({ color: 0xe9e6df, vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide })),
+      // graphite information marks: tone and alpha per vertex (stage + depth); they
+      // write depth, so a plane in front veils them and a plane behind does not
+      marks: ctx.track(new THREE.MeshBasicMaterial({ color: 0xe9e6df, vertexColors: true, transparent: true, depthWrite: true })),
+      // the filters: clear neutral resin (not smoked, not glossy), shaded in one pass
+      plane: ctx.track(new THREE.ShaderMaterial({
+        transparent: true, depthWrite: false, side: THREE.DoubleSide,
+        uniforms: {
+          uLegible: { value: new THREE.Vector3(0, 0, 0) },   // per plane: has the Signal been filtered here (U2)
+          uHL: { value: new THREE.Vector2(5, 30) },           // crossing response: uv → roughly round, ~10 px
+          uLite: { value: 0 },                                // phones / Tier C: no internal reflection line
+          uResin: { value: new THREE.Vector3(0.87, 0.885, 0.875) },
+          uEmber: { value: new THREE.Vector3(1.0, 0.353, 0.212) },
+        },
+        vertexShader: `
+          attribute float aFace; attribute float aPlane;
+          varying vec2 vUv; varying float vFace; varying float vPlane;
+          void main() { vUv = uv; vFace = aFace; vPlane = aPlane; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+        fragmentShader: `
+          uniform vec3 uLegible; uniform vec2 uHL; uniform float uLite; uniform vec3 uResin; uniform vec3 uEmber;
+          varying vec2 vUv; varying float vFace; varying float vPlane;
+          void main() {
+            float pi = floor(vPlane + 0.5);
+            float leg = pi < 0.5 ? uLegible.x : (pi < 1.5 ? uLegible.y : uLegible.z);
+            float stage = 0.85 + 0.15 * pi;                       // first → third: a touch more legible
+            vec3 col = uResin; float a;
+            if (vFace > 1.5) {
+              // the thickness strip at the leading edge: where the edge catches
+              a = (0.085 + 0.05 * leg) * stage;
+            } else {
+              // body: present at the leading edge, thinning as it recedes into depth
+              a = mix(0.05, 0.018, smoothstep(0.0, 1.0, vUv.x)) * (vFace > 0.5 ? 0.55 : 1.0);
+              // top / bottom edges catch a little light
+              float e = min(vUv.y, 1.0 - vUv.y);
+              a += 0.028 * (1.0 - smoothstep(0.0, 0.02, e));
+              // one faint internal reflection, parallel to the leading edge (front face)
+              if (vFace < 0.5 && uLite < 0.5) a += 0.03 * (1.0 - smoothstep(0.0, 0.03, abs(vUv.x - 0.2)));
+              a *= stage * mix(0.75, 1.0, leg);
+              // where the Signal crosses (mid depth, centre): a tiny local response, warm only there
+              vec2 d = (vUv - 0.5) * uHL;
+              float h = exp(-dot(d, d) * 1.6) * leg;
+              a += 0.045 * h;
+              col = mix(col, uEmber, 0.35 * h);
+            }
+            gl_FragColor = vec4(col, a);
+          }`,
+      })),
       edges: ctx.track(new THREE.LineBasicMaterial({ color: 0xe9e6df, vertexColors: true, transparent: true, depthWrite: false })),
       node: ctx.track(new THREE.MeshBasicMaterial({ color: 0xff5a36, vertexColors: true, transparent: true, depthWrite: false })),
       // THE SIGNAL — same Ember language and thickness family as the Hero:
@@ -301,13 +355,20 @@ export function create(ctx) {
       }
     });
 
+    // U3 tone ladder: [unprocessed, processed]
+    const TONE = { noise: [0.72, 0.56], gone: [0.6, 0.6], kept: [[0.62, 0.76], [0.62, 0.88], [0.62, 0.84]] };
+    for (const m of marks) m.tone = m.kind === 'kept' ? TONE.kept[Math.min(2, m.zone - 1)] : TONE[m.kind];
     const mGeo = new THREE.BufferGeometry();
     mGeo.setAttribute('position', dyn(marks.length * 6, 3));
     mGeo.setAttribute('color', dyn(marks.length * 6, 4));
     add(new THREE.Mesh(mGeo, mats.marks), 1);
 
-    // ===================== 3. FILTER PLANES (U1 geometry) =====================
-    const FP = [], EP = [];
+    // ===================== 3. FILTER PLANES (U1 geometry, U3 thickness) =====================
+    // Thickness: the back face sits a few units downstream along the Signal's
+    // axis (mirror-aware through P), so the slab reads as a double edge.
+    const lite = !horiz || c.tier === 'C';
+    const TH = horiz ? 5 : 4;
+    const FP = [], FU = [], FF = [], FI = [], EP = [];
     pl.forEach((p, i) => {
       const zc = DEPTH.planes[i], dz = DEPTH.planeDz[i], zn = zc + dz / 2, zf = zc - dz / 2;
       const [lx, ly] = P(p.a, C.mid), [tx, ty] = P(p.a + p.t, C.mid);
@@ -318,12 +379,28 @@ export function create(ctx) {
         ? [[near[0], near[1] + hw, zn], [near[0], near[1] - hw, zn], [far[0], far[1] + hw + tilt, zf], [far[0], far[1] - hw + tilt, zf]]
         : [[near[0] - hw, near[1], zn], [near[0] + hw, near[1], zn], [far[0] - hw + tilt, far[1], zf], [far[0] + hw + tilt, far[1], zf]];
       const [n0, n1, f0, f1] = corners;
-      FP.push(...n0, ...n1, ...f0, ...f0, ...n1, ...f1);
-      EP.push(...n0, ...n1, ...n0, ...f0, ...n1, ...f1, ...f0, ...f1);
+      const o0 = place(...P(p.a, C.mid), zn), o1 = place(...P(p.a + TH, C.mid), zn);
+      const d = [o1[0] - o0[0], o1[1] - o0[1], 0];
+      const off = (v) => [v[0] + d[0], v[1] + d[1], v[2] + d[2]];
+      // uv: x = near (0) → far (1) edge, y = across (0 → 1)
+      const face = (A, B, Cc, Dd, f) => {
+        FP.push(...A, ...B, ...Cc, ...Cc, ...B, ...Dd);
+        FU.push(0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1);
+        for (let k = 0; k < 6; k++) { FF.push(f); FI.push(i); }
+      };
+      face(n0, n1, f0, f1, 0);                                         // front face
+      if (!lite) face(off(n0), off(n1), off(f0), off(f1), 1);          // back face (desktop A/B)
+      face(n0, n1, off(n0), off(n1), 2);                               // leading thickness strip
+      EP.push(...n0, ...n1, ...n0, ...f0, ...n1, ...f1, ...f0, ...f1, ...off(n0), ...off(n1));
     });
     const fGeo = new THREE.BufferGeometry();
-    fGeo.setAttribute('position', new THREE.Float32BufferAttribute(FP, 3)); fGeo.setAttribute('color', dyn(FP.length / 3, 4));
+    fGeo.setAttribute('position', new THREE.Float32BufferAttribute(FP, 3));
+    fGeo.setAttribute('uv', new THREE.Float32BufferAttribute(FU, 2));
+    fGeo.setAttribute('aFace', new THREE.Float32BufferAttribute(FF, 1));
+    fGeo.setAttribute('aPlane', new THREE.Float32BufferAttribute(FI, 1));
     add(new THREE.Mesh(fGeo, mats.plane), 2);
+    mats.plane.uniforms.uLite.value = lite ? 1 : 0;
+    mats.plane.uniforms.uHL.value.set(horiz ? 5 : 2.5, 30);
     const eGeo = new THREE.BufferGeometry();
     eGeo.setAttribute('position', new THREE.Float32BufferAttribute(EP, 3)); eGeo.setAttribute('color', dyn(EP.length / 3, 4));
     add(new THREE.LineSegments(eGeo, mats.edges), 3);
@@ -394,20 +471,23 @@ export function create(ctx) {
       const hx = (horiz ? la : lb) * s / 2, hy = (horiz ? lb : la) * s / 2, o = i * 18;
       const v = [[-hx, hy], [-hx, -hy], [hx, hy], [hx, hy], [-hx, -hy], [hx, -hy]];
       v.forEach(([dx, dy], k) => { mp[o + k * 3] = c3[0] + dx; mp[o + k * 3 + 1] = c3[1] + dy; mp[o + k * 3 + 2] = z; });
-      for (let k = 0; k < 6; k++) { const c = i * 24 + k * 4; mc[c] = 1; mc[c + 1] = 1; mc[c + 2] = 1; mc[c + 3] = A; }
+      // graphite by stage (never white), and quieter the deeper it sits
+      const tone = lerp(m.tone[0], m.tone[1], u), fade = 0.7 + 0.3 * clamp01((z + 420) / 410);
+      for (let k = 0; k < 6; k++) { const c = i * 24 + k * 4; mc[c] = tone; mc[c + 1] = tone; mc[c + 2] = tone * 0.985; mc[c + 3] = A * fade; }
     });
     S.mGeo.attributes.position.needsUpdate = true; S.mGeo.attributes.color.needsUpdate = true;
 
     // planes: quiet and neutral until the Signal crosses; then their approved
     // (U1) presence — a slight edge/readability change, nothing more
-    const fc = S.fGeo.attributes.color.array, ec = S.eGeo.attributes.color.array;
+    const ec = S.eGeo.attributes.color.array, leg = mats.plane.uniforms.uLegible.value;
     pl.forEach((p, i) => {
-      const u = done(p.a, R * 0.6), fill = lerp(0.026, 0.035 + 0.012 * i, u);
-      for (let k = 0; k < 6; k++) fc.set([1, 1, 1, fill], (i * 6 + k) * 4);
-      const lead = lerp(0.3, 0.4, u), rest = lerp(0.75, 1, u);
-      [lead, lead, 0.2 * rest, 0.12 * rest, 0.2 * rest, 0.12 * rest, 0.1 * rest, 0.1 * rest].forEach((al, k) => ec.set([1, 1, 1, al], (i * 8 + k) * 4));
+      const u = done(p.a, R * 0.6);
+      leg.setComponent(i, u);
+      // front leading edge firm, back leading edge (thickness) softer, the rest structural
+      const lead = lerp(0.3, 0.4, u), rest = lerp(0.75, 1, u), back = lerp(0.12, 0.2, u);
+      [lead, lead, 0.2 * rest, 0.12 * rest, 0.2 * rest, 0.12 * rest, 0.1 * rest, 0.1 * rest, back, back].forEach((al, k) => ec.set([1, 1, 1, al], (i * 10 + k) * 4));
     });
-    S.fGeo.attributes.color.needsUpdate = true; S.eGeo.attributes.color.needsUpdate = true;
+    S.eGeo.attributes.color.needsUpdate = true;
 
     // nodes: Ember only here — each crossing becomes legible once the Signal has
     // been filtered there; the exit marker never moves (exactly where U1 places it)
