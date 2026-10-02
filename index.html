@@ -363,6 +363,15 @@
     transition:border-color .25s ease, color .25s ease, background .25s ease;
   }
   .foot-links a:hover{ border-color:var(--ember); color:var(--paper); background:rgba(255,90,54,0.08); }
+
+  .foot-recognition{ display:flex; flex-direction:column; align-items:center; gap:9px; text-align:center; border-top:1px solid var(--line); padding:48px 0 0; }
+  .foot-recognition-label{ font-size:10px; letter-spacing:3px; color:var(--paper-dim); }
+  .foot-recognition a{
+    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:1px;
+    color:var(--paper); opacity:0.85; padding:4px 0; border-bottom:1px solid var(--paper-dim);
+    transition:border-color .25s ease, opacity .25s ease;
+  }
+  .foot-recognition a:hover{ border-color:var(--ember); opacity:1; }
 </style>
 </head>
 <body>
@@ -709,6 +718,11 @@
       </form>
     </div>
   </section>
+
+  <div class="foot-recognition">
+    <span class="foot-recognition-label mono">RECOGNITION</span>
+    <a href="https://www.designrush.com/agency/website-design-development" target="_blank" rel="sponsored noopener noreferrer">DesignRush Verified Agency <span aria-hidden="true">&#8599;</span></a>
+  </div>
 
   <footer>
     <div class="foot-mark">
