@@ -181,7 +181,41 @@ export function primaryMembers(name, st, N) {
     return P;
   }
   if (name === 'core') return P;                 // unresolved: nothing is primary yet
-  for (const [a, b] of st.edges) P.add(key(a, b)); // exit + (until rolled out) the other states: all primary
+  const big = N >= 36;
+  if (name === 'experience') {                   // the thresholds carry the journey; rails and the floor path stay quieter
+    const F = big ? 6 : 4;
+    for (const [a, b] of st.edges) { const lo = Math.min(a, b), hi = Math.max(a, b);
+      if (hi < 4 * F && Math.floor(lo / 4) === Math.floor(hi / 4)) P.add(key(a, b)); }
+    return P;
+  }
+  if (name === 'product') {                      // the bounding object is primary; its face and seated components are detail
+    for (const [a, b] of st.edges) if (a < 8 && b < 8) P.add(key(a, b));
+    return P;
+  }
+  if (name === 'portal') {                       // the gateway and the destination modules; the distributing spokes are quieter
+    const C = (N - 8) / 4;
+    for (const [a, b] of st.edges) { const lo = Math.min(a, b), hi = Math.max(a, b);
+      if (hi < 8) P.add(key(a, b));                                              // gateway frame
+      else if (lo >= 8 && (lo - 8) % C !== 0 && (hi - 8) % C !== 0) P.add(key(a, b)); }   // a destination's own ring
+    return P;
+  }
+  if (name === 'automation') {                   // the repeated processes and the one flow they become are primary;
+    const L = big ? 6 : 4, L4 = 4 * L;           // the bundle tie and the hand-overs into the flow are quieter
+    for (const [a, b] of st.edges) { const lo = Math.min(a, b), hi = Math.max(a, b);
+      if (lo >= L4) P.add(key(a, b));                                            // the single flow
+      else if (hi < L4 && hi - lo === 1 && Math.floor(lo / L) === Math.floor(hi / L)) P.add(key(a, b)); }   // a lane's own run
+    return P;
+  }
+  if (name === 'ai') {                           // the base systems and the layer's outline; the layer grid and the reading verticals are quieter
+    const bm = big ? 6 : 4, base = 4 * bm, lx = 4, ly = (N - base) / lx;
+    for (const [a, b] of st.edges) { const lo = Math.min(a, b), hi = Math.max(a, b);
+      if (hi < base) { if (Math.floor(lo / bm) === Math.floor(hi / bm)) P.add(key(a, b)); continue; }
+      if (lo < base) continue;                                                   // vertical into a base system
+      const u0 = (lo - base) % lx, v0 = Math.floor((lo - base) / lx), u1 = (hi - base) % lx, v1 = Math.floor((hi - base) / lx);
+      if ((v0 === v1 && (v0 === 0 || v0 === ly - 1)) || (u0 === u1 && (u0 === 0 || u0 === lx - 1))) P.add(key(a, b)); }
+    return P;
+  }
+  for (const [a, b] of st.edges) P.add(key(a, b)); // exit: every tidy module evenly
   return P;
 }
 
@@ -203,8 +237,9 @@ export function create(ctx) {
   const idsView = ctx.debug && params.get('signal-view') === 'ids';     // local debug: colour nodes by identity
   const forcedT = ctx.debug && params.has('signal-state') ? clamp01(parseFloat(params.get('signal-state')) || 0) * 7 : null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // S03 materials prototype (local debug only): ?signal-mat=v2
-  const matV2 = ctx.debug && params.get('signal-mat') === 'v2';
+  // S03 materials: the approved material system is the default; the earlier line
+  // treatment remains reachable in local debug only (?signal-mat=v1) for comparison
+  const matV2 = !(ctx.debug && params.get('signal-mat') === 'v1');
   let L = null, lastP = 0, lastCtx = null, fontsHooked = false, dirWatch = null;
 
   function materials() {
