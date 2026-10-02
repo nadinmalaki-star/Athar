@@ -164,6 +164,27 @@ export function makeStates(N) {
   return S;
 }
 
+// S03 materials (prototype): member hierarchy per state — which members define the
+// silhouette (primary) and which are internal detail (secondary). Metadata only: it
+// never changes positions, edges or node identity. Returns a Set of 'a-b' keys.
+export function primaryMembers(name, st, N) {
+  const key = (a, b) => (a < b ? a + '-' + b : b + '-' + a), P = new Set();
+  if (name === 'system') {                       // layer outlines + the hub verticals carry the network
+    const per = N / 3, cols = 4, rows = per / cols;
+    for (const [a, b] of st.edges) {
+      const la = Math.floor(a / per), lb = Math.floor(b / per);
+      if (la !== lb) { P.add(key(a, b)); continue; }
+      const ka = a % per, kb = b % per, ga = [ka % cols, Math.floor(ka / cols)], gb = [kb % cols, Math.floor(kb / cols)];
+      const alongX = ga[1] === gb[1], edgeRow = ga[1] === 0 || ga[1] === rows - 1, edgeCol = ga[0] === 0 || ga[0] === cols - 1;
+      if ((alongX && edgeRow) || (!alongX && edgeCol && gb[0] === ga[0])) P.add(key(a, b));
+    }
+    return P;
+  }
+  if (name === 'core') return P;                 // unresolved: nothing is primary yet
+  for (const [a, b] of st.edges) P.add(key(a, b)); // exit + (until rolled out) the other states: all primary
+  return P;
+}
+
 // Orientation: desktop flows along +x (mirrored for RTL); phones flow DOWN the
 // stage (the vertical reading order), never mirrored.
 export function orient(p, mode, rtl) {
@@ -182,6 +203,8 @@ export function create(ctx) {
   const idsView = ctx.debug && params.get('signal-view') === 'ids';     // local debug: colour nodes by identity
   const forcedT = ctx.debug && params.has('signal-state') ? clamp01(parseFloat(params.get('signal-state')) || 0) * 7 : null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // S03 materials prototype (local debug only): ?signal-mat=v2
+  const matV2 = ctx.debug && params.get('signal-mat') === 'v2';
   let L = null, lastP = 0, lastCtx = null, fontsHooked = false, dirWatch = null;
 
   function materials() {
@@ -190,6 +213,13 @@ export function create(ctx) {
       members: ctx.track(new THREE.LineBasicMaterial({ color: 0xd9d6cf, vertexColors: true, transparent: true, depthWrite: false })),
       latent: ctx.track(new THREE.LineBasicMaterial({ color: 0xd9d6cf, transparent: true, opacity: 0, depthWrite: false })),
       signal: ctx.track(new THREE.MeshBasicMaterial({ color: 0xff5a36, transparent: true, opacity: 0.92, depthWrite: false, side: THREE.DoubleSide })),
+      // --- S03 materials prototype ---
+      rod: ctx.track(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.55, metalness: 0.3 })),        // graphite satin (tone per instance)
+      rodFlat: ctx.track(new THREE.MeshBasicMaterial({ color: 0xffffff })),                                        // phones: flat
+      joint: ctx.track(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.42, metalness: 0.55, flatShading: true })), // dark anodized
+      jointFlat: ctx.track(new THREE.MeshBasicMaterial({ color: 0xffffff })),
+      ember: ctx.track(new THREE.MeshBasicMaterial({ color: 0xff5a36, vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide })),
+      seat: ctx.track(new THREE.MeshBasicMaterial({ color: 0xff5a36, transparent: true, opacity: 0.9, depthWrite: false })),
     };
   }
   function clearBuilt() { for (const o of built) { o.removeFromParent(); if (o.isInstancedMesh) o.dispose(); if (o.geometry) o.geometry.dispose(); } built.length = 0; }
@@ -230,6 +260,7 @@ export function create(ctx) {
     const edgeIx = new Map(), edges = [];
     states.forEach((st, si) => st.edges.forEach(([a, b]) => { const kk = key(a, b); if (!edgeIx.has(kk)) { edgeIx.set(kk, edges.length); edges.push({ a, b, in: new Set() }); } edges[edgeIx.get(kk)].in.add(si); }));
 
+    if (matV2) { layoutV2(c, { N, mode, rtl, k, W3, entry, edges, states, S, pitch, yaw, edgeIx, key }); return; }
     // nodes: the same N instances in every state
     const box = new THREE.BoxGeometry(1, 1, 1);
     const nodes = new THREE.InstancedMesh(box, mats.node, N);
@@ -262,6 +293,130 @@ export function create(ctx) {
     if (ctx.debug) window.__signalB = { N, states: ORDER, edges: edges.length, keys: keys.map((v) => v && Math.round(v)) };
   }
 
+  // ---------------------------------------------------------------- S03 materials prototype
+  // Members are thin rectangular rods (real 3D: depth-tested, perspective, occlusion),
+  // joints are small faceted dark-metal joints in two grades, Ember is a thinner inlay
+  // with seat rings. Phones: flat, unlit, two weights, no latent hairlines.
+  function layoutV2(c, g) {
+    const { N, mode, W3, edges, states, S, pitch, yaw, key } = g, phone = mode === 'mobile';
+    // per state: tier of every member (0 absent, 1 secondary, 2 primary) and joint grade
+    const tiers = states.map((st, si) => {
+      const name = ORDER[si], prim = primaryMembers(name, st, N), t = new Uint8Array(edges.length);
+      edges.forEach((ed, j) => { if (ed.in.has(si)) t[j] = prim.has(key(ed.a, ed.b)) ? 2 : 1; });
+      return t;
+    });
+    const grades = states.map((st, si) => {
+      const deg = new Uint8Array(N), gr = new Uint8Array(N);
+      edges.forEach((ed, j) => { if (tiers[si][j]) { deg[ed.a]++; deg[ed.b]++; } });
+      edges.forEach((ed, j) => { if (tiers[si][j] === 2) { gr[ed.a] = 1; gr[ed.b] = 1; } });
+      for (let i = 0; i < N; i++) if (deg[i] >= 3) gr[i] = 1;
+      if (ORDER[si] === 'core') gr.fill(0);           // unresolved: no structural joints yet
+      return gr;
+    });
+    // entry: uneven, fragmentary tone per member (fixed, deterministic)
+    const jitter = new Float32Array(edges.length); { let sd = 3; for (let j = 0; j < edges.length; j++) { sd = (sd * 16807) % 2147483647; jitter[j] = (sd / 2147483647); } }
+    // seats: where the route enters and leaves the configuration (Ember rings, not dots)
+    const seats = states.map((st, si) => { const n = ORDER[si]; if (n === 'core') return []; const r = st.route;
+      if (n === 'exit') return [r[r.length - 1]]; return phone ? [r[r.length - 1]] : [r[0], r[r.length - 1]]; });
+
+    const rodGeo = new THREE.BoxGeometry(1, 1, 1);
+    const rods = new THREE.InstancedMesh(rodGeo, phone ? mats.rodFlat : mats.rod, edges.length);
+    rods.instanceMatrix.setUsage(THREE.DynamicDrawUsage); add(rods, 2);
+    const jGeo = phone ? new THREE.PlaneGeometry(1, 1) : new THREE.IcosahedronGeometry(0.5, 0);
+    const joints = new THREE.InstancedMesh(jGeo, phone ? mats.jointFlat : mats.joint, N);
+    joints.instanceMatrix.setUsage(THREE.DynamicDrawUsage); add(joints, 1);
+    let lGeo = null;
+    if (!phone) {   // latent: desktop only, hairlines, very faint
+      const LP = []; for (let si = 1; si <= 6; si++) for (const [a, b] of states[si].edges) LP.push(...W3[si][a], ...W3[si][b]);
+      lGeo = new THREE.BufferGeometry(); lGeo.setAttribute('position', new THREE.Float32BufferAttribute(LP, 3));
+      add(new THREE.LineSegments(lGeo, mats.latent), 0);
+    }
+    const M = 40, sGeo = new THREE.BufferGeometry();
+    sGeo.setAttribute('position', dyn(M * 2, 3)); sGeo.setAttribute('color', dyn(M * 2, 4));
+    const idx = []; for (let i = 0; i < M - 1; i++) { const v = i * 2; idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2); }
+    sGeo.setIndex(idx); add(new THREE.Mesh(sGeo, mats.ember), 3);
+    const seatMesh = new THREE.InstancedMesh(new THREE.TorusGeometry(1, 0.16, 3, 16), mats.seat, 4);
+    seatMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); add(seatMesh, 4);
+
+    const sec = c.section.getBoundingClientRect();
+    const keyEls = [c.section.querySelector('.outcomes'), ...c.section.querySelectorAll('.outcome'), c.section.querySelector('.build-exit')];
+    const keys = keyEls.map((el, i) => { if (!el) return null; const r = el.getBoundingClientRect(); return (i === 0 ? r.top : r.top + r.height / 2) - sec.top; });
+    if (mode === 'desktop' && keys.every((v) => v != null)) keys[0] = keys[1] - 1.5 * (keys[2] - keys[1]);
+    L = { v2: true, N, mode, rtl: g.rtl, k: g.k, W3, entry: g.entry, edges, tiers, grades, jitter, seats, rods, joints, sGeo, seatMesh, M, keys, secH: sec.height,
+      q: new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ')) };
+    if (ctx.debug) window.__signalB = { N, states: ORDER, edges: edges.length, keys: keys.map((v) => v && Math.round(v)), mat: 'v2', members: phone ? 'rods (flat, unlit)' : 'rods (lit satin prisms)' };
+  }
+
+  const zAxis = new THREE.Vector3(0, 0, 1), tmpD = new THREE.Vector3(), tmpQ = new THREE.Quaternion();
+  function applyV2(t) {
+    const phone = L.mode === 'mobile', i0 = Math.min(6, Math.floor(t)), u = t - i0, e = smooth((u - 0.3) / 0.4);
+    const A = L.W3[i0], B = L.W3[i0 + 1];
+    const P = A.map((a, i) => [lerp(a[0], B[i][0], e), lerp(a[1], B[i][1], e), lerp(a[2], B[i][2], e)]);
+    let zmin = 1e9, zmax = -1e9; for (const p of P) { zmin = Math.min(zmin, p[2]); zmax = Math.max(zmax, p[2]); }
+    const dn = (z) => (z - zmin) / ((zmax - zmin) || 1);                  // 0 far … 1 near
+    const isEntry = (si) => ORDER[si] === 'core';
+    // ---- members: thin rods; width and tone by tier, depth and state
+    const WIDTH = phone ? [0, 0.9, 1.4] : [0, 1.15, 1.9];
+    const TONE = phone ? [0, 0.3, 0.44] : [0, 0.3, 0.5];        // phones are unlit: tones are display (sRGB) values, kept quiet
+    L.edges.forEach((ed, j) => {
+      const ta = L.tiers[i0][j], tb = L.tiers[i0 + 1][j];
+      // entry: present but unresolved — uneven fragments, quieter than any configured state
+      const wOf = (si, tr) => (tr ? WIDTH[tr] * (isEntry(si) ? 1.08 : 1) : 0);
+      const cOf = (si, tr) => (tr ? TONE[tr] * (isEntry(si) ? 1.25 + 0.6 * L.jitter[j] : 1) : 0);
+      const pa = P[ed.a], pb = P[ed.b], depth = (dn(pa[2]) + dn(pb[2])) / 2;
+      let w = lerp(wOf(i0, ta), wOf(i0 + 1, tb), e) * (phone ? 1 : 0.78 + 0.4 * depth);
+      let c = lerp(cOf(i0, ta), cOf(i0 + 1, tb), e) * (phone ? (depth > 0.5 ? 1 : 0.72) : 0.7 + 0.5 * depth);
+      const dx = pb[0] - pa[0], dy = pb[1] - pa[1], dz = pb[2] - pa[2], len = Math.hypot(dx, dy, dz) || 1e-3;
+      if (w < 0.05) w = 0;
+      tmpQ.setFromUnitVectors(zAxis, tmpD.set(dx / len, dy / len, dz / len));
+      L.rods.setMatrixAt(j, tmpM.compose(tmpV.set((pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2, (pa[2] + pb[2]) / 2), tmpQ, tmpS.set(w, w, w ? len : 0)));
+      if (idsView) tmpC.setRGB(0.5, 0.5, 0.5); else if (phone) tmpC.setRGB(c * 0.98, c * 0.98, c, THREE.SRGBColorSpace); else tmpC.setRGB(c * 0.98, c * 0.98, c);   // graphite, the faintest cool lean
+      L.rods.setColorAt(j, tmpC);
+    });
+    L.rods.instanceMatrix.needsUpdate = true; if (L.rods.instanceColor) L.rods.instanceColor.needsUpdate = true;
+    // ---- joints: two grades; structural joints catch the key, pass-through ones recede
+    const SIZE = phone ? [1.9, 2.8] : [2.3, 3.6];
+    P.forEach((p, i) => {
+      const ga = L.grades[i0][i], gb = L.grades[i0 + 1][i], g = lerp(ga, gb, e), depth = dn(p[2]);
+      const ent = isEntry(i0) ? 1 - e : 0;              // entry joints: a touch more present (no structure to carry them yet)
+      const s = lerp(SIZE[0], SIZE[1], g) * (phone ? 1 : 0.85 + 0.3 * depth) * (1 + 0.85 * ent);
+      L.joints.setMatrixAt(i, tmpM.compose(tmpV.set(p[0], p[1], p[2]), phone ? tmpQ.identity() : L.q, tmpS.set(s, s, s)));
+      if (idsView) tmpC.setHSL(i / L.N, 0.75, 0.6);
+      else { const v = (phone ? lerp(0.3, 0.5, g) * (depth > 0.5 ? 1 : 0.8) : lerp(0.22, 0.62, g)) + 0.36 * ent; if (phone) tmpC.setRGB(v, v, v, THREE.SRGBColorSpace); else tmpC.setRGB(v, v, v * 1.01); }
+      L.joints.setColorAt(i, tmpC);
+    });
+    L.joints.instanceMatrix.needsUpdate = true; if (L.joints.instanceColor) L.joints.instanceColor.needsUpdate = true;
+    // ---- latent: very faint, only as the structure returns to its calm core
+    mats.latent.opacity = phone ? 0 : 0.045 * smooth((t - 6.3) / 0.6);
+    // ---- Ember: a thinner inlay; quieter on its approach, full where it is seated in the structure
+    const route = (si, pos) => { const pts = routePoints(SROUTES[si], pos), f = pts[0];
+      const from = L.mode === 'mobile' ? [f[0], H / 2 + 12, f[2]] : [L.rtl ? W / 2 + 12 : -W / 2 - 12, f[1], f[2]];
+      return [from, ...pts]; };
+    const ra = resample(route(i0, A), L.M), rb = resample(route(i0 + 1, B), L.M);
+    const R = ra.map((a, i) => [lerp(a[0], rb[i][0], e), lerp(a[1], rb[i][1], e), lerp(a[2], rb[i][2], e)]);
+    // where the approach ends (first point inside the structure), as a fraction of the route
+    const seatFrac = (pts) => { let tot = 0, first = 0; for (let i = 0; i < pts.length - 1; i++) { const l = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]); if (i === 0) first = l; tot += l; } return tot ? first / tot : 0; };
+    const fa = seatFrac(route(i0, A)), fb = seatFrac(route(i0 + 1, B)), fs = lerp(fa, fb, e);
+    const sp = L.sGeo.attributes.position.array, sc = L.sGeo.attributes.color.array, hw = phone ? 0.75 : 0.8;
+    for (let i = 0; i < L.M; i++) {
+      const a = R[Math.max(0, i - 1)], b = R[Math.min(L.M - 1, i + 1)];
+      let dx = b[0] - a[0], dy = b[1] - a[1]; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+      const zo = R[i][2] + (phone ? 2 : 3);            // seated on the member's near face: an inlay, never hidden inside it
+      sp.set([R[i][0] - dy * hw, R[i][1] + dx * hw, zo], i * 6); sp.set([R[i][0] + dy * hw, R[i][1] - dx * hw, zo], i * 6 + 3);
+      const al = i / (L.M - 1) < fs ? 0.55 : 0.95;
+      sc.set([1, 1, 1, al, 1, 1, 1, al], i * 8);
+    }
+    L.sGeo.attributes.position.needsUpdate = true; L.sGeo.attributes.color.needsUpdate = true;
+    // ---- seats: thin Ember rings where the route enters / leaves the configuration
+    const R0 = phone ? 2.6 : 3.2; let n = 0;
+    const seatAt = (si, w, pos) => { for (const r of L.seats[si]) { if (n >= 4) break; const p = Array.isArray(r) ? routePoints([r], pos)[0] : pos[r];
+      const s = R0 * w; L.seatMesh.setMatrixAt(n++, tmpM.compose(tmpV.set(p[0], p[1], p[2] + (phone ? 3 : 4)), tmpQ.identity(), tmpS.set(s, s, s))); } };
+    seatAt(i0, 1 - e, P); seatAt(i0 + 1, e, P);
+    while (n < 4) L.seatMesh.setMatrixAt(n++, tmpM.makeScale(0, 0, 0));
+    L.seatMesh.instanceMatrix.needsUpdate = true;
+    if (ctx.debug && window.__signalB) window.__signalB.t = Math.round(t * 100) / 100;
+  }
+
   // scroll → continuous state index t (0 … 7)
   function stateFor(p) {
     if (reduced) return 7;
@@ -277,6 +432,7 @@ export function create(ctx) {
   const tmpM = new THREE.Matrix4(), tmpV = new THREE.Vector3(), tmpS = new THREE.Vector3(), tmpC = new THREE.Color();
   function apply(t) {
     if (!L) return;
+    if (L.v2) { applyV2(t); return; }
     const i0 = Math.min(6, Math.floor(t)), u = t - i0;
     const e = smooth((u - 0.3) / 0.4);                           // each configuration holds, then re-forms
     const A = L.W3[i0], B = L.W3[i0 + 1];
@@ -349,8 +505,14 @@ export function create(ctx) {
   return {
     init() {
       scene = new THREE.Scene();
-      const key = new THREE.DirectionalLight(0xf2f0ea, 1.7); key.position.set(-0.4, 0.8, 0.7);
-      scene.add(key, new THREE.AmbientLight(0xffffff, 0.55));
+      if (matV2) {   // one restrained key from upper-left-front, a faint rim behind-right, near-zero ambient
+        const key = new THREE.DirectionalLight(0xf2f0ea, 2.4); key.position.set(-0.45, 0.85, 0.6);
+        const rim = new THREE.DirectionalLight(0xe6e4de, 0.45); rim.position.set(0.6, 0.15, -0.8);
+        scene.add(key, rim, new THREE.AmbientLight(0xffffff, 0.08));
+      } else {
+        const key = new THREE.DirectionalLight(0xf2f0ea, 1.7); key.position.set(-0.4, 0.8, 0.7);
+        scene.add(key, new THREE.AmbientLight(0xffffff, 0.55));
+      }
       camera = new THREE.PerspectiveCamera(30, 1, 1, 6000);
       mats = materials();
       dirWatch = new MutationObserver(() => { if (scene && lastCtx) { relayout(lastCtx); ctx.requestFrame('direction'); } });
