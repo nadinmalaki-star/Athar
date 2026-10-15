@@ -22,12 +22,13 @@ const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/site.webmanifest',
-  '/images/favicon-16.png',
-  '/images/favicon-32.png',
-  '/images/favicon-48.png',
-  '/images/apple-touch-icon.png',
-  '/images/icon-192.png',
-  '/images/icon-512.png',
+  '/favicon.ico',
+  '/images/athar-mark-16.png',
+  '/images/athar-mark-32.png',
+  '/images/athar-mark-48.png',
+  '/images/athar-mark-180.png',
+  '/images/athar-mark-192.png',
+  '/images/athar-mark-512.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -60,6 +61,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   if (url.origin !== self.location.origin) return;
+  // Athar Lab (/lab/) is its own site, proxied from a separate deployment: never cached or
+  // answered here (no cache-first assets, no main-site offline fallback), always the network.
+  if (url.pathname === '/lab' || url.pathname.startsWith('/lab/')) return;
 
   const isHTML = request.mode === 'navigate' ||
     (request.headers.get('accept') || '').includes('text/html');

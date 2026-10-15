@@ -13,6 +13,18 @@
   ],
   "rewrites": [
     {
+      "source": "/lab/",
+      "destination": "https://athar-lab.vercel.app/lab/index.html"
+    },
+    {
+      "source": "/lab/:page/",
+      "destination": "https://athar-lab.vercel.app/lab/:page/index.html"
+    },
+    {
+      "source": "/lab/:path*",
+      "destination": "https://athar-lab.vercel.app/lab/:path*"
+    },
+    {
       "source": "/clue/saad-maslamani/:path*",
       "destination": "https://athar-clue-engine.vercel.app/clue/saad-maslamani/:path*"
     },
@@ -40,6 +52,7 @@
     }
   ],
   "redirects": [
+    { "source": "/lab", "destination": "/lab/", "permanent": true },
     { "source": "/clue/abu-mazen", "destination": "https://athar-clue-engine.vercel.app/clue/abu-mazen-small-detail", "permanent": false },
     { "source": "/clue/nativity-bells", "destination": "https://athar-clue-engine.vercel.app/clue/nativity-bells", "permanent": false },
     { "source": "/clue/ararat-hotel", "destination": "https://athar-clue-engine.vercel.app/clue/ararat-hotel", "permanent": false },

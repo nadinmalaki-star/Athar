@@ -329,7 +329,12 @@ export function start(boot) {
 
   // ---------- visibility: lazy near-viewport loading + single active scene ----------
   const ratios = new Map();
-  for (const def of SCENES) {
+  // LOCAL REVIEW SWITCH (Stage 2 Hero): index.html sets data-hero-v2 on dev hosts only, for ?hero=v2-2c / ?hero=v2-2b1;
+  // reviewed in English on desktop. Without it the scene list is unchanged.
+  const heroV2Attr = document.documentElement.getAttribute('data-hero-v2');
+  const heroV2 = heroV2Attr && heroV2Attr !== 'v4' && !rtl && innerWidth > 900;   // v4 is a rendered image: no WebGL scene
+  const defs = SCENES.map((d) => (d.name === 'hero' && heroV2 ? Object.assign({}, d, { module: './scenes/hero-v2-scene.js', productionReady: true }) : d));
+  for (const def of defs) {
     const el = document.querySelector(def.selector);
     if (!el) continue;
     scenes.set(def.name, { def, el, api: null, disposables: [], listeners: [] });

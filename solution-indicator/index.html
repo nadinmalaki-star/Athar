@@ -3,17 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مؤشر الحلول — Athar Solution Indicator</title>
-<meta name="description" content="أداة تشخيص مجانية وسريعة من أثر — جاوب-ي على كام سؤال عن مشروعك أو بزنسك، وطلّع-ي توصية بأنسب حل رقمي إلك.">
-<link rel="canonical" href="https://studioathar.studio/solution-indicator/">
+<title>Athar Solution Indicator — مؤشر الحلول</title>
+<meta name="description" content="A short, smart assessment that reads your real needs and gives you a recommended solution with an initial investment estimate — before we even talk.">
+<!-- Language-aware head (English-first): /solution-indicator/ is English, /solution-indicator/?lang=ar is Arabic. The canonical
+     follows the URL's explicit language; title and description follow the page language (?lang= → saved athar_lang → English). -->
+<script>
+(function(){
+  var q = new URLSearchParams(location.search).get('lang'), lang = q;
+  if (lang !== 'en' && lang !== 'ar') { try { lang = localStorage.getItem('athar_lang'); } catch (e) { lang = null; } }
+  if (lang !== 'en' && lang !== 'ar') lang = 'en';
+  var c = document.createElement('link'); c.rel = 'canonical';
+  c.href = 'https://studioathar.studio/solution-indicator/' + (q === 'ar' ? '?lang=ar' : ''); document.head.appendChild(c);
+  if (lang === 'ar') {
+    document.title = 'مؤشر الحلول — Athar Solution Indicator';
+    var d = document.querySelector('meta[name="description"]'); if (d) d.setAttribute('content', 'أداة تشخيص مجانية وسريعة من أثر — جاوب-ي على كام سؤال عن مشروعك أو بزنسك، وطلّع-ي توصية بأنسب حل رقمي إلك.');
+  }
+})();
+</script>
+<link rel="alternate" hreflang="en" href="https://studioathar.studio/solution-indicator/">
+<link rel="alternate" hreflang="ar" href="https://studioathar.studio/solution-indicator/?lang=ar">
+<link rel="alternate" hreflang="x-default" href="https://studioathar.studio/solution-indicator/">
 <meta name="theme-color" content="#050505">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Athar — أثر">
 <meta property="og:url" content="https://studioathar.studio/solution-indicator/">
-<meta property="og:title" content="مؤشر الحلول — Athar Solution Indicator">
-<meta property="og:description" content="أداة تشخيص مجانية وسريعة من أثر — جاوب-ي على كام سؤال، وطلّع-ي توصية بأنسب حل رقمي إلك.">
-<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
-<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<meta property="og:title" content="Athar Solution Indicator — مؤشر الحلول">
+<meta property="og:description" content="A short, smart assessment that reads your real needs and gives you a recommended solution with an initial investment estimate — before we even talk.">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ar_AR">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/athar-mark-32.png">
+<link rel="apple-touch-icon" href="/images/athar-mark-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -299,7 +318,7 @@ button{font-family:inherit; cursor:pointer;}
   <button data-lang="en">EN</button>
 </div>
 
-<img class="brand-fixed" id="brandFixed" src="assets/logo-icon.png" alt="Athar">
+<img class="brand-fixed" id="brandFixed" src="/images/athar-logo-wordmark-official.png" alt="Athar">
 
 <a href="/" class="back-to-site" id="backToSite" data-i18n="backToSite">الرجوع لموقع أثر</a>
 
@@ -673,7 +692,7 @@ function applyI18nStatic(){
   document.getElementById('langSwitch').classList.toggle('on-light', currentScreenIsLight());
   $('#brandLogoIntro').src = LANG==='ar' ? 'assets/logo-ar.png' : 'assets/logo-en.png';
   const backLink = document.getElementById('backToSite');
-  if(backLink) backLink.href = LANG==='en' ? '/?lang=en' : '/';
+  if(backLink) backLink.href = '/?lang=' + LANG;
 }
 function currentScreenIsLight(){
   return false;
@@ -948,20 +967,22 @@ document.getElementById('btnCloseSuccess').addEventListener('click', closeLeadMo
 // لغة الصفحة عند الدخول: من ?lang= بالرابط (نفس اتفاقية موقع أثر الرئيسي)
 // إن وجدت — عشان لو المستخدم-ة جاية من رابط أثر وهي عم تتصفح بالإنجليزي،
 // الفهرس يفتح إنجليزي مباشرة بدل ما يرجعها عربي.
+// Language order (shared across Athar): explicit ?lang= → saved athar_lang (set only by a language toggle) → English.
 (function(){
   const urlLang = new URL(window.location.href).searchParams.get('lang');
-  if (urlLang === 'en' || urlLang === 'ar') {
-    LANG = urlLang;
-    document.querySelectorAll('#langSwitch button').forEach(b=>{
-      b.classList.toggle('active', b.getAttribute('data-lang') === LANG);
-    });
-  }
+  let savedLang = null;
+  try { savedLang = localStorage.getItem('athar_lang'); } catch(e){}
+  LANG = (urlLang === 'en' || urlLang === 'ar') ? urlLang : (savedLang === 'en' || savedLang === 'ar') ? savedLang : 'en';
+  document.querySelectorAll('#langSwitch button').forEach(b=>{
+    b.classList.toggle('active', b.getAttribute('data-lang') === LANG);
+  });
   trackEvent('indicator_page_view');
 })();
 
 document.querySelectorAll('#langSwitch button').forEach(btn=>{
   btn.addEventListener('click', async ()=>{
     LANG = btn.getAttribute('data-lang');
+    try { localStorage.setItem('athar_lang', LANG); } catch(e){}   // an explicit choice: shared with the main site and the Lab
     document.querySelectorAll('#langSwitch button').forEach(b=>b.classList.toggle('active', b===btn));
     applyI18nStatic();
     if(state && !$('#screen-assess').classList.contains('hidden')) renderQuestion();

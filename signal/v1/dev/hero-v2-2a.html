@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- DEV-ONLY fidelity harness for Stage 2A/2B/2C (?story=0..1: a 2C story state) (not linked anywhere; remove before release). -->
+<html lang="en"><head><meta charset="utf-8"><title>Hero V2 — 2A fidelity</title>
+<style>html,body{margin:0;background:#050505} canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/vendor/three/0.186.1/three.module.min.js" } }</script>
+</head><body>
+<canvas id="c" width="1440" height="900" style="width:1440px;height:900px"></canvas>
+<script type="module">
+import * as THREE from 'three';
+const PRE = new URLSearchParams(location.search).get('state') === '2b1';   // dev: the frozen approved 2B.1 state
+const { createHeroV2 } = await import(PRE ? '/signal/v1/dev/hero-v2-2b1.js' : '/signal/v1/scenes/hero-v2.js');
+const lang = new URLSearchParams(location.search).get('lang') || 'en';
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, alpha: false });
+renderer.setPixelRatio(1); renderer.setSize(1440, 900, false);
+renderer.outputColorSpace = THREE.LinearSRGBColorSpace; renderer.toneMapping = THREE.NoToneMapping;
+const t0 = performance.now();
+
+const tune = JSON.parse(new URLSearchParams(location.search).get('tune') || '{}');
+const hero = await createHeroV2(THREE, { base: PRE ? '/signal/v1/assets/hero-v2-2b1' : '/signal/v1/assets/hero-v2', lang, tune });
+const st = new URLSearchParams(location.search).get('story'); if (st != null && hero.setStory) hero.setStory(+st, true);   // dev: a 2C story state
+const t1 = performance.now();
+hero.render(renderer);
+const gl = renderer.getContext(); gl.finish();
+const f0 = performance.now(); for (let i = 0; i < 30; i++) hero.render(renderer); gl.finish(); const f1 = performance.now();
+renderer.info.reset(); renderer.info.autoReset = false; hero.render(renderer);
+window.__hero2a = { loadMs: Math.round(t1 - t0), frameMs: +((f1 - f0) / 30).toFixed(2), calls: renderer.info.render.calls, tris: renderer.info.render.triangles,
+  geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, ...hero.stats };
+document.title = 'ready';
+</script></body></html>

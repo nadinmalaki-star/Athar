@@ -3,14 +3,33 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://studioathar.studio/</loc>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://studioathar.studio/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://studioathar.studio/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://studioathar.studio/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://studioathar.studio/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://studioathar.studio/"/>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://studioathar.studio/?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://studioathar.studio/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://studioathar.studio/?lang=ar"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://studioathar.studio/"/>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://studioathar.studio/solution-indicator/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://studioathar.studio/solution-indicator/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://studioathar.studio/solution-indicator/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://studioathar.studio/solution-indicator/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://studioathar.studio/solution-indicator/?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://studioathar.studio/solution-indicator/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://studioathar.studio/solution-indicator/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://studioathar.studio/solution-indicator/"/>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
