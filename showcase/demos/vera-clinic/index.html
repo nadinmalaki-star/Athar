@@ -73,65 +73,83 @@
   .menu-btn{display:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--paper);align-items:center;justify-content:center}
   @media (max-width:860px){ .nav-links{display:none} .menu-btn{display:flex} }
 
-  /* hero */
-  .hero{position:relative;padding:92px var(--gutter) 64px;overflow:hidden}
-  .hero-shape{position:absolute;inset:0;z-index:0;overflow:hidden}
-  .hero-shape svg{position:absolute;right:-8%;top:-12%;width:62%;height:auto;opacity:.9}
-  .hero-in{position:relative;z-index:1;max-width:var(--shell);margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
-  .hero-copy h1{font-size:clamp(40px,6vw,74px);margin-top:18px}
-  .hero-copy h1 em{font-style:italic;color:var(--sage-dark)}
-  .hero-copy p.lead{margin-top:22px;font-size:18px;max-width:46ch}
-  .hero-cta{margin-top:34px;display:flex;gap:16px;flex-wrap:wrap}
-  .hero-stats{margin-top:46px;display:flex;gap:36px;flex-wrap:wrap}
-  .hero-stats div strong{display:block;font-family:var(--display);font-size:30px;color:var(--sage-dark)}
-  .hero-stats div span{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft)}
-  .hero-visual{position:relative;aspect-ratio:4/5;border-radius:28px;background:
-      linear-gradient(0deg, rgba(43,46,39,.32), rgba(43,46,39,0) 45%), url('images/hero.jpg') center/cover no-repeat;
-    overflow:hidden;box-shadow:0 30px 60px -20px rgba(92,107,80,.35)}
-  .hero-visual .blob{display:none}
-  .hero-visual .ring{position:absolute;inset:14%;border:1px solid rgba(255,255,255,.55);border-radius:50%}
-  .hero-visual .card{position:absolute;left:12%;bottom:12%;background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 18px 34px -14px rgba(43,46,39,.28);display:flex;align-items:center;gap:12px;max-width:220px}
-  .hero-visual .card .ic{width:36px;height:36px;border-radius:10px;background:var(--sage-pale);display:flex;align-items:center;justify-content:center;flex:none}
-  .hero-visual .card strong{display:block;font-size:13px}
-  .hero-visual .card span{font-size:11px;color:var(--ink-soft)}
-  @media (max-width:980px){ .hero-in{grid-template-columns:1fr} .hero-visual{order:-1;aspect-ratio:16/10} }
-
   /* section shell */
   section{padding:84px var(--gutter)}
-  .section-head{max-width:640px;margin-bottom:48px}
+  .section-head{max-width:680px;margin-bottom:48px}
   .section-head h2{margin-top:14px}
   .dark{background:var(--ink);color:var(--cream)}
   .dark p{color:#C8CBC0}
   .dark h2,.dark h3{color:var(--cream)}
 
-  /* services (interactive selector — own visual treatment) */
-  .services-wrap{display:grid;grid-template-columns:.85fr 1.15fr;gap:0;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:var(--paper)}
-  .service-list{display:flex;flex-direction:column}
-  .service-btn{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 30px;border-bottom:1px solid var(--line);transition:background .2s}
-  .service-btn:last-child{border-bottom:none}
-  .service-btn:hover{background:var(--sage-pale)}
-  .service-btn[aria-selected="true"]{background:var(--sage-pale)}
-  .service-btn .num{font-family:var(--display);font-size:13px;color:var(--sage-dark)}
-  .service-btn .name{font-family:var(--display);font-size:20px;flex:1;margin:0 16px}
-  .service-btn .arrow{width:30px;height:30px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;transition:transform .25s}
-  .service-btn[aria-selected="true"] .arrow{transform:rotate(45deg)}
-  .service-detail{padding:44px;display:flex;flex-direction:column;gap:18px;background:
-      linear-gradient(100deg, var(--cream) 0%, var(--cream) 38%, rgba(245,243,237,.78) 60%, rgba(245,243,237,.4) 100%), url('images/reception.jpg') center/cover no-repeat}
-  .service-detail .tag{display:inline-flex;align-self:flex-start;padding:7px 14px;border-radius:999px;background:var(--terracotta);color:#fff;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600}
-  .service-detail h3{font-size:30px}
-  .service-detail ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
-  .service-detail li{display:flex;gap:10px;font-size:15px;color:var(--ink-soft)}
-  .service-detail li svg{flex:none;width:18px;height:18px;color:var(--sage-dark);margin-top:2px}
-  @media (max-width:820px){ .services-wrap{grid-template-columns:1fr} .service-detail{padding:30px} }
+  /* ---------- 1. INTAKE: branching concern cards (replaces the old hero) ---------- */
+  .intake{padding-top:72px}
+  .intake-head{max-width:720px}
+  .intake-head .eyebrow{color:var(--sage-dark)}
+  .intake-head h1{font-family:var(--display);font-weight:500;font-size:clamp(36px,5.6vw,60px);margin-top:16px;letter-spacing:-.5px}
+  .intake-head h1 em{font-style:italic;color:var(--sage-dark)}
+  .intake-head p{margin-top:18px;font-size:17px;max-width:54ch}
 
-  /* practitioner */
-  .practitioner{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:center}
-  .practitioner-visual{aspect-ratio:1;border-radius:24px;background:linear-gradient(160deg,var(--sage-pale),var(--sage));position:relative;overflow:hidden}
-  .practitioner-visual svg{position:absolute;inset:0;width:100%;height:100%}
-  .practitioner-copy .role{color:var(--terracotta-dark);font-weight:600;font-size:14px;margin-top:6px;display:block}
-  .practitioner-copy p{margin-top:18px;font-size:16px;max-width:52ch}
-  .practitioner-note{margin-top:22px;font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:16px}
-  @media (max-width:860px){ .practitioner{grid-template-columns:1fr} }
+  .concern-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
+  .concern-card{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:14px;padding:28px 22px;border-radius:20px;border:1.5px solid var(--line);background:var(--paper);transition:border-color .25s,background .25s,transform .25s,box-shadow .25s}
+  .concern-card:hover{border-color:var(--sage);transform:translateY(-3px);box-shadow:0 18px 34px -22px rgba(43,46,39,.3)}
+  .concern-card:focus-visible{outline:2px solid var(--sage-dark);outline-offset:3px}
+  .concern-card[aria-pressed="true"]{border-color:var(--sage-dark);background:var(--sage-pale)}
+  .concern-card .ic{width:46px;height:46px;border-radius:14px;background:var(--sage-pale);display:flex;align-items:center;justify-content:center;flex:none;transition:background .25s}
+  .concern-card[aria-pressed="true"] .ic{background:var(--sage)}
+  .concern-card[aria-pressed="true"] .ic svg{stroke:#fff}
+  .concern-card .q{font-family:var(--display);font-size:19px;line-height:1.2}
+  .concern-card .sub{font-size:13px;color:var(--ink-soft)}
+  @media (max-width:980px){ .concern-grid{grid-template-columns:1fr 1fr} }
+  @media (max-width:560px){ .concern-grid{grid-template-columns:1fr} }
+
+  /* branching result panel */
+  .intake-result{margin-top:40px;max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.22,.61,.36,1)}
+  .intake-result.open{max-height:900px}
+  .intake-result-in{display:grid;grid-template-columns:1.1fr .9fr;gap:0;border-radius:24px;overflow:hidden;background:var(--paper);border:1px solid var(--line);box-shadow:0 30px 60px -32px rgba(43,46,39,.3)}
+  .intake-result-copy{padding:40px}
+  .intake-result-copy .tag{display:inline-flex;padding:7px 14px;border-radius:999px;background:var(--terracotta);color:#fff;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600}
+  .intake-result-copy h3{font-size:28px;margin-top:16px}
+  .intake-result-copy ul{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+  .intake-result-copy li{display:flex;gap:10px;font-size:14.5px;color:var(--ink-soft)}
+  .intake-result-copy li svg{flex:none;width:18px;height:18px;color:var(--sage-dark);margin-top:2px}
+  .intake-result-copy .cta{margin-top:24px;display:flex;gap:14px;flex-wrap:wrap}
+  .intake-result-visual{position:relative;min-height:220px;background-size:cover;background-position:center}
+  .intake-result-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(43,46,39,.25),transparent 55%)}
+  @media (max-width:860px){ .intake-result-in{grid-template-columns:1fr} .intake-result-visual{order:-1;min-height:180px} }
+
+  /* ---------- 2. JOURNEY: horizontal scroll-snap timeline ---------- */
+  .journey{background:var(--paper);padding-bottom:40px}
+  .journey-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:8px}
+  .journey-nav{display:flex;gap:10px}
+  .journey-nav button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper);display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s}
+  .journey-nav button:hover{border-color:var(--sage);background:var(--sage-pale)}
+  .journey-nav button:focus-visible{outline:2px solid var(--sage-dark);outline-offset:2px}
+  .journey-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:36px var(--gutter) 20px;margin:0 calc(var(--gutter) * -1);scroll-padding-left:var(--gutter);-webkit-overflow-scrolling:touch}
+  .journey-track:focus-visible{outline:2px solid var(--sage-dark);outline-offset:-2px}
+  .journey-track::-webkit-scrollbar{height:6px}
+  .journey-track::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
+  .journey-panel{scroll-snap-align:start;flex:0 0 min(640px,82vw);border-radius:24px;overflow:hidden;position:relative;aspect-ratio:4/3;background-size:cover;background-position:center}
+  .journey-panel::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(43,46,39,.78) 0%,rgba(43,46,39,.1) 55%)}
+  .journey-panel-in{position:absolute;left:0;right:0;bottom:0;padding:28px;color:#fff;z-index:1}
+  .journey-panel .idx{font-family:var(--display);font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#D7E2C9}
+  .journey-panel h3{color:#fff;font-size:26px;margin-top:8px}
+  .journey-panel p{color:#E6E8DF;margin-top:8px;font-size:14.5px;max-width:42ch}
+  @media (max-width:560px){ .journey-panel{flex-basis:88vw} }
+  @media (prefers-reduced-motion:reduce){
+    .journey-track{scroll-snap-type:none;flex-wrap:wrap;overflow-x:visible}
+    .journey-panel{flex:1 1 260px;aspect-ratio:16/10}
+  }
+
+  /* ---------- 3. TRUST CARD: practitioner, integrated not isolated ---------- */
+  .trust-wrap{background:var(--sage-pale)}
+  .trust-card{display:flex;align-items:center;gap:28px;background:var(--paper);border-radius:24px;padding:32px;border:1px solid var(--line)}
+  .trust-avatar{width:88px;height:88px;border-radius:50%;flex:none;background:linear-gradient(160deg,var(--sage-pale),var(--sage));position:relative;overflow:hidden}
+  .trust-avatar svg{position:absolute;inset:0;width:100%;height:100%}
+  .trust-card h3{font-size:21px}
+  .trust-card .role{color:var(--terracotta-dark);font-weight:600;font-size:13px;display:block;margin-top:2px}
+  .trust-card p{margin-top:10px;font-size:14.5px;max-width:62ch}
+  .trust-note{font-size:11.5px;color:var(--ink-soft);margin-top:10px;display:block}
+  @media (max-width:700px){ .trust-card{flex-direction:column;align-items:flex-start;text-align:left} }
 
   /* approach */
   .approach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
@@ -184,9 +202,9 @@
   <div class="nav-in">
     <a class="brand" href="#top"><span class="mark" aria-hidden="true">V</span>VERA Clinic</a>
     <div class="nav-links">
-      <a href="#services">Services</a>
-      <a href="#practitioner">Our Team</a>
-      <a href="#approach">Approach</a>
+      <a href="#intake">What brings you in</a>
+      <a href="#journey">Your visit</a>
+      <a href="#team">Our team</a>
       <a href="#appointment">Appointment</a>
     </div>
     <div class="nav-cta">
@@ -198,75 +216,67 @@
   </div>
 </nav>
 
-<header class="hero" id="top">
-  <div class="hero-shape" aria-hidden="true">
-    <svg viewBox="0 0 600 600"><circle cx="300" cy="300" r="280" fill="#E7EADF"/></svg>
-  </div>
-  <div class="hero-in">
-    <div class="hero-copy reveal">
+<!-- 1. INTAKE — branching concern cards replace the traditional hero -->
+<section id="intake" class="intake" style="padding-bottom:0">
+  <div class="shell" id="top">
+    <div class="intake-head reveal">
       <span class="eyebrow">Dental &amp; Wellness Clinic</span>
-      <h1>Care that feels <em>unhurried.</em></h1>
-      <p class="lead">VERA Clinic blends modern dentistry with a calmer kind of care — thoughtful appointments, clear explanations, and a space designed to put you at ease.</p>
-      <div class="hero-cta">
-        <a class="btn" href="#appointment">Request an appointment
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <a class="btn outline" href="#services">Explore services</a>
-      </div>
-      <div class="hero-stats">
-        <div><strong>12+</strong><span>Years in practice*</span></div>
-        <div><strong>4</strong><span>Care specialities</span></div>
-        <div><strong>30 min</strong><span>Typical first visit</span></div>
-      </div>
-      <p class="demo-note">*Illustrative figures for this ATHAR demonstration — VERA Clinic is a fictional brand.</p>
+      <h1>What brings you in <em>today?</em></h1>
+      <p>Tell us why you're here, and we'll show you what to expect — no generic service list, just the path that matches you.</p>
     </div>
-    <div class="hero-visual reveal">
-      <div class="blob b1" aria-hidden="true"></div>
-      <div class="blob b2" aria-hidden="true"></div>
-      <div class="ring" aria-hidden="true"></div>
-      <div class="card">
-        <span class="ic" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C6B50" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
-        </span>
-        <span><strong>Next available</strong><span>Tomorrow, 10:30 AM</span></span>
+
+    <div class="concern-grid reveal" role="group" aria-label="What brings you in today?" id="concernGrid"></div>
+
+    <div class="intake-result" id="intakeResult">
+      <div class="intake-result-in">
+        <div class="intake-result-copy" id="intakeResultCopy"></div>
+        <div class="intake-result-visual" id="intakeResultVisual" aria-hidden="true"></div>
       </div>
     </div>
   </div>
-</header>
+</section>
 
-<section id="services">
+<!-- 2. JOURNEY — horizontal scroll-snap timeline, a different scroll axis entirely -->
+<section id="journey" class="journey">
   <div class="shell">
-    <div class="section-head reveal">
-      <span class="eyebrow">What we treat</span>
-      <h2>A service for every <em>stage of care.</em></h2>
-    </div>
-    <div class="services-wrap reveal" role="tablist" aria-label="VERA Clinic services">
-      <div class="service-list" id="serviceList"></div>
-      <div class="service-detail" id="serviceDetail" aria-live="polite"></div>
+    <div class="journey-head reveal">
+      <div>
+        <span class="eyebrow">Your visit, start to finish</span>
+        <h2 style="margin-top:14px;font-size:clamp(28px,3.6vw,42px)">Nothing about your visit is a surprise.</h2>
+      </div>
+      <div class="journey-nav">
+        <button type="button" id="journeyPrev" aria-label="Previous step">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" id="journeyNext" aria-label="Next step">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
     </div>
   </div>
+  <div class="journey-track reveal" id="journeyTrack" tabindex="0" aria-label="Scroll through the four stages of a VERA Clinic visit"></div>
 </section>
 
-<section id="practitioner" style="background:var(--paper)">
-  <div class="shell practitioner">
-    <div class="practitioner-visual reveal" aria-hidden="true">
-      <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
-        <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EDF0E4"/><stop offset="1" stop-color="#8E9C80"/></linearGradient></defs>
-        <rect width="400" height="400" fill="url(#g1)"/>
-        <circle cx="200" cy="160" r="70" fill="#ffffff" opacity=".55"/>
-        <path d="M80 360c20-80 90-120 120-120s100 40 120 120" fill="#ffffff" opacity=".4"/>
-      </svg>
-    </div>
-    <div class="practitioner-copy reveal">
-      <span class="eyebrow">Meet the team</span>
-      <h2 style="margin-top:14px">Dr. Lina Haddad</h2>
-      <span class="role">Lead Dentist &amp; Founder, VERA Clinic (fictional)</span>
-      <p>Dr. Haddad founded VERA Clinic around a simple idea: dental visits should be calm, clearly explained, and built around the patient's time — not the other way around. She leads a small team of general and cosmetic dentists supported by a dedicated patient-care coordinator.</p>
-      <p>Every first visit starts with a conversation, not a form — so treatment plans are understood before they're agreed to.</p>
-      <p class="practitioner-note">Dr. Lina Haddad and VERA Clinic are fictional, created for this ATHAR Digital Studio demonstration. No real clinic, practitioner, or patient outcome is represented.</p>
+<!-- 3. TRUST CARD — practitioner folded into the flow, not a split hero section -->
+<div class="trust-wrap">
+  <div class="shell" style="padding:56px var(--gutter)" id="team">
+    <div class="trust-card reveal">
+      <div class="trust-avatar" aria-hidden="true">
+        <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EDF0E4"/><stop offset="1" stop-color="#8E9C80"/></linearGradient></defs>
+          <rect width="400" height="400" fill="url(#g1)"/>
+          <circle cx="200" cy="160" r="70" fill="#ffffff" opacity=".55"/>
+          <path d="M80 360c20-80 90-120 120-120s100 40 120 120" fill="#ffffff" opacity=".4"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Dr. Lina Haddad<span class="role">Lead Dentist &amp; Founder, VERA Clinic (fictional)</span></h3>
+        <p>Every first visit starts with a conversation, not a form — so treatment plans are understood before they're agreed to. Dr. Haddad leads a small team of general and cosmetic dentists supported by a dedicated patient-care coordinator.</p>
+        <span class="trust-note">Dr. Lina Haddad and VERA Clinic are fictional, created for this ATHAR Digital Studio demonstration. No real clinic, practitioner, or patient outcome is represented.</span>
+      </div>
     </div>
   </div>
-</section>
+</div>
 
 <section id="approach" class="dark" style="background:linear-gradient(180deg, rgba(43,46,39,.92), rgba(43,46,39,.96)), url('images/treatment-detail.jpg') center/cover no-repeat">
   <div class="shell">
@@ -303,7 +313,7 @@
   <div class="shell appt">
     <div class="appt-aside reveal">
       <span class="eyebrow">Request an appointment</span>
-      <h2 style="margin-top:14px">Tell us what you <em>need,</em> we'll take it from there.</h2>
+      <h2 style="margin-top:14px" id="apptHeading">Tell us what you <em>need,</em> we'll take it from there.</h2>
       <p style="margin-top:16px">This is a simulated inquiry for demonstration purposes — submitting it does not book a real appointment or contact an actual clinic.</p>
       <ul>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>We reply within one business day (in a real deployment)</li>
@@ -368,8 +378,8 @@
       </div>
       <div class="foot-col">
         <h4>Explore</h4>
-        <a href="#services">Services</a>
-        <a href="#practitioner">Our Team</a>
+        <a href="#intake">What brings you in</a>
+        <a href="#journey">Your visit</a>
         <a href="#appointment">Appointment</a>
       </div>
     </div>
@@ -384,61 +394,148 @@
 (function(){
   "use strict";
 
-  var services = [
-    { name:"General Dentistry", tag:"Most requested", points:[
-        "Routine checkups, cleanings and early-decay prevention.",
-        "Digital X-rays reviewed and explained during your visit.",
-        "Gentle approach for anxious or first-time patients."
-      ]},
-    { name:"Cosmetic Dentistry", tag:"By consultation", points:[
-        "Whitening, veneers and bonding, planned around your smile goals.",
-        "Before-and-after simulation during the consultation.",
-        "Transparent, itemised cost estimate before any work begins."
-      ]},
-    { name:"Pediatric Care", tag:"Family-friendly", points:[
-        "Shorter, playful appointments designed for younger patients.",
-        "Parents welcome in the room for every visit.",
-        "Preventive focus: sealants, fluoride and habit coaching."
-      ]},
-    { name:"Emergency Care", tag:"Same-day slots", points:[
+  // ---------- Data: 4 concerns, each mapping to one of VERA's real services ----------
+  // Copy/points reused verbatim from the previous service-list implementation.
+  var concerns = [
+    {
+      q: "A toothache or sudden pain",
+      sub: "Something hurts right now",
+      service: "Emergency Care",
+      tag: "Same-day slots",
+      points: [
         "Reserved same-day slots for pain, breaks or swelling.",
         "Clear guidance by phone before you even arrive.",
         "Follow-up plan booked before you leave."
-      ]}
+      ],
+      note: "Dr. Haddad's team keeps same-day slots open specifically for moments like this.",
+      icon: '<path d="M12 9v4M12 17h.01" stroke-linecap="round"/><path d="M10.3 3.9a2 2 0 013.4 0l8.2 14.2a2 2 0 01-1.7 3H3.8a2 2 0 01-1.7-3z"/>',
+      image: "images/hero.jpg"
+    },
+    {
+      q: "A brighter, more confident smile",
+      sub: "Cosmetic consultation",
+      service: "Cosmetic Dentistry",
+      tag: "By consultation",
+      points: [
+        "Whitening, veneers and bonding, planned around your smile goals.",
+        "Before-and-after simulation during the consultation.",
+        "Transparent, itemised cost estimate before any work begins."
+      ],
+      note: "Every cosmetic plan starts with a conversation about what \"confident\" looks like for you.",
+      icon: '<path d="M8 13s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/>',
+      image: "images/reception.jpg"
+    },
+    {
+      q: "Due for a checkup or cleaning",
+      sub: "Routine care",
+      service: "General Dentistry",
+      tag: "Most requested",
+      points: [
+        "Routine checkups, cleanings and early-decay prevention.",
+        "Digital X-rays reviewed and explained during your visit.",
+        "Gentle approach for anxious or first-time patients."
+      ],
+      note: "Most first visits start here — a calm checkup, no pressure to commit to anything else.",
+      icon: '<path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/>',
+      image: "images/treatment-detail.jpg"
+    },
+    {
+      q: "Bringing in my child",
+      sub: "Family-friendly care",
+      service: "Pediatric Care",
+      tag: "Family-friendly",
+      points: [
+        "Shorter, playful appointments designed for younger patients.",
+        "Parents welcome in the room for every visit.",
+        "Preventive focus: sealants, fluoride and habit coaching."
+      ],
+      note: "Pediatric visits are paced for younger patients, with parents in the room throughout.",
+      icon: '<path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6c-2.5 4.5-9.5 9-9.5 9z"/>',
+      image: "images/hero.jpg"
+    }
   ];
 
-  var list = document.getElementById('serviceList');
-  var detail = document.getElementById('serviceDetail');
+  var grid = document.getElementById('concernGrid');
+  var result = document.getElementById('intakeResult');
+  var resultCopy = document.getElementById('intakeResultCopy');
+  var resultVisual = document.getElementById('intakeResultVisual');
+  var apptHeading = document.getElementById('apptHeading');
+  var apptService = document.getElementById('vService');
+  var activeIndex = null;
 
-  function renderDetail(i){
-    var s = services[i];
-    var html = '<span class="tag">' + s.tag + '</span><h3>' + s.name + '</h3><ul>';
-    s.points.forEach(function(p){
+  function renderConcern(i){
+    var c = concerns[i];
+    var html = '<span class="tag">' + c.tag + '</span><h3>' + c.service + '</h3><ul>';
+    c.points.forEach(function(p){
       html += '<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>' + p + '</span></li>';
     });
-    html += '</ul>';
-    detail.innerHTML = html;
+    html += '</ul><p style="margin-top:18px;font-style:italic;color:var(--ink-soft)">"' + c.note + '" <span style="font-style:normal;font-weight:600">— Dr. Lina Haddad</span></p>';
+    html += '<div class="cta"><a class="btn" href="#appointment" id="intakeCta">Request this appointment' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>' +
+      '<a class="btn outline" href="#journey">See what the visit looks like</a></div>';
+    resultCopy.innerHTML = html;
+    resultVisual.style.backgroundImage = "url('" + c.image + "')";
+    apptHeading.innerHTML = 'You told us: <em>' + c.q.charAt(0).toLowerCase() + c.q.slice(1) + '.</em> Let\'s get it booked.';
+    document.getElementById('intakeCta').addEventListener('click', function(){
+      apptService.value = c.service;
+    });
   }
 
-  function setActive(i){
-    var btns = list.querySelectorAll('.service-btn');
-    btns.forEach(function(b,idx){ b.setAttribute('aria-selected', idx===i ? 'true':'false'); });
-    renderDetail(i);
+  function selectConcern(i){
+    var wasOpen = activeIndex === i;
+    var cards = grid.querySelectorAll('.concern-card');
+    cards.forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+    if (wasOpen) {
+      activeIndex = null;
+      result.classList.remove('open');
+      apptHeading.innerHTML = 'Tell us what you <em>need,</em> we\'ll take it from there.';
+      return;
+    }
+    activeIndex = i;
+    cards[i].setAttribute('aria-pressed','true');
+    renderConcern(i);
+    result.classList.add('open');
   }
 
-  services.forEach(function(s, i){
+  concerns.forEach(function(c, i){
     var b = document.createElement('button');
-    b.className = 'service-btn';
+    b.className = 'concern-card';
     b.type = 'button';
-    b.setAttribute('role','tab');
-    b.setAttribute('aria-selected', i===0 ? 'true':'false');
-    b.innerHTML = '<span class="num">0' + (i+1) + '</span><span class="name">' + s.name + '</span><span class="arrow" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-    b.addEventListener('click', function(){ setActive(i); });
-    list.appendChild(b);
+    b.setAttribute('aria-pressed','false');
+    b.innerHTML = '<span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5C6B50" stroke-width="2">' + c.icon + '</svg></span>' +
+      '<span class="q">' + c.q + '</span><span class="sub">' + c.sub + '</span>';
+    b.addEventListener('click', function(){ selectConcern(i); });
+    grid.appendChild(b);
   });
-  setActive(0);
 
-  // Appointment form: client-side validation + demo-only confirmation, no network call.
+  // ---------- Journey: horizontal scroll-snap timeline ----------
+  var steps = [
+    { idx: '01 — Arrive', title: 'Arrive', body: 'Check in at reception, five minutes early — no paperwork pile, just a short digital form on a tablet.', image: 'images/reception.jpg', pos: 'center' },
+    { idx: '02 — Consultation', title: 'Consultation', body: 'A real conversation first: what brought you in, what you want, what today\'s visit can realistically cover.', image: 'images/hero.jpg', pos: 'center 30%' },
+    { idx: '03 — Treatment', title: 'Treatment', body: 'Every step explained before it happens, with pacing set by you — not the clock.', image: 'images/treatment-detail.jpg', pos: 'center' },
+    { idx: '04 — Aftercare', title: 'Aftercare', body: 'You leave with a written plan, not just a reminder card — what to expect, and when to come back.', image: 'images/hero.jpg', pos: 'center 70%' }
+  ];
+  var track = document.getElementById('journeyTrack');
+  steps.forEach(function(s){
+    var el = document.createElement('div');
+    el.className = 'journey-panel';
+    el.style.backgroundImage = "url('" + s.image + "')";
+    el.style.backgroundPosition = s.pos;
+    el.innerHTML = '<div class="journey-panel-in"><span class="idx">' + s.idx + '</span><h3>' + s.title + '</h3><p>' + s.body + '</p></div>';
+    track.appendChild(el);
+  });
+  function panelStep(){
+    var first = track.querySelector('.journey-panel');
+    return first ? (first.getBoundingClientRect().width + 20) : 300;
+  }
+  document.getElementById('journeyNext').addEventListener('click', function(){
+    track.scrollBy({ left: panelStep(), behavior: 'smooth' });
+  });
+  document.getElementById('journeyPrev').addEventListener('click', function(){
+    track.scrollBy({ left: -panelStep(), behavior: 'smooth' });
+  });
+
+  // ---------- Appointment form: client-side validation + demo-only confirmation ----------
   var form = document.getElementById('apptForm');
   var status = document.getElementById('apptStatus');
   form.addEventListener('submit', function(e){
@@ -459,7 +556,7 @@
     form.reset();
   });
 
-  // Reveal-on-scroll (mirrors FORMA V10's technique)
+  // ---------- Reveal-on-scroll (mirrors FORMA V10's technique) ----------
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) {
     document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });

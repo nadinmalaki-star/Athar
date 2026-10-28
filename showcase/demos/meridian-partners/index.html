@@ -55,76 +55,113 @@ button{font:inherit;cursor:pointer}
 .nav-cta:hover{background:var(--bronze);color:var(--navy)}
 .nav-toggle{display:none;background:none;border:0;color:var(--paper)}
 
-/* hero */
+/* ---------- hero : asymmetric editorial grid ---------- */
 .hero{position:relative;background:
-  linear-gradient(100deg, var(--navy) 0%, var(--navy) 42%, rgba(12,19,34,.82) 65%, rgba(12,19,34,.55) 100%),
+  linear-gradient(100deg, var(--navy) 0%, var(--navy) 46%, rgba(12,19,34,.86) 70%, rgba(12,19,34,.6) 100%),
   url('images/hero.jpg') center/cover no-repeat;
-  color:var(--paper);overflow:hidden;padding:120px var(--gutter) 140px}
+  color:var(--paper);overflow:hidden}
 .hero-grid{position:absolute;inset:0;opacity:.5;pointer-events:none}
-.hero-inner{position:relative;max-width:var(--shell);margin:0 auto}
-.hero h1{font-size:clamp(40px,6.4vw,84px);max-width:16ch;margin:22px 0 28px}
-.hero h1 i{font-style:italic;color:var(--bronze-hot)}
-.hero p{max-width:46ch;font-size:17px;line-height:1.7;color:#cfd4db;margin:0 0 40px}
-.hero-actions{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 26px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;border:1px solid var(--bronze);border-radius:2px;color:var(--bronze-hot);transition:background .25s,color .25s}
+.hero-inner{position:relative;max-width:var(--shell);margin:0 auto;padding:132px var(--gutter) 0;
+  display:grid;grid-template-columns:1.55fr .85fr;gap:0 56px;align-items:stretch;min-height:88vh}
+.hero-main{display:flex;flex-direction:column;justify-content:center;padding-bottom:64px}
+.hero-mark{font-family:var(--display);font-size:120px;line-height:.6;color:var(--bronze);opacity:.5;margin:0 0 6px -6px}
+.hero-main h1{font-size:clamp(32px,4.4vw,56px);max-width:19ch;margin:0 0 30px;font-weight:400;line-height:1.14}
+.hero-main h1 i{font-style:italic;color:var(--bronze-hot)}
+.hero-main .cite{display:flex;align-items:center;gap:14px;margin-top:8px}
+.hero-main .cite .rule{width:38px;height:1px;background:var(--bronze)}
+.hero-main .cite span{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#aab1ba}
+.hero-side{border-left:1px solid var(--line);padding:132px 0 64px 44px;display:flex;flex-direction:column;gap:0}
+.hero-side .stat{padding:24px 0;border-bottom:1px solid var(--line)}
+.hero-side .stat:first-child{padding-top:0}
+.hero-side .stat strong{display:block;font-family:var(--display);font-size:34px;color:var(--bronze-hot);font-weight:400}
+.hero-side .stat span{display:block;margin-top:6px;font-size:11px;letter-spacing:1.2px;color:#9aa3ad;text-transform:uppercase}
+.hero-side .side-actions{margin-top:auto;padding-top:30px;display:flex;flex-direction:column;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:15px 24px;font-size:11.5px;letter-spacing:1.6px;text-transform:uppercase;border:1px solid var(--bronze);border-radius:2px;color:var(--bronze-hot);transition:background .25s,color .25s}
 .btn:hover{background:var(--bronze);color:var(--navy)}
 .btn.ghost{border-color:rgba(244,242,236,.3);color:var(--paper)}
 .btn.ghost:hover{background:rgba(244,242,236,.08);color:var(--paper)}
-.hero-meta{display:flex;gap:48px;margin-top:84px;padding-top:28px;border-top:1px solid var(--line);flex-wrap:wrap}
-.hero-meta div strong{display:block;font-family:var(--display);font-size:26px;color:var(--bronze-hot)}
-.hero-meta div span{font-size:11px;letter-spacing:1px;color:#9aa3ad;text-transform:uppercase}
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;min-height:0;padding-top:108px}
+  .hero-side{border-left:0;border-top:1px solid var(--line);padding:32px 0 48px;flex-direction:row;flex-wrap:wrap;gap:0 36px}
+  .hero-side .stat{border-bottom:0;flex:1 1 auto;min-width:120px}
+  .hero-side .side-actions{width:100%;flex-direction:row;flex-wrap:wrap;margin-top:18px}
+  .hero-side .side-actions .btn{flex:1 1 180px}
+}
 
-/* intro */
+/* ---------- intro ---------- */
 .intro{padding:110px var(--gutter);background:var(--paper)}
 .intro-inner{max-width:var(--shell);margin:0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:60px}
 .intro h2{font-size:clamp(28px,3.4vw,42px);margin:16px 0 0}
 .intro-body p{font-size:16px;line-height:1.8;color:var(--ink-dim);max-width:52ch}
+@media(max-width:860px){.intro-inner{grid-template-columns:1fr;gap:22px}}
 
-/* services */
+/* ---------- narrative: pinned challenge -> solution scrollytelling ---------- */
+.narrative{position:relative;background:var(--navy);--stages:8}
+.narrative-scroll{height:calc(var(--stages) * 100vh)}
+.narrative-pin{position:sticky;top:0;height:100vh;overflow:hidden}
+.narrative-pin-in{max-width:var(--shell);margin:0 auto;padding:0 var(--gutter);height:100%;
+  display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.narrative-progress{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line)}
+.narrative-progress-bar{position:absolute;left:0;top:0;width:100%;background:var(--bronze);transition:height .25s linear}
+.narrative-top{position:absolute;top:36px;left:var(--gutter);right:var(--gutter);display:flex;justify-content:space-between;align-items:center;max-width:var(--shell);margin:0 auto}
+.narrative-top .phase{font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:#7a828d;transition:color .4s}
+.narrative-top .phase.on{color:var(--bronze-hot)}
+.narrative-top .count{font-family:var(--display);font-size:13px;color:#7a828d}
+.narrative-stage{grid-column:1/2;position:relative}
+.narrative-stage-text{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease;pointer-events:none}
+.narrative-stage-text.active{opacity:1;transform:none;pointer-events:auto}
+.narrative-stage-text .k{font-size:11px;letter-spacing:2.6px;text-transform:uppercase;color:var(--bronze)}
+.narrative-stage-text h3{color:var(--paper);font-family:var(--display);font-size:clamp(24px,2.9vw,38px);margin:16px 0 18px;font-weight:400;max-width:15ch}
+.narrative-stage-text p{color:#c3c9d1;font-size:15.5px;line-height:1.75;max-width:46ch;margin:0}
+.narrative-visual{grid-column:2/3;position:relative;height:70%;align-self:center;display:flex;align-items:center;justify-content:center}
+.narrative-visual-num{font-family:var(--display);font-size:clamp(110px,15vw,220px);font-weight:300;line-height:1;transition:color .6s ease,opacity .6s ease;opacity:.14;color:#5a6b85}
+.narrative-visual-num.solved{color:var(--bronze);opacity:.28}
+.narrative-visual-ring{position:absolute;inset:8%;border:1px solid var(--line);border-radius:50%;transition:border-color .6s ease}
+.narrative-visual-ring.solved{border-color:rgba(176,137,104,.4)}
+@media(max-width:900px){
+  .narrative{--stages:1}
+  .narrative-scroll{height:auto}
+  .narrative-pin{position:static;height:auto;overflow:visible;padding:88px 0}
+  .narrative-top{display:none}
+  .narrative-progress{display:none}
+  .narrative-pin-in{display:flex;flex-direction:column;gap:56px;padding:0 var(--gutter);height:auto}
+  .narrative-stage{position:static;height:auto}
+  .narrative-stage-text{position:static;opacity:1!important;transform:none!important;pointer-events:auto;padding:0}
+  .narrative-visual{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .narrative{--stages:1}
+  .narrative-scroll{height:auto}
+  .narrative-pin{position:static;height:auto;overflow:visible;padding:88px 0}
+  .narrative-top,.narrative-progress{display:none}
+  .narrative-pin-in{display:flex;flex-direction:column;gap:56px;padding:0 var(--gutter);height:auto}
+  .narrative-stage-text{position:static!important;opacity:1!important;transform:none!important}
+  .narrative-visual{display:none}
+}
+
+/* ---------- services: editorial index grid ---------- */
 .services{padding:110px var(--gutter);background:var(--ink)}
-.services-head{max-width:var(--shell);margin:0 auto 60px}
-.services-head h2{color:var(--paper);font-size:clamp(28px,3.4vw,42px)}
-.services-wrap{max-width:var(--shell);margin:0 auto;display:grid;grid-template-columns:.9fr 1.3fr;gap:0;border-top:1px solid var(--line)}
-.service-tabs{display:flex;flex-direction:column}
-.service-tab{text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:26px 24px 26px 0;display:flex;align-items:center;justify-content:space-between;color:var(--paper)}
-.service-tab .num{font-size:12px;color:#7a828d;margin-inline-end:14px;font-family:var(--body)}
-.service-tab .name{font-family:var(--display);font-size:20px;flex:1}
-.service-tab .arrow{opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .25s;color:var(--bronze-hot)}
-.service-tab[aria-selected="true"] .arrow{opacity:1;transform:none}
-.service-tab[aria-selected="true"] .name{color:var(--bronze-hot)}
-.service-tab:hover .name{color:var(--bronze-hot)}
-.service-detail{padding:8px 0 8px 56px;border-bottom:1px solid var(--line);background:linear-gradient(90deg, var(--ink) 0%, var(--ink) 38%, rgba(16,19,24,.7) 70%, rgba(16,19,24,.35) 100%), url('images/meeting.jpg') center/cover no-repeat}
-.service-panel{display:none;padding:10px 0 46px}
-.service-panel.active{display:block}
-.service-panel .eyebrow{color:#7a828d}
-.service-panel h3{color:var(--paper);font-family:var(--display);font-size:28px;margin:10px 0 16px}
-.service-panel p{color:#b7bec7;line-height:1.75;font-size:15px;max-width:48ch;margin:0 0 18px}
-.service-panel ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
-.service-panel li{display:flex;gap:10px;font-size:14px;color:#cfd4db}
-.service-panel li:before{content:'';width:5px;height:5px;margin-top:8px;background:var(--bronze);flex:none}
+.services-head{max-width:var(--shell);margin:0 auto 54px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.services-head h2{color:var(--paper);font-size:clamp(28px,3.4vw,42px);margin:10px 0 0}
+.services-head .note{max-width:34ch;font-size:13.5px;color:#9aa3ad;line-height:1.7}
+.index-grid{max-width:var(--shell);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.index-card{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:38px 40px}
+.index-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;cursor:pointer;background:none;border:0;width:100%;text-align:left;color:inherit}
+.index-card .num{font-family:var(--display);font-size:14px;color:var(--bronze)}
+.index-card h3{font-family:var(--display);color:var(--paper);font-size:23px;margin:14px 0 10px;font-weight:400}
+.index-card .tagline{font-size:13.5px;color:#9aa3ad;line-height:1.6;margin:0}
+.index-card .plus{flex:none;width:28px;height:28px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--bronze-hot);transition:transform .3s ease,border-color .3s ease;margin-top:2px}
+.index-card[data-open="true"] .plus{transform:rotate(45deg);border-color:var(--bronze)}
+.index-card-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.16,1,.3,1)}
+.index-card[data-open="true"] .index-card-body{max-height:260px}
+.index-card-body-in{padding-top:20px}
+.index-card-body p{color:#b7bec7;line-height:1.75;font-size:14.5px;max-width:42ch;margin:0 0 14px}
+.index-card-body ul{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+.index-card-body li{display:flex;gap:10px;font-size:13.5px;color:#cfd4db}
+.index-card-body li:before{content:'';width:5px;height:5px;margin-top:7px;background:var(--bronze);flex:none}
+@media(max-width:760px){.index-grid{grid-template-columns:1fr}}
 
-/* challenges */
-.challenges{padding:110px var(--gutter);background:var(--paper)}
-.challenges-head{max-width:var(--shell);margin:0 auto 54px}
-.challenges-head h2{font-size:clamp(28px,3.4vw,42px)}
-.challenge-grid{max-width:var(--shell);margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-dark);border:1px solid var(--line-dark)}
-.challenge-card{background:var(--paper);padding:38px 30px}
-.challenge-card .num{font-family:var(--display);font-size:15px;color:var(--bronze)}
-.challenge-card h3{font-family:var(--display);font-size:21px;margin:18px 0 12px;font-weight:500}
-.challenge-card p{font-size:14.5px;line-height:1.7;color:var(--ink-dim);margin:0}
-
-/* approach */
-.approach{padding:110px var(--gutter);background:var(--navy-2)}
-.approach-inner{max-width:var(--shell);margin:0 auto}
-.approach h2{color:var(--paper);font-size:clamp(28px,3.4vw,42px);margin-bottom:60px}
-.approach-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;position:relative}
-.approach-steps:before{content:'';position:absolute;top:17px;left:4%;right:4%;height:1px;background:var(--line)}
-.step{position:relative}
-.step .dot{width:9px;height:9px;border-radius:50%;background:var(--bronze);margin-bottom:22px;position:relative;z-index:1}
-.step h3{color:var(--paper);font-family:var(--display);font-size:19px;margin:0 0 10px;font-weight:500}
-.step p{color:#aab1ba;font-size:13.5px;line-height:1.7;margin:0}
-
-/* inquiry */
+/* ---------- inquiry ---------- */
 .inquiry{padding:120px var(--gutter);background:var(--paper)}
 .inquiry-inner{max-width:760px;margin:0 auto}
 .inquiry-head{text-align:center;margin-bottom:54px}
@@ -142,6 +179,7 @@ button{font:inherit;cursor:pointer}
 .q-status{font-size:13.5px;color:var(--ink-dim)}
 .q-status.ok{color:#5f7a52}
 .demo-note{margin-top:14px;font-size:12px;color:#9a9388}
+@media(max-width:860px){.q-form{grid-template-columns:1fr}}
 
 /* footer */
 footer{padding:48px var(--gutter);background:var(--navy);color:#8c93a0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;font-size:12.5px}
@@ -159,18 +197,7 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
   .back-chip{padding:9px}
   .nav .wordmark{font-size:16px}
 }
-@media(max-width:860px){
-  .intro-inner{grid-template-columns:1fr;gap:22px}
-  .services-wrap{grid-template-columns:1fr}
-  .service-detail{padding-left:0;border-bottom:none}
-  .challenge-grid{grid-template-columns:1fr}
-  .approach-steps{grid-template-columns:1fr 1fr;row-gap:36px}
-  .approach-steps:before{display:none}
-  .q-form{grid-template-columns:1fr}
-}
 @media(max-width:480px){
-  .hero{padding-top:100px}
-  .hero-meta{gap:28px}
   footer{flex-direction:column;align-items:flex-start}
 }
 </style>
@@ -186,8 +213,8 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
     <a class="wordmark" href="#top">MERIDIAN <b>Partners</b></a>
   </div>
   <ul class="nav-links">
+    <li><a href="#narrative">The Work</a></li>
     <li><a href="#services">Services</a></li>
-    <li><a href="#approach">Approach</a></li>
     <li><a href="#inquiry">Inquiry</a></li>
   </ul>
   <a class="nav-cta" href="#inquiry">Request a Quotation</a>
@@ -213,17 +240,20 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
     <circle cx="1180" cy="180" r="3" fill="#d4a876"/>
   </svg>
   <div class="hero-inner">
-    <div class="eyebrow reveal">Business Advisory &amp; Growth Partners</div>
-    <h1 class="display reveal">Clarity before strategy. <i>Structure before scale.</i></h1>
-    <p class="reveal">MERIDIAN Partners works with ambitious businesses to diagnose what's actually slowing growth, then design the operating structure, digital systems, and plan to fix it — not a slide deck, a working path forward.</p>
-    <div class="hero-actions reveal">
-      <a class="btn" href="#inquiry">Request a Quotation</a>
-      <a class="btn ghost" href="#services">Explore Our Services</a>
+    <div class="hero-main">
+      <div class="hero-mark reveal" aria-hidden="true">&ldquo;</div>
+      <div class="eyebrow reveal">Business Advisory &amp; Growth Partners</div>
+      <h1 class="display reveal">Clarity before strategy. <i>Structure before scale.</i></h1>
+      <div class="cite reveal"><span class="rule"></span><span>The MERIDIAN operating position</span></div>
     </div>
-    <div class="hero-meta reveal">
-      <div><strong>04</strong><span>Advisory Lines</span></div>
-      <div><strong>01</strong><span>Engagement, Fully Scoped</span></div>
-      <div><strong>100%</strong><span>Qualified Inquiries Reviewed</span></div>
+    <div class="hero-side reveal">
+      <div class="stat"><strong>04</strong><span>Advisory Lines</span></div>
+      <div class="stat"><strong>01</strong><span>Engagement, Fully Scoped</span></div>
+      <div class="stat"><strong>100%</strong><span>Qualified Inquiries Reviewed</span></div>
+      <div class="side-actions">
+        <a class="btn" href="#inquiry">Request a Quotation</a>
+        <a class="btn ghost" href="#narrative">See How We Work</a>
+      </div>
     </div>
   </div>
 </section>
@@ -244,95 +274,156 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
   </div>
 </section>
 
+<!-- ================= PINNED CHALLENGE -> SOLUTION NARRATIVE ================= -->
+<section class="narrative" id="narrative">
+  <div class="narrative-scroll">
+    <div class="narrative-pin">
+      <div class="narrative-progress" aria-hidden="true"><div class="narrative-progress-bar" id="narrativeBar"></div></div>
+      <div class="narrative-top" aria-hidden="true">
+        <span class="phase" data-phase="challenge">The Challenge</span>
+        <span class="count" id="narrativeCount">01 / 08</span>
+        <span class="phase" data-phase="solution">The Solution</span>
+      </div>
+      <div class="narrative-pin-in">
+        <div class="narrative-stage" id="narrativeStage">
+          <div class="narrative-stage-text active" data-stage="0" data-phase="challenge">
+            <div class="k">Challenge 01 / 03</div>
+            <h3>Growth has outpaced structure.</h3>
+            <p>Headcount and revenue grew faster than the systems and decision-making meant to support them.</p>
+          </div>
+          <div class="narrative-stage-text" data-stage="1" data-phase="challenge">
+            <div class="k">Challenge 02 / 03</div>
+            <h3>Decisions take too long.</h3>
+            <p>Approvals and information move slowly between teams, and nobody is quite sure who owns what.</p>
+          </div>
+          <div class="narrative-stage-text" data-stage="2" data-phase="challenge">
+            <div class="k">Challenge 03 / 03</div>
+            <h3>Tools don't talk to each other.</h3>
+            <p>Data lives in spreadsheets and disconnected systems, so reporting is manual and often out of date.</p>
+          </div>
+          <div class="narrative-stage-text" data-stage="3" data-phase="pivot">
+            <div class="k">The Shift</div>
+            <h3>Here's the path we build instead.</h3>
+            <p>Four stages, one coordinated plan — not a diagnosis that stops at the report.</p>
+          </div>
+          <div class="narrative-stage-text" data-stage="4" data-phase="solution">
+            <div class="k">Solution — Discover</div>
+            <h3>Discover</h3>
+            <p>We map the business as it actually runs today — not the org chart version.</p>
+          </div>
+          <div class="narrative-stage-text" data-stage="5" data-phase="solution">
+            <div class="k">Solution — Diagnose</div>
+            <h3>Diagnose</h3>
+            <p>We isolate the two or three structural issues actually limiting growth.</p>
+          </div>
+          <div class="narrative-stage-text" data-stage="6" data-phase="solution">
+            <div class="k">Solution — Design</div>
+            <h3>Design</h3>
+            <p>We build a scoped plan with clear ownership, sequencing, and milestones.</p>
+          </div>
+          <div class="narrative-stage-text" data-stage="7" data-phase="solution">
+            <div class="k">Solution — Deliver</div>
+            <h3>Deliver</h3>
+            <p>We stay engaged through implementation so the plan survives contact with reality.</p>
+          </div>
+        </div>
+        <div class="narrative-visual" aria-hidden="true">
+          <div class="narrative-visual-ring" id="narrativeRing"></div>
+          <div class="narrative-visual-num" id="narrativeNum">01</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="services" id="services">
   <div class="services-head">
-    <div class="eyebrow reveal" style="color:#7a828d">What We Advise On</div>
-    <h2 class="display reveal">Four advisory lines, one coordinated plan.</h2>
-  </div>
-  <div class="services-wrap">
-    <div class="service-tabs reveal" role="tablist" aria-orientation="vertical" id="serviceTabs">
-      <button class="service-tab" role="tab" data-service="strategy" aria-selected="true"><span class="name"><span class="num">01</span>Business Strategy</span><span class="arrow">→</span></button>
-      <button class="service-tab" role="tab" data-service="digital" aria-selected="false"><span class="name"><span class="num">02</span>Digital Transformation</span><span class="arrow">→</span></button>
-      <button class="service-tab" role="tab" data-service="operations" aria-selected="false"><span class="name"><span class="num">03</span>Operations Advisory</span><span class="arrow">→</span></button>
-      <button class="service-tab" role="tab" data-service="growth" aria-selected="false"><span class="name"><span class="num">04</span>Growth Planning</span><span class="arrow">→</span></button>
+    <div class="reveal">
+      <div class="eyebrow" style="color:#7a828d">What We Advise On</div>
+      <h2 class="display">Four advisory lines, one coordinated plan.</h2>
     </div>
-    <div class="service-detail reveal">
-      <div class="service-panel active" id="panel-strategy">
-        <div class="eyebrow">01 / Business Strategy</div>
-        <h3>A plan built around your actual constraints.</h3>
-        <p>We clarify where the business competes, where it shouldn't, and what has to be true in 12 months for the next stage to work — then translate that into a plan your team can actually execute.</p>
-        <ul>
-          <li>Market and competitive positioning review</li>
-          <li>Business model and revenue-structure assessment</li>
-          <li>12-month strategic roadmap with clear ownership</li>
-        </ul>
-      </div>
-      <div class="service-panel" id="panel-digital">
-        <div class="eyebrow">02 / Digital Transformation</div>
-        <h3>Systems that match how the business actually works.</h3>
-        <p>We assess where manual work, disconnected tools, and legacy systems are costing time, and design a practical digital operating plan — not a platform migration for its own sake.</p>
-        <ul>
-          <li>Digital maturity and tooling audit</li>
-          <li>Process-to-system mapping</li>
-          <li>Phased transformation roadmap</li>
-        </ul>
-      </div>
-      <div class="service-panel" id="panel-operations">
-        <div class="eyebrow">03 / Operations Advisory</div>
-        <h3>Fewer bottlenecks, clearer ownership.</h3>
-        <p>We study how work actually flows between teams, identify where decisions stall, and redesign the operating rhythm so execution speeds up without adding headcount.</p>
-        <ul>
-          <li>Operating-model and workflow review</li>
-          <li>Decision-rights and ownership mapping</li>
-          <li>Implementation support for agreed changes</li>
-        </ul>
-      </div>
-      <div class="service-panel" id="panel-growth">
-        <div class="eyebrow">04 / Growth Planning</div>
-        <h3>A growth plan sized to what the business can execute.</h3>
-        <p>We build growth plans around realistic capacity — commercial, operational, and financial — so expansion doesn't outrun the structure supporting it.</p>
-        <ul>
-          <li>Growth-readiness assessment</li>
-          <li>Channel and expansion prioritisation</li>
-          <li>Milestone-based growth roadmap</li>
-        </ul>
+    <p class="note reveal">Each line below opens on its own — review the ones relevant to your engagement.</p>
+  </div>
+  <div class="index-grid reveal">
+    <div class="index-card" data-open="true">
+      <button class="index-card-head" aria-expanded="true">
+        <span>
+          <span class="num">01</span>
+          <h3>Business Strategy</h3>
+          <p class="tagline">A plan built around your actual constraints.</p>
+        </span>
+        <span class="plus" aria-hidden="true">+</span>
+      </button>
+      <div class="index-card-body">
+        <div class="index-card-body-in">
+          <p>We clarify where the business competes, where it shouldn't, and what has to be true in 12 months for the next stage to work — then translate that into a plan your team can actually execute.</p>
+          <ul>
+            <li>Market and competitive positioning review</li>
+            <li>Business model and revenue-structure assessment</li>
+            <li>12-month strategic roadmap with clear ownership</li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="challenges">
-  <div class="challenges-head">
-    <div class="eyebrow reveal">Challenges We Solve</div>
-    <h2 class="display reveal">The problems that usually bring businesses to us.</h2>
-  </div>
-  <div class="challenge-grid">
-    <div class="challenge-card reveal">
-      <div class="num display">01</div>
-      <h3>Growth has outpaced structure</h3>
-      <p>Headcount and revenue grew faster than the systems and decision-making meant to support them.</p>
+    <div class="index-card" data-open="false">
+      <button class="index-card-head" aria-expanded="false">
+        <span>
+          <span class="num">02</span>
+          <h3>Digital Transformation</h3>
+          <p class="tagline">Systems that match how the business actually works.</p>
+        </span>
+        <span class="plus" aria-hidden="true">+</span>
+      </button>
+      <div class="index-card-body">
+        <div class="index-card-body-in">
+          <p>We assess where manual work, disconnected tools, and legacy systems are costing time, and design a practical digital operating plan — not a platform migration for its own sake.</p>
+          <ul>
+            <li>Digital maturity and tooling audit</li>
+            <li>Process-to-system mapping</li>
+            <li>Phased transformation roadmap</li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="challenge-card reveal">
-      <div class="num display">02</div>
-      <h3>Decisions take too long</h3>
-      <p>Approvals and information move slowly between teams, and nobody is quite sure who owns what.</p>
+    <div class="index-card" data-open="false">
+      <button class="index-card-head" aria-expanded="false">
+        <span>
+          <span class="num">03</span>
+          <h3>Operations Advisory</h3>
+          <p class="tagline">Fewer bottlenecks, clearer ownership.</p>
+        </span>
+        <span class="plus" aria-hidden="true">+</span>
+      </button>
+      <div class="index-card-body">
+        <div class="index-card-body-in">
+          <p>We study how work actually flows between teams, identify where decisions stall, and redesign the operating rhythm so execution speeds up without adding headcount.</p>
+          <ul>
+            <li>Operating-model and workflow review</li>
+            <li>Decision-rights and ownership mapping</li>
+            <li>Implementation support for agreed changes</li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="challenge-card reveal">
-      <div class="num display">03</div>
-      <h3>Tools don't talk to each other</h3>
-      <p>Data lives in spreadsheets and disconnected systems, so reporting is manual and often out of date.</p>
-    </div>
-  </div>
-</section>
-
-<section class="approach" id="approach">
-  <div class="approach-inner">
-    <h2 class="display reveal">How an engagement runs.</h2>
-    <div class="approach-steps">
-      <div class="step reveal"><span class="dot"></span><h3>Discover</h3><p>We map the business as it actually runs today — not the org chart version.</p></div>
-      <div class="step reveal"><span class="dot"></span><h3>Diagnose</h3><p>We isolate the two or three structural issues actually limiting growth.</p></div>
-      <div class="step reveal"><span class="dot"></span><h3>Design</h3><p>We build a scoped plan with clear ownership, sequencing, and milestones.</p></div>
-      <div class="step reveal"><span class="dot"></span><h3>Deliver</h3><p>We stay engaged through implementation so the plan survives contact with reality.</p></div>
+    <div class="index-card" data-open="false">
+      <button class="index-card-head" aria-expanded="false">
+        <span>
+          <span class="num">04</span>
+          <h3>Growth Planning</h3>
+          <p class="tagline">A growth plan sized to what the business can execute.</p>
+        </span>
+        <span class="plus" aria-hidden="true">+</span>
+      </button>
+      <div class="index-card-body">
+        <div class="index-card-body-in">
+          <p>We build growth plans around realistic capacity — commercial, operational, and financial — so expansion doesn't outrun the structure supporting it.</p>
+          <ul>
+            <li>Growth-readiness assessment</li>
+            <li>Channel and expansion prioritisation</li>
+            <li>Milestone-based growth roadmap</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -341,7 +432,7 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
   <div class="inquiry-inner">
     <div class="inquiry-head reveal">
       <div class="eyebrow">Start a Conversation</div>
-      <h2 class="display">Request a qualified quotation.</h2>
+      <h2 class="display">Request a diagnostic.</h2>
       <p>Tell us about the business challenge you're facing. This is a demonstration form built by ATHAR — no real inquiry is sent to MERIDIAN Partners.</p>
     </div>
     <form class="q-form reveal" id="quoteForm" novalidate>
@@ -394,22 +485,20 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
 
 <script>
 (function(){
-  // service tab switching
-  var tabs = document.querySelectorAll('.service-tab');
-  var panels = document.querySelectorAll('.service-panel');
-  tabs.forEach(function(tab){
-    tab.addEventListener('click', function(){
-      tabs.forEach(function(t){ t.setAttribute('aria-selected','false'); });
-      tab.setAttribute('aria-selected','true');
-      panels.forEach(function(p){ p.classList.remove('active'); });
-      document.getElementById('panel-' + tab.dataset.service).classList.add('active');
-    });
-    tab.addEventListener('keydown', function(e){
-      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tab.click(); }
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isMobile = window.matchMedia('(max-width: 900px)').matches;
+
+  // ---------- index-grid accordion (services) ----------
+  document.querySelectorAll('.index-card-head').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var card = btn.closest('.index-card');
+      var open = card.getAttribute('data-open') === 'true';
+      card.setAttribute('data-open', open ? 'false' : 'true');
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
     });
   });
 
-  // reveal on scroll
+  // ---------- reveal on scroll ----------
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
@@ -421,7 +510,53 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
     document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });
   }
 
-  // quote form (demo-only, no backend)
+  // ---------- pinned challenge -> solution narrative ----------
+  var narrativeSection = document.getElementById('narrative');
+  var stages = Array.prototype.slice.call(document.querySelectorAll('.narrative-stage-text'));
+  var STAGE_COUNT = stages.length;
+  var bar = document.getElementById('narrativeBar');
+  var countEl = document.getElementById('narrativeCount');
+  var numEl = document.getElementById('narrativeNum');
+  var ringEl = document.getElementById('narrativeRing');
+  var phaseEls = document.querySelectorAll('.narrative-top .phase');
+
+  function setStage(i){
+    stages.forEach(function(s){ s.classList.toggle('active', Number(s.dataset.stage) === i); });
+    if(countEl) countEl.textContent = String(i+1).padStart(2,'0') + ' / ' + String(STAGE_COUNT).padStart(2,'0');
+    var phase = stages[i] ? stages[i].dataset.phase : 'challenge';
+    var solved = phase === 'solution' || (phase === 'pivot' && i >= 3);
+    if(numEl){
+      numEl.textContent = String(i+1).padStart(2,'0');
+      numEl.classList.toggle('solved', phase === 'solution');
+    }
+    if(ringEl) ringEl.classList.toggle('solved', phase === 'solution');
+    phaseEls.forEach(function(p){ p.classList.toggle('on', p.dataset.phase === (phase === 'pivot' ? 'challenge' : phase)); });
+  }
+
+  function updateNarrative(){
+    if(!narrativeSection || isMobile || reducedMotion) return;
+    var rect = narrativeSection.getBoundingClientRect();
+    var total = rect.height - window.innerHeight;
+    if(total <= 0) return;
+    var scrolled = -rect.top;
+    var progress = Math.min(1, Math.max(0, scrolled/total));
+    if(bar) bar.style.height = (progress*100) + '%';
+    var stage = Math.min(STAGE_COUNT-1, Math.floor(progress*STAGE_COUNT));
+    setStage(stage);
+  }
+
+  if(!isMobile && !reducedMotion){
+    var ticking = false;
+    window.addEventListener('scroll', function(){
+      if(!ticking){
+        window.requestAnimationFrame(function(){ updateNarrative(); ticking = false; });
+        ticking = true;
+      }
+    }, {passive:true});
+    updateNarrative();
+  }
+
+  // ---------- quote form (demo-only, no backend) ----------
   var form = document.getElementById('quoteForm');
   var status = document.getElementById('mStatus');
   var submitBtn = document.getElementById('mSubmit');
