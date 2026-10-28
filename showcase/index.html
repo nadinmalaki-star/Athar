@@ -87,7 +87,10 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .flagship-loading{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--paper-mute);background:var(--void);transition:opacity .4s ease}
 .flagship-loading.hide{opacity:0;pointer-events:none}
 .flagship-overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;padding:120px var(--gutter) 64px;pointer-events:none}
-.flagship-tile{pointer-events:auto;max-width:460px}
+.flagship-overlay::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,rgba(3,3,3,.72) 0%,rgba(3,3,3,.5) 24%,rgba(3,3,3,.08) 48%,transparent 60%),linear-gradient(0deg,rgba(3,3,3,.55) 0%,transparent 28%);pointer-events:none}
+[dir="rtl"] .flagship-overlay::before{background:linear-gradient(260deg,rgba(3,3,3,.72) 0%,rgba(3,3,3,.5) 24%,rgba(3,3,3,.08) 48%,transparent 60%),linear-gradient(0deg,rgba(3,3,3,.55) 0%,transparent 28%)}
+.flagship-tile{pointer-events:auto;max-width:460px;transition:opacity .4s ease}
+.flagship-tile.is-hidden{opacity:0;pointer-events:none}
 .flagship-zone-index{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--ember-hot);display:block;margin-bottom:10px;direction:ltr;unicode-bidi:isolate;text-align:start}
 .flagship-zone-name{font-family:var(--display);font-weight:800;font-size:clamp(30px,4.6vw,58px);line-height:1.02;letter-spacing:-.015em;color:#fff;transition:opacity .35s ease}
 .flagship-zone-tag{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--paper-mute);margin-top:12px}
@@ -152,19 +155,36 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .zone-arrow svg{width:16px;height:16px}
 .zone-hint{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--paper-mute)}
 
-/* Mobile + reduced-motion fallback: simple full-bleed stacked list, no horizontal scroll */
+/* Mobile + reduced-motion fallback: an independently art-directed stacked
+   gallery, not a shrunk desktop view or a plain functional list — each
+   card carries its sector's own accent, a slow breathing Ken Burns on the
+   photo (auto-disabled under reduced-motion by the global rule below),
+   and the same numeral/typography language as the desktop cinematic overlay. */
 .zone-stack{display:none}
 @media (max-width:860px){
   .zone-nav{display:none}
   .zone-track{display:none}
-  .zone-stack{display:flex;flex-direction:column;gap:14px;padding:0 var(--gutter)}
-  .zone-card{position:relative;border-radius:4px;overflow:hidden;min-height:380px;display:flex;align-items:flex-end;background-size:cover;background-position:center}
-  .zone-card::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,5,5,.88),rgba(5,5,5,.25) 60%)}
-  .zone-card[data-id="forma"]{background-image:url('assets/sector-previews/forma.jpg')}
-  .zone-card[data-id="vera"]{background-image:url('demos/vera-clinic/images/hero.jpg')}
-  .zone-card[data-id="ascend"]{background-image:url('demos/ascend-academy/images/hero.jpg')}
-  .zone-card[data-id="meridian"]{background-image:url('demos/meridian-partners/images/hero.jpg')}
-  .zone-card-in{position:relative;z-index:1;padding:28px}
+  .zone-stack{display:flex;flex-direction:column;gap:18px;padding:0 var(--gutter)}
+  .zone-card{position:relative;border-radius:8px;overflow:hidden;min-height:440px;display:flex;align-items:flex-end;isolation:isolate;box-shadow:0 24px 60px -24px rgba(0,0,0,.6)}
+  .zone-card-bg{position:absolute;inset:-6%;background-size:cover;background-position:center;animation:zoneCardBreathe 18s ease-in-out infinite alternate;will-change:transform}
+  @keyframes zoneCardBreathe{0%{transform:scale(1)}100%{transform:scale(1.08)}}
+  .zone-card[data-id="forma"] .zone-card-bg{background-image:url('assets/sector-previews/forma.jpg')}
+  .zone-card[data-id="vera"] .zone-card-bg{background-image:url('demos/vera-clinic/images/hero.jpg')}
+  .zone-card[data-id="ascend"] .zone-card-bg{background-image:url('demos/ascend-academy/images/hero.jpg')}
+  .zone-card[data-id="meridian"] .zone-card-bg{background-image:url('demos/meridian-partners/images/hero.jpg')}
+  .zone-card[data-id="forma"]{--card-accent:#d4b483}
+  .zone-card[data-id="vera"]{--card-accent:#9fcf97}
+  .zone-card[data-id="ascend"]{--card-accent:#d6ff3f}
+  .zone-card[data-id="meridian"]{--card-accent:#d4af7a}
+  .zone-card::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,rgba(5,5,5,.92) 0%,rgba(5,5,5,.4) 52%,rgba(5,5,5,.08) 100%)}
+  .zone-card::before{content:'';position:absolute;inset:0;z-index:2;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(245,243,237,.1);pointer-events:none}
+  .zone-card-accent{position:absolute;top:0;left:0;right:0;height:3px;z-index:3;background:var(--card-accent);box-shadow:0 0 16px 0 var(--card-accent)}
+  .zone-card-arrow{position:absolute;top:20px;right:20px;z-index:3;width:38px;height:38px;border-radius:50%;background:rgba(5,5,5,.45);border:1px solid rgba(245,243,237,.18);display:flex;align-items:center;justify-content:center}
+  [dir="rtl"] .zone-card-arrow{right:auto;left:20px}
+  [dir="rtl"] .zone-card-arrow svg{transform:scaleX(-1)}
+  .zone-card-arrow svg{width:15px;height:15px;color:var(--paper)}
+  .zone-card-in{position:relative;z-index:3;padding:28px 26px 30px}
+  .zone-card .zone-num{color:var(--card-accent)}
   #sectorMotif{display:none}
 }
 @media (prefers-reduced-motion:reduce){
@@ -296,11 +316,11 @@ footer a:hover{color:var(--paper)}
           <div class="zone-bg"></div>
           <div class="zone-in">
             <span class="zone-num">01 / 04</span>
-            <h3 class="zone-name">FORMA Living</h3>
-            <span class="zone-tag">Interior Design &amp; Renovation</span>
-            <p class="zone-desc">A luxury architectural-editorial experience: cinematic scroll storytelling, an interactive room-by-room gallery, a guided design-consultation journey.</p>
-            <div class="zone-meta"><span><strong>Objective</strong> Renovation &amp; design consultation requests</span><span><strong>Core interaction</strong> Cinematic scroll + category explorer</span></div>
-            <a class="btn btn-primary zone-cta" href="demos/forma/index.html" target="_blank" rel="noopener">Open full demo<span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
+            <h3 class="zone-name" data-ar="FORMA Living" data-en="FORMA Living">FORMA Living</h3>
+            <span class="zone-tag" data-ar="تصميم داخلي وتجديد" data-en="Interior Design &amp; Renovation">Interior Design &amp; Renovation</span>
+            <p class="zone-desc" data-ar="تجربة تحريرية معمارية فاخرة: سرد سينمائي بالسكرول، معرض تفاعلي غرفة بغرفة، ورحلة استشارة تصميم موجّهة." data-en="A luxury architectural-editorial experience: cinematic scroll storytelling, an interactive room-by-room gallery, a guided design-consultation journey.">A luxury architectural-editorial experience: cinematic scroll storytelling, an interactive room-by-room gallery, a guided design-consultation journey.</p>
+            <div class="zone-meta"><span><strong data-ar="الهدف" data-en="Objective">Objective</strong> <span data-ar="طلبات تجديد واستشارة تصميم" data-en="Renovation &amp; design consultation requests">Renovation &amp; design consultation requests</span></span><span><strong data-ar="التفاعل الأساسي" data-en="Core interaction">Core interaction</strong> <span data-ar="سكرول سينمائي + مستكشف فئات" data-en="Cinematic scroll + category explorer">Cinematic scroll + category explorer</span></span></div>
+            <a class="btn btn-primary zone-cta" href="demos/forma/index.html" target="_blank" rel="noopener"><span data-ar="افتح النسخة الكاملة" data-en="Open full demo">Open full demo</span><span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
           </div>
         </article>
 
@@ -308,11 +328,11 @@ footer a:hover{color:var(--paper)}
           <div class="zone-bg"></div>
           <div class="zone-in">
             <span class="zone-num">02 / 04</span>
-            <h3 class="zone-name">VERA Clinic</h3>
-            <span class="zone-tag">Clinics &amp; Healthcare</span>
-            <p class="zone-desc">A calm, contemporary healthcare experience built on trust: a concern-first patient journey, a practitioner introduction, and an approachable appointment flow.</p>
-            <div class="zone-meta"><span><strong>Objective</strong> Appointment inquiries</span><span><strong>Core interaction</strong> Concern-branching + guided visit journey</span></div>
-            <a class="btn btn-primary zone-cta" href="demos/vera-clinic/index.html" target="_blank" rel="noopener">Open full demo<span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
+            <h3 class="zone-name" data-ar="VERA Clinic" data-en="VERA Clinic">VERA Clinic</h3>
+            <span class="zone-tag" data-ar="عيادات ورعاية صحية" data-en="Clinics &amp; Healthcare">Clinics &amp; Healthcare</span>
+            <p class="zone-desc" data-ar="تجربة رعاية صحية هادئة ومعاصرة مبنية على الثقة: رحلة مريض تبدأ من القلق، تعريف بالممارس، ومسار حجز موعد قريب المنال." data-en="A calm, contemporary healthcare experience built on trust: a concern-first patient journey, a practitioner introduction, and an approachable appointment flow.">A calm, contemporary healthcare experience built on trust: a concern-first patient journey, a practitioner introduction, and an approachable appointment flow.</p>
+            <div class="zone-meta"><span><strong data-ar="الهدف" data-en="Objective">Objective</strong> <span data-ar="استفسارات حجز موعد" data-en="Appointment inquiries">Appointment inquiries</span></span><span><strong data-ar="التفاعل الأساسي" data-en="Core interaction">Core interaction</strong> <span data-ar="تفرّع حسب القلق + رحلة زيارة موجّهة" data-en="Concern-branching + guided visit journey">Concern-branching + guided visit journey</span></span></div>
+            <a class="btn btn-primary zone-cta" href="demos/vera-clinic/index.html" target="_blank" rel="noopener"><span data-ar="افتح النسخة الكاملة" data-en="Open full demo">Open full demo</span><span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
           </div>
         </article>
 
@@ -320,11 +340,11 @@ footer a:hover{color:var(--paper)}
           <div class="zone-bg"></div>
           <div class="zone-in">
             <span class="zone-num">03 / 04</span>
-            <h3 class="zone-name">ASCEND Academy</h3>
-            <span class="zone-tag">Education &amp; Training</span>
-            <p class="zone-desc">A bold, immersive training-brand experience: a full-viewport program switcher, a scroll-driven curriculum build, and a confident enrollment journey.</p>
-            <div class="zone-meta"><span><strong>Objective</strong> Course enrollment inquiries</span><span><strong>Core interaction</strong> Immersive program switcher + scroll-pin</span></div>
-            <a class="btn btn-primary zone-cta" href="demos/ascend-academy/index.html" target="_blank" rel="noopener">Open full demo<span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
+            <h3 class="zone-name" data-ar="ASCEND Academy" data-en="ASCEND Academy">ASCEND Academy</h3>
+            <span class="zone-tag" data-ar="تعليم وتدريب" data-en="Education &amp; Training">Education &amp; Training</span>
+            <p class="zone-desc" data-ar="تجربة علامة تدريبية جريئة وغامرة: مبدّل برامج بملء الشاشة، بناء منهج مدفوع بالسكرول، ورحلة تسجيل واثقة." data-en="A bold, immersive training-brand experience: a full-viewport program switcher, a scroll-driven curriculum build, and a confident enrollment journey.">A bold, immersive training-brand experience: a full-viewport program switcher, a scroll-driven curriculum build, and a confident enrollment journey.</p>
+            <div class="zone-meta"><span><strong data-ar="الهدف" data-en="Objective">Objective</strong> <span data-ar="استفسارات تسجيل بالدورات" data-en="Course enrollment inquiries">Course enrollment inquiries</span></span><span><strong data-ar="التفاعل الأساسي" data-en="Core interaction">Core interaction</strong> <span data-ar="مبدّل برامج غامر + تثبيت بالسكرول" data-en="Immersive program switcher + scroll-pin">Immersive program switcher + scroll-pin</span></span></div>
+            <a class="btn btn-primary zone-cta" href="demos/ascend-academy/index.html" target="_blank" rel="noopener"><span data-ar="افتح النسخة الكاملة" data-en="Open full demo">Open full demo</span><span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
           </div>
         </article>
 
@@ -332,11 +352,11 @@ footer a:hover{color:var(--paper)}
           <div class="zone-bg"></div>
           <div class="zone-in">
             <span class="zone-num">04 / 04</span>
-            <h3 class="zone-name">MERIDIAN Partners</h3>
-            <span class="zone-tag">Professional Services</span>
-            <p class="zone-desc">A sophisticated consultancy experience: a pinned challenge-to-solution scroll narrative and an editorial service index, built for a qualified diagnostic request.</p>
-            <div class="zone-meta"><span><strong>Objective</strong> Qualified quotation requests</span><span><strong>Core interaction</strong> Pinned narrative + editorial index</span></div>
-            <a class="btn btn-primary zone-cta" href="demos/meridian-partners/index.html" target="_blank" rel="noopener">Open full demo<span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
+            <h3 class="zone-name" data-ar="MERIDIAN Partners" data-en="MERIDIAN Partners">MERIDIAN Partners</h3>
+            <span class="zone-tag" data-ar="خدمات مهنية" data-en="Professional Services">Professional Services</span>
+            <p class="zone-desc" data-ar="تجربة استشارية راقية: سرد مثبّت بالسكرول من التحدي إلى الحل، وفهرس خدمات تحريري، مبنية لطلب تشخيص مؤهَّل." data-en="A sophisticated consultancy experience: a pinned challenge-to-solution scroll narrative and an editorial service index, built for a qualified diagnostic request.">A sophisticated consultancy experience: a pinned challenge-to-solution scroll narrative and an editorial service index, built for a qualified diagnostic request.</p>
+            <div class="zone-meta"><span><strong data-ar="الهدف" data-en="Objective">Objective</strong> <span data-ar="طلبات عرض سعر مؤهَّلة" data-en="Qualified quotation requests">Qualified quotation requests</span></span><span><strong data-ar="التفاعل الأساسي" data-en="Core interaction">Core interaction</strong> <span data-ar="سرد مثبّت + فهرس تحريري" data-en="Pinned narrative + editorial index">Pinned narrative + editorial index</span></span></div>
+            <a class="btn btn-primary zone-cta" href="demos/meridian-partners/index.html" target="_blank" rel="noopener"><span data-ar="افتح النسخة الكاملة" data-en="Open full demo">Open full demo</span><span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
           </div>
         </article>
 
@@ -345,23 +365,35 @@ footer a:hover{color:var(--paper)}
       <!-- Mobile fallback: stacked cards, no horizontal scroll -->
       <div class="zone-stack">
         <a class="zone-card" data-id="forma" href="demos/forma/index.html" target="_blank" rel="noopener">
-          <div class="zone-card-in"><span class="zone-num">01 / 04</span><h3 class="zone-name" style="font-size:clamp(26px,7vw,36px)">FORMA Living</h3><span class="zone-tag">Interior Design &amp; Renovation</span></div>
+          <div class="zone-card-bg" aria-hidden="true"></div>
+          <div class="zone-card-accent" aria-hidden="true"></div>
+          <span class="zone-card-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <div class="zone-card-in"><span class="zone-num">01 / 04</span><h3 class="zone-name" style="font-size:clamp(26px,7vw,36px)" data-ar="FORMA Living" data-en="FORMA Living">FORMA Living</h3><span class="zone-tag" data-ar="تصميم داخلي وتجديد" data-en="Interior Design &amp; Renovation">Interior Design &amp; Renovation</span></div>
         </a>
         <a class="zone-card" data-id="vera" href="demos/vera-clinic/index.html" target="_blank" rel="noopener">
-          <div class="zone-card-in"><span class="zone-num">02 / 04</span><h3 class="zone-name" style="font-size:clamp(26px,7vw,36px)">VERA Clinic</h3><span class="zone-tag">Clinics &amp; Healthcare</span></div>
+          <div class="zone-card-bg" aria-hidden="true"></div>
+          <div class="zone-card-accent" aria-hidden="true"></div>
+          <span class="zone-card-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <div class="zone-card-in"><span class="zone-num">02 / 04</span><h3 class="zone-name" style="font-size:clamp(26px,7vw,36px)" data-ar="VERA Clinic" data-en="VERA Clinic">VERA Clinic</h3><span class="zone-tag" data-ar="عيادات ورعاية صحية" data-en="Clinics &amp; Healthcare">Clinics &amp; Healthcare</span></div>
         </a>
         <a class="zone-card" data-id="ascend" href="demos/ascend-academy/index.html" target="_blank" rel="noopener">
-          <div class="zone-card-in"><span class="zone-num">03 / 04</span><h3 class="zone-name" style="font-size:clamp(26px,7vw,36px)">ASCEND Academy</h3><span class="zone-tag">Education &amp; Training</span></div>
+          <div class="zone-card-bg" aria-hidden="true"></div>
+          <div class="zone-card-accent" aria-hidden="true"></div>
+          <span class="zone-card-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <div class="zone-card-in"><span class="zone-num">03 / 04</span><h3 class="zone-name" style="font-size:clamp(26px,7vw,36px)" data-ar="ASCEND Academy" data-en="ASCEND Academy">ASCEND Academy</h3><span class="zone-tag" data-ar="تعليم وتدريب" data-en="Education &amp; Training">Education &amp; Training</span></div>
         </a>
         <a class="zone-card" data-id="meridian" href="demos/meridian-partners/index.html" target="_blank" rel="noopener">
-          <div class="zone-card-in"><span class="zone-num">04 / 04</span><h3 class="zone-name" style="font-size:clamp(26px,7vw,36px)">MERIDIAN Partners</h3><span class="zone-tag">Professional Services</span></div>
+          <div class="zone-card-bg" aria-hidden="true"></div>
+          <div class="zone-card-accent" aria-hidden="true"></div>
+          <span class="zone-card-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <div class="zone-card-in"><span class="zone-num">04 / 04</span><h3 class="zone-name" style="font-size:clamp(26px,7vw,36px)" data-ar="MERIDIAN Partners" data-en="MERIDIAN Partners">MERIDIAN Partners</h3><span class="zone-tag" data-ar="خدمات مهنية" data-en="Professional Services">Professional Services</span></div>
         </a>
       </div>
     </div>
 
     <div class="zone-nav">
       <div class="zone-dots" id="zoneDots" role="tablist" aria-label="Jump to sector"></div>
-      <span class="zone-hint">Scroll or drag to explore →</span>
+      <span class="zone-hint" data-ar="مرر أو اسحب للاستكشاف ←" data-en="Scroll or drag to explore →">Scroll or drag to explore →</span>
       <div class="zone-arrows">
         <button class="zone-arrow" id="zonePrev" aria-label="Previous sector"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5"/></svg></button>
         <button class="zone-arrow" id="zoneNext" aria-label="Next sector"><svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5"/></svg></button>
@@ -824,10 +856,16 @@ footer a:hover{color:var(--paper)}
     var currentZoneName = 'entrance';
     document.addEventListener('athar:langchange', function(){ updateOverlay(currentZoneName); });
 
+    var tileEl = document.querySelector('.flagship-tile');
     function updateOverlay(zoneName){
       currentZoneName = zoneName;
       var info = ZONE_INFO[zoneName] || ZONE_INFO.entrance;
       var L = lang();
+      // The entrance station's own 3D scene shows the real ATHAR wordmark as
+      // a lit sign — repeating "Athar" as HTML overlay text on top of it
+      // reads as a collision, not reinforcement, once the camera is close.
+      // Industry zones still get the full text tile.
+      if (tileEl) tileEl.classList.toggle('is-hidden', zoneName === 'entrance');
       zoneIndexEl.textContent = info.num;
       zoneNameEl.textContent = info.name[L];
       zoneTagEl.textContent = info.tag[L];
@@ -860,7 +898,8 @@ footer a:hover{color:var(--paper)}
           forma: '/showcase/assets/sector-previews/forma-tex.jpg',
           vera: '/showcase/assets/sector-previews/vera-tex.jpg',
           ascend: '/showcase/assets/sector-previews/ascend-tex.jpg',
-          meridian: '/showcase/assets/sector-previews/meridian-tex.jpg'
+          meridian: '/showcase/assets/sector-previews/meridian-tex.jpg',
+          logo: '/showcase/assets/athar-logo-wordmark-official.png'
         },
         onZoneChange: function(i, zoneName){ updateOverlay(zoneName); }
       });

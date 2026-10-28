@@ -618,14 +618,15 @@
       if (!gsap || !ScrollTrigger || !track) throw new Error('gsap unavailable');
       gsap.registerPlugin(ScrollTrigger);
 
-      // A sequential procession through the room, not an additive stack: only one
-      // layer is ever near full strength at a given scroll position. Each layer
-      // rises to its moment, then recedes to a soft, blurred backdrop presence
-      // (not back to invisible) as the next one takes over — reads as moving
-      // further into the clinic, not three photos ghosting on top of each other.
-      gsap.set(layerBack, { opacity: 0, filter: 'blur(7px)', transformOrigin: '70% 50%', x: '-10%', y: '2%', rotateY: 14, rotateX: 2, z: -320, scale: 0.84 });
-      gsap.set(layerMid,  { opacity: 0, filter: 'blur(7px)', transformOrigin: '30% 50%', x: '9%',  y: '-3%', rotateY: -11, rotateX: -1, z: -160, scale: 0.9 });
-      gsap.set(layerFront,{ opacity: 0.22, filter: 'blur(4px)', transformOrigin: '50% 60%', y: '6%', rotateX: 7, z: 40, scale: 1.08 });
+      // One sharp anchor, not three competing exposures: the front photo is
+      // the visible subject from early in the scroll and only ever gets
+      // sharper/more present; back and mid stay as soft, dim, permanently
+      // blurred depth cues behind it (never above ~0.4 opacity, never in
+      // focus) — real rack-focus/depth-of-field, not a relay of three full
+      // exposures that wash each other out when they overlap.
+      gsap.set(layerBack, { opacity: 0, filter: 'blur(9px)', transformOrigin: '70% 50%', x: '-10%', y: '2%', rotateY: 14, rotateX: 2, z: -320, scale: 0.84 });
+      gsap.set(layerMid,  { opacity: 0, filter: 'blur(8px)', transformOrigin: '30% 50%', x: '9%',  y: '-3%', rotateY: -11, rotateX: -1, z: -160, scale: 0.9 });
+      gsap.set(layerFront,{ opacity: 0.55, filter: 'blur(2px)', transformOrigin: '50% 60%', y: '6%', rotateX: 7, z: 40, scale: 1.08 });
 
       var tl = gsap.timeline({
         scrollTrigger: {
@@ -639,14 +640,18 @@
           }
         }
       });
-      // Back: arrives in focus first, then dims and softens into a faint backdrop.
-      tl.to(layerBack, { opacity: 0.88, filter: 'blur(0px)', x: '-8%', y: 0, rotateY: 5, rotateX: 0, z: -150, scale: 0.92, duration: 0.32, ease: 'none' }, 0);
-      tl.to(layerBack, { opacity: 0.14, filter: 'blur(5px)', duration: 0.28, ease: 'none' }, 0.5);
-      // Mid: takes over next, then also recedes once front arrives.
-      tl.to(layerMid, { opacity: 0.92, filter: 'blur(0px)', x: '7%', y: 0, rotateY: -4, rotateX: 0, z: -60, scale: 0.97, duration: 0.32, ease: 'none' }, 0.26);
-      tl.to(layerMid, { opacity: 0.18, filter: 'blur(4px)', duration: 0.26, ease: 'none' }, 0.72);
-      // Front: the resting state the visitor settles on — fully in focus, holds.
-      tl.to(layerFront, { opacity: 1, filter: 'blur(0px)', y: 0, rotateX: 0, z: 0, scale: 1, duration: 0.36, ease: 'none' }, 0.56);
+      // Back: a dim, permanently-blurred glimpse that fades in, then further
+      // down as the front subject takes over — never competes for attention.
+      tl.to(layerBack, { opacity: 0.32, filter: 'blur(6px)', x: '-8%', y: 0, rotateY: 5, rotateX: 0, z: -150, scale: 0.92, duration: 0.3, ease: 'none' }, 0);
+      tl.to(layerBack, { opacity: 0.1, duration: 0.3, ease: 'none' }, 0.5);
+      // Mid: same treatment, staged slightly later — soft depth, never sharp.
+      tl.to(layerMid, { opacity: 0.38, filter: 'blur(5px)', x: '7%', y: 0, rotateY: -4, rotateX: 0, z: -60, scale: 0.97, duration: 0.3, ease: 'none' }, 0.22);
+      tl.to(layerMid, { opacity: 0.14, duration: 0.3, ease: 'none' }, 0.68);
+      // Front: the one subject that's ever actually sharp, present from the
+      // start and resolving to full clarity — the visitor's eye always has
+      // one clear thing to look at, which is what reads as "clean," not
+      // three photos all vying for the same attention at once.
+      tl.to(layerFront, { opacity: 1, filter: 'blur(0px)', y: 0, rotateX: 0, z: 0, scale: 1, duration: 0.5, ease: 'none' }, 0.42);
     }).catch(function(err){
       // GSAP/ScrollTrigger failed to load (offline cdnjs mirror, etc.) — fall back to the
       // same static resolved-photo presentation used for reduced-motion, not a blank scene.
