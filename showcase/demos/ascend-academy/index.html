@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASCEND Academy — Learn by building the real thing.</title>
+<meta name="description" content="A demonstration website built by ATHAR Digital Studio. ASCEND Academy is a fictional education &amp; training brand used to showcase premium interactive web design — not a real school.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0c'/><text x='50' y='68' font-size='62' font-family='Arial Black,sans-serif' fill='%23D6FF3F' text-anchor='middle'>A</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"></noscript>
+<style>
+:root{
+  --void:#0a0a0c;
+  --panel:#121216;
+  --panel-2:#17171c;
+  --paper:#f4f3ee;
+  --ink:#0a0a0c;
+  --ink-dim:#56565c;
+  --line:rgba(255,255,255,.14);
+  --line-soft:rgba(255,255,255,.07);
+  --line-dark:rgba(10,10,12,.14);
+  --white:#f4f3ee;
+  --white-dim:rgba(244,243,238,.6);
+  --white-faint:rgba(244,243,238,.32);
+  --lime:#D6FF3F;
+  --lime-dim:#A9CC2E;
+  --display:'Archivo Black','Arial Black',sans-serif;
+  --body:'Space Grotesk','Helvetica Neue',Arial,sans-serif;
+  --mono:'Space Mono','Courier New',monospace;
+  --gutter:clamp(20px,4.4vw,72px);
+  --shell:1360px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--void);color:var(--white);font-family:var(--body);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+::selection{background:var(--lime);color:var(--ink)}
+.shell{max-width:var(--shell);margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--lime)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.skip-link{position:absolute;left:-999px;top:0;background:var(--lime);color:var(--ink);padding:10px 16px;font-family:var(--mono);font-size:12px;z-index:200}
+.skip-link:focus{left:16px;top:16px}
+
+/* ---------- reveal (mirrors FORMA's IntersectionObserver pattern) ---------- */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  .marquee-track{animation:none!important}
+}
+
+/* ---------- back-to-athar chip ---------- */
+.back-chip{position:fixed;top:18px;left:18px;z-index:150;display:inline-flex;align-items:center;gap:8px;padding:9px 14px 9px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(10,10,12,.72);backdrop-filter:blur(10px);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--white-dim);transition:border-color .2s,color .2s}
+.back-chip:hover{border-color:var(--lime);color:var(--lime)}
+.back-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--lime)}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px var(--gutter);background:linear-gradient(180deg,rgba(10,10,12,.92),rgba(10,10,12,.7) 70%,transparent);backdrop-filter:blur(6px)}
+.wordmark{font-family:var(--display);font-size:19px;letter-spacing:.01em}
+.wordmark span{color:var(--lime)}
+.nav-links{display:flex;gap:34px;list-style:none;margin:0;padding:0}
+.nav-links a{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--white-dim);transition:color .2s}
+.nav-links a:hover{color:var(--lime)}
+.nav-cta{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 18px;border:1px solid var(--lime);color:var(--lime);border-radius:2px;transition:background .2s,color .2s}
+.nav-cta:hover{background:var(--lime);color:var(--ink)}
+.menu-btn{display:none;background:none;border:1px solid var(--line);color:var(--white);width:40px;height:40px;border-radius:2px}
+@media (max-width:860px){.nav-links{display:none}.nav-cta{display:none}.menu-btn{display:block}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 64px;overflow:hidden;background:
+  radial-gradient(1100px 620px at 82% -8%, rgba(214,255,63,.16), transparent 60%),
+  linear-gradient(180deg,#0a0a0c, #0d0d10 55%, #0a0a0c)}
+.hero-grid{position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+  background-size:72px 72px;mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent)}
+.hero-in{position:relative;padding:0 var(--gutter)}
+.hero-eyebrow-row{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+.hero-rule{height:1px;flex:1;background:var(--line)}
+.hero h1{font-family:var(--display);font-size:clamp(40px,8.6vw,118px);line-height:.94;margin:0;letter-spacing:-.01em}
+.hero h1 em{font-style:normal;color:var(--lime)}
+.hero-sub{max-width:560px;margin:26px 0 0;font-size:clamp(15px,1.6vw,18px);line-height:1.6;color:var(--white-dim)}
+.hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:40px}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:15px 24px;border:1px solid var(--lime);color:var(--lime);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;transition:background .2s,color .2s;background:transparent}
+.btn:hover{background:var(--lime);color:var(--ink)}
+.btn.solid{background:var(--lime);color:var(--ink)}
+.btn.solid:hover{background:var(--white);border-color:var(--white)}
+.btn.ghost{border-color:var(--line);color:var(--white)}
+.btn.ghost:hover{border-color:var(--white);background:transparent;color:var(--white)}
+
+/* marquee */
+.marquee{margin-top:64px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding:16px 0}
+.marquee-track{display:flex;gap:48px;white-space:nowrap;width:max-content;animation:scrollx 26s linear infinite}
+.marquee-track span{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--white-faint)}
+.marquee-track span.on{color:var(--lime)}
+@keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- editorial intro (light section, contrast pacing) ---------- */
+.intro{background:var(--paper);color:var(--ink);padding:120px 0}
+.intro-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:60px;align-items:start}
+.intro .eyebrow{color:var(--ink-dim)}
+.intro h2{font-family:var(--display);font-size:clamp(28px,3.6vw,46px);line-height:1.08;margin:18px 0 0}
+.intro p{font-size:17px;line-height:1.75;color:#3a3a3e;margin:0 0 18px}
+.intro p:last-child{margin-bottom:0}
+@media (max-width:820px){.intro-grid{grid-template-columns:1fr;gap:28px}}
+
+/* ---------- section scaffolding ---------- */
+.section{padding:120px 0}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:56px;flex-wrap:wrap}
+.section-head h2{font-family:var(--display);font-size:clamp(30px,4.2vw,56px);line-height:1;margin:14px 0 0}
+.section-note{max-width:360px;font-size:14px;line-height:1.6;color:var(--white-dim)}
+
+/* ---------- programs selector ---------- */
+.programs{background:var(--void)}
+.prog-tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.prog-tab{appearance:none;background:none;border:0;border-right:1px solid var(--line);padding:26px 20px;text-align:left;cursor:pointer;color:var(--white-dim);transition:background .2s,color .2s}
+.prog-tab:last-child{border-right:0}
+.prog-tab .num{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--white-faint);margin-bottom:10px}
+.prog-tab .name{display:block;font-family:var(--display);font-size:clamp(15px,1.6vw,20px);color:var(--white)}
+.prog-tab[aria-selected="true"]{background:var(--panel);color:var(--lime)}
+.prog-tab[aria-selected="true"] .num{color:var(--lime)}
+.prog-tab:hover{background:var(--panel-2)}
+.prog-tab:focus-visible{outline:2px solid var(--lime);outline-offset:-2px}
+.prog-panel{padding:56px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.prog-panel-meta{display:flex;flex-direction:column;gap:22px}
+.prog-panel-meta .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--lime)}
+.prog-panel-meta h3{font-family:var(--display);font-size:clamp(26px,3.2vw,42px);margin:0;line-height:1.05}
+.prog-panel-meta p{font-size:15px;line-height:1.7;color:var(--white-dim);margin:0;max-width:440px}
+.prog-stats{display:flex;gap:34px;margin-top:6px}
+.prog-stats div b{display:block;font-family:var(--display);font-size:22px;color:var(--lime)}
+.prog-stats div span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--white-faint)}
+.curriculum{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.curriculum li{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--white-dim)}
+.curriculum li b{font-family:var(--mono);color:var(--lime);font-weight:400;flex:none;width:28px}
+@media (max-width:900px){.prog-tabs{grid-template-columns:repeat(2,1fr)}.prog-panel{grid-template-columns:1fr;gap:30px}}
+@media (max-width:540px){.prog-tabs{grid-template-columns:1fr}.prog-tab{border-right:0;border-bottom:1px solid var(--line)}}
+
+/* ---------- pathway (accordion) ---------- */
+.pathway{background:var(--paper);color:var(--ink)}
+.pathway .eyebrow{color:var(--ink-dim)}
+.pathway .section-note{color:#55555b}
+.steps{border-top:1px solid var(--line-dark)}
+.step{border-bottom:1px solid var(--line-dark)}
+.step-head{display:flex;align-items:center;gap:22px;width:100%;background:none;border:0;padding:26px 0;cursor:pointer;text-align:left;color:var(--ink)}
+.step-head .idx{font-family:var(--mono);font-size:12px;color:var(--ink-dim);width:28px;flex:none}
+.step-head h3{font-family:var(--display);font-size:clamp(17px,2vw,24px);margin:0;flex:1;line-height:1.1}
+.step-head .plus{font-family:var(--mono);font-size:20px;color:var(--ink-dim);transition:transform .25s}
+.step[data-open="true"] .plus{transform:rotate(45deg);color:var(--lime-dim)}
+.step-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.step[data-open="true"] .step-body{max-height:220px}
+.step-body p{margin:0 0 24px;padding-left:50px;max-width:620px;font-size:15px;line-height:1.7;color:#4a4a50}
+.step-head:focus-visible{outline:2px solid var(--lime-dim);outline-offset:-2px}
+
+/* ---------- schedule ---------- */
+.schedule{background:var(--void)}
+.sched-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.sched-card{background:var(--void);padding:32px 26px}
+.sched-card .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--white-faint)}
+.sched-card .v{font-family:var(--display);font-size:clamp(18px,2vw,26px);margin-top:12px;color:var(--white)}
+.sched-card .v.lime{color:var(--lime)}
+@media (max-width:760px){.sched-grid{grid-template-columns:1fr}}
+
+/* ---------- enrollment form ---------- */
+.enroll{background:var(--panel)}
+.enroll-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:60px}
+.enroll-side h2{font-family:var(--display);font-size:clamp(28px,3.4vw,44px);line-height:1.06;margin:14px 0 18px}
+.enroll-side p{font-size:15px;line-height:1.7;color:var(--white-dim);max-width:420px}
+.form{display:flex;flex-direction:column;gap:18px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--white-faint)}
+.field input,.field select,.field textarea{background:transparent;border:0;border-bottom:1px solid var(--line);padding:12px 2px;color:var(--white);font-size:15px;outline:none;transition:border-color .2s}
+.field select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%23D6FF3F' stroke-width='1.6' fill='none'/></svg>");background-repeat:no-repeat;background-position:right 4px center}
+.field select option{color:#000}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--lime)}
+.field textarea{min-height:96px;resize:vertical}
+.form .btn{align-self:flex-start;margin-top:6px}
+.form-status{font-family:var(--mono);font-size:12px;letter-spacing:.02em;min-height:18px}
+.form-status.ok{color:var(--lime)}
+.form-status.err{color:#ff6b6b}
+.demo-note{display:flex;gap:10px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px dashed var(--line);border-radius:2px;font-family:var(--mono);font-size:11px;line-height:1.6;color:var(--white-faint)}
+@media (max-width:900px){.enroll-grid{grid-template-columns:1fr;gap:34px}.form-row{grid-template-columns:1fr}}
+
+/* ---------- footer ---------- */
+footer{background:var(--void);border-top:1px solid var(--line);padding:48px var(--gutter) 40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px}
+footer .f-left{font-family:var(--mono);font-size:11px;color:var(--white-faint);letter-spacing:.04em;max-width:520px;line-height:1.7}
+footer .f-right{font-family:var(--mono);font-size:11px;color:var(--white-faint);display:flex;gap:18px}
+footer a:hover{color:var(--lime)}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<a class="back-chip" href="../../index.html#showcase" data-dest="athar"><span class="dot" aria-hidden="true"></span>← Back to Athar</a>
+
+<header class="nav">
+  <div class="wordmark">ASCEND<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#programs">Programs</a></li>
+    <li><a href="#pathway">Pathway</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#enroll">Apply</a></li>
+  </ul>
+  <a class="nav-cta" href="#enroll">Enroll now</a>
+  <button class="menu-btn" aria-label="Menu">☰</button>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-in">
+      <div class="hero-eyebrow-row">
+        <span class="eyebrow">Education &amp; Training — Demo brand by ATHAR</span>
+        <span class="hero-rule" aria-hidden="true"></span>
+      </div>
+      <h1 class="reveal">Learn by<br>building <em>the<br>real thing.</em></h1>
+      <p class="hero-sub reveal">ASCEND runs intensive, studio-style programs in product design, engineering and growth — small cohorts, real briefs, and a portfolio you actually ship.</p>
+      <div class="hero-actions reveal">
+        <a class="btn solid" href="#programs">Explore programs →</a>
+        <a class="btn ghost" href="#enroll">Request enrollment info</a>
+      </div>
+    </div>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span class="on">01 PRODUCT DESIGN</span><span>—</span><span>02 SOFTWARE ENGINEERING</span><span>—</span><span>03 DIGITAL MARKETING</span><span>—</span><span>04 DATA FUNDAMENTALS</span><span>—</span>
+        <span class="on">01 PRODUCT DESIGN</span><span>—</span><span>02 SOFTWARE ENGINEERING</span><span>—</span><span>03 DIGITAL MARKETING</span><span>—</span><span>04 DATA FUNDAMENTALS</span><span>—</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="intro">
+    <div class="shell intro-grid">
+      <div>
+        <span class="eyebrow">01 / Our approach</span>
+        <h2 class="reveal">Education built like a studio, not a syllabus.</h2>
+      </div>
+      <div class="reveal">
+        <p>Most training programs teach in theory and hope it transfers. ASCEND works the other way — every module is structured around a real brief, a real constraint, and a real critique, so the habits you build are the habits that hold up on the job.</p>
+        <p>Cohorts stay small on purpose. Instructors are practitioners, not lecturers. And the pace is set by mastery, not by a calendar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section programs" id="programs">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">02 / Programs</span>
+          <h2>Choose your track.</h2>
+        </div>
+        <p class="section-note">Four intensive tracks, each built around a working discipline — not a survey of topics.</p>
+      </div>
+    </div>
+    <div class="shell" style="padding:0">
+      <div class="prog-tabs" role="tablist" aria-label="Programs" id="progTabs">
+        <button class="prog-tab" role="tab" aria-selected="true" data-prog="design"><span class="num">01</span><span class="name">Product Design</span></button>
+        <button class="prog-tab" role="tab" aria-selected="false" data-prog="eng"><span class="num">02</span><span class="name">Software Engineering</span></button>
+        <button class="prog-tab" role="tab" aria-selected="false" data-prog="growth"><span class="num">03</span><span class="name">Digital Marketing</span></button>
+        <button class="prog-tab" role="tab" aria-selected="false" data-prog="data"><span class="num">04</span><span class="name">Data Fundamentals</span></button>
+      </div>
+      <div class="prog-panel reveal" id="progPanel">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <section class="section pathway" id="pathway">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">03 / Pathway</span>
+          <h2>From application<br>to showcase.</h2>
+        </div>
+        <p class="section-note">A fixed structure every cohort follows — predictable enough to plan around, demanding enough to matter.</p>
+      </div>
+      <div class="steps reveal" id="steps">
+        <div class="step" data-open="true">
+          <button class="step-head" aria-expanded="true"><span class="idx">01</span><h3>Apply</h3><span class="plus">+</span></button>
+          <div class="step-body"><p>A short application and a placement conversation to confirm the track and cohort fit your goals and schedule.</p></div>
+        </div>
+        <div class="step" data-open="false">
+          <button class="step-head" aria-expanded="false"><span class="idx">02</span><h3>Foundations</h3><span class="plus">+</span></button>
+          <div class="step-body"><p>Core principles and tools for the track, taught against small real exercises rather than slides.</p></div>
+        </div>
+        <div class="step" data-open="false">
+          <button class="step-head" aria-expanded="false"><span class="idx">03</span><h3>Studio practice</h3><span class="plus">+</span></button>
+          <div class="step-body"><p>Weekly briefs, instructor critique, and peer review — the bulk of the program, run like a working studio.</p></div>
+        </div>
+        <div class="step" data-open="false">
+          <button class="step-head" aria-expanded="false"><span class="idx">04</span><h3>Capstone</h3><span class="plus">+</span></button>
+          <div class="step-body"><p>One extended project, self-directed, reviewed by practitioners outside the cohort.</p></div>
+        </div>
+        <div class="step" data-open="false">
+          <button class="step-head" aria-expanded="false"><span class="idx">05</span><h3>Showcase</h3><span class="plus">+</span></button>
+          <div class="step-body"><p>Cohort presentations and a finished portfolio piece, ready to use in real applications.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section schedule" id="schedule">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">04 / Schedule</span>
+          <h2>Next cohort.</h2>
+        </div>
+        <p class="section-note">Cohorts run on a fixed cadence — join the current intake or reserve a seat for the next one.</p>
+      </div>
+      <div class="sched-grid reveal">
+        <div class="sched-card"><div class="k">Format</div><div class="v">Hybrid · live + self-paced</div></div>
+        <div class="sched-card"><div class="k">Duration</div><div class="v lime">12 weeks</div></div>
+        <div class="sched-card"><div class="k">Commitment</div><div class="v">Part-time, evenings</div></div>
+        <div class="sched-card"><div class="k">Cohort size</div><div class="v lime">16 seats</div></div>
+        <div class="sched-card"><div class="k">Next intake</div><div class="v">Rolling · ask for current date</div></div>
+        <div class="sched-card"><div class="k">Language</div><div class="v lime">English / Arabic</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section enroll" id="enroll">
+    <div class="shell enroll-grid">
+      <div class="enroll-side reveal">
+        <span class="eyebrow">05 / Enrollment</span>
+        <h2>Request program info.</h2>
+        <p>Tell us which track you're considering and when you'd like to start — we'll follow up with cohort dates and next steps.</p>
+      </div>
+      <form class="form reveal" id="enrollForm" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="eName">Full name</label>
+            <input id="eName" name="name" type="text" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="eEmail">Email</label>
+            <input id="eEmail" name="email" type="email" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="eProgram">Program of interest</label>
+            <select id="eProgram" name="program" required>
+              <option value="">Select a program</option>
+              <option>Product Design</option>
+              <option>Software Engineering</option>
+              <option>Digital Marketing</option>
+              <option>Data Fundamentals</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="eStart">Preferred start</label>
+            <select id="eStart" name="start">
+              <option value="">No preference</option>
+              <option>Next cohort</option>
+              <option>In 1–2 months</option>
+              <option>In 3+ months</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="eMsg">Anything we should know?</label>
+          <textarea id="eMsg" name="message" placeholder="Your background, goals, questions…"></textarea>
+        </div>
+        <button class="btn solid" type="submit" id="enrollSubmit">Submit request →</button>
+        <p class="form-status" id="enrollStatus" role="status" aria-live="polite"></p>
+        <div class="demo-note">⚠ This is a demonstration built by ATHAR Digital Studio. ASCEND Academy is fictional — no enrollment request is actually transmitted or stored.</div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="f-left">ASCEND Academy is a fictional education brand, built as a working demonstration of ATHAR Digital Studio's design and engineering capability. No real courses, accreditation, or enrollments are associated with this page.</div>
+  <div class="f-right"><a href="../../index.html#showcase">Built by ATHAR</a><a href="#top">↑ Top</a></div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- reveal on scroll ----------
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  // ---------- program selector ----------
+  var programs = {
+    design: {
+      tag: 'Studio track', title: 'Product Design',
+      desc: 'Research, interaction design and visual systems — taught through full case studies, not isolated exercises.',
+      stats: [['12','WEEKS'],['4','PROJECTS'],['1:12','MENTOR RATIO']],
+      curriculum: ['User research & problem framing','Interaction & systems design','Visual craft & design systems','Portfolio case study & critique']
+    },
+    eng: {
+      tag: 'Studio track', title: 'Software Engineering',
+      desc: 'Full-stack fundamentals through shipped features — version control, testing and review from week one.',
+      stats: [['12','WEEKS'],['5','PROJECTS'],['1:10','MENTOR RATIO']],
+      curriculum: ['Core web fundamentals & tooling','Building & shipping full-stack features','Testing, review & collaboration','Capstone application']
+    },
+    growth: {
+      tag: 'Studio track', title: 'Digital Marketing',
+      desc: 'Positioning, channels and measurement — planning and running a real campaign brief end to end.',
+      stats: [['10','WEEKS'],['3','CAMPAIGNS'],['1:12','MENTOR RATIO']],
+      curriculum: ['Positioning & audience strategy','Channel planning & content','Measurement & iteration','Campaign capstone & review']
+    },
+    data: {
+      tag: 'Studio track', title: 'Data Fundamentals',
+      desc: 'Practical analysis and reporting for real business questions, not abstract datasets.',
+      stats: [['8','WEEKS'],['3','PROJECTS'],['1:10','MENTOR RATIO']],
+      curriculum: ['Data literacy & tooling','Analysis for real questions','Reporting & visual communication','Applied capstone']
+    }
+  };
+
+  var tabsEl = document.getElementById('progTabs');
+  var panelEl = document.getElementById('progPanel');
+
+  function renderProgram(key){
+    var p = programs[key];
+    if (!p) return;
+    var statsHtml = p.stats.map(function(s){ return '<div><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'; }).join('');
+    var listHtml = p.curriculum.map(function(c,i){
+      var n = String(i+1).padStart(2,'0');
+      return '<li><b>'+n+'</b><span>'+c+'</span></li>';
+    }).join('');
+    panelEl.innerHTML =
+      '<div class="prog-panel-meta">'+
+        '<span class="tag">'+p.tag+'</span>'+
+        '<h3>'+p.title+'</h3>'+
+        '<p>'+p.desc+'</p>'+
+        '<div class="prog-stats">'+statsHtml+'</div>'+
+      '</div>'+
+      '<ul class="curriculum">'+listHtml+'</ul>';
+  }
+
+  if (tabsEl) {
+    var tabButtons = tabsEl.querySelectorAll('.prog-tab');
+    tabButtons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        tabButtons.forEach(function(b){ b.setAttribute('aria-selected','false'); });
+        btn.setAttribute('aria-selected','true');
+        renderProgram(btn.dataset.prog);
+      });
+      btn.addEventListener('keydown', function(e){
+        var idx = Array.prototype.indexOf.call(tabButtons, btn);
+        if (e.key === 'ArrowRight') { e.preventDefault(); (tabButtons[idx+1] || tabButtons[0]).focus(); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); (tabButtons[idx-1] || tabButtons[tabButtons.length-1]).focus(); }
+      });
+    });
+    renderProgram('design');
+  }
+
+  // ---------- pathway accordion ----------
+  var steps = document.querySelectorAll('.step');
+  steps.forEach(function(step){
+    var head = step.querySelector('.step-head');
+    head.addEventListener('click', function(){
+      var isOpen = step.getAttribute('data-open') === 'true';
+      steps.forEach(function(s){
+        s.setAttribute('data-open','false');
+        s.querySelector('.step-head').setAttribute('aria-expanded','false');
+      });
+      if (!isOpen) {
+        step.setAttribute('data-open','true');
+        head.setAttribute('aria-expanded','true');
+      }
+    });
+  });
+
+  // ---------- enrollment form (demo only, no backend) ----------
+  var form = document.getElementById('enrollForm');
+  var statusEl = document.getElementById('enrollStatus');
+  var submitBtn = document.getElementById('enrollSubmit');
+  if (form) {
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = document.getElementById('eName').value.trim();
+      var email = document.getElementById('eEmail').value.trim();
+      var program = document.getElementById('eProgram').value;
+      var emailOk = /.+@.+\..+/.test(email);
+
+      if (!name || !emailOk || !program) {
+        statusEl.className = 'form-status err';
+        statusEl.textContent = 'Please fill in your name, a valid email, and choose a program.';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      statusEl.className = 'form-status';
+      statusEl.textContent = 'Submitting…';
+
+      setTimeout(function(){
+        submitBtn.disabled = false;
+        statusEl.className = 'form-status ok';
+        statusEl.textContent = 'Demo only — no real enrollment request was sent. In the live product, this would notify our admissions team.';
+        form.reset();
+      }, 500);
+    });
+  }
+})();
+</script>
+</body>
+</html>

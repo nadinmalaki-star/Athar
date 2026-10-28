@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MERIDIAN Partners — Business Advisory</title>
+<meta name="description" content="MERIDIAN Partners — a fictional demonstration brand built by ATHAR Digital Studio to showcase premium business-consultancy web experiences.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0c1420; --navy-2:#141f30; --navy-3:#1b2838;
+  --graphite:#2a2f38;
+  --paper:#f4f2ec; --paper-dim:#dedac6;
+  --ink:#10151c; --ink-dim:#4d5560;
+  --bronze:#b08968; --bronze-hot:#d4a876;
+  --line:rgba(244,242,236,.12); --line-dark:rgba(16,21,28,.1);
+  --display:'Fraunces',Georgia,serif;
+  --body:'Inter',Arial,sans-serif;
+  --gutter:clamp(20px,4.5vw,72px);
+  --shell:1280px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+.shell{max-width:var(--shell);margin:0 auto;padding:0 var(--gutter)}
+.eyebrow{font-family:var(--body);font-size:11px;letter-spacing:3.2px;font-weight:600;text-transform:uppercase;color:var(--bronze)}
+.display{font-family:var(--display);font-weight:500;letter-spacing:-.5px;line-height:1.05}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.reveal.show{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+
+/* back-to-athar chip */
+.back-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;background:rgba(244,242,236,.06);border:1px solid rgba(244,242,236,.18);border-radius:999px;color:var(--paper);font-size:12px;letter-spacing:.4px;transition:background .25s,border-color .25s;flex:none}
+.back-chip:hover{background:rgba(244,242,236,.14);border-color:var(--bronze)}
+.back-chip svg{width:14px;height:14px}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px var(--gutter);background:rgba(12,20,32,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-left{display:flex;align-items:center;gap:22px;min-width:0}
+.nav .wordmark{font-family:var(--display);font-size:20px;letter-spacing:.5px;color:var(--paper);white-space:nowrap}
+.nav .wordmark b{color:var(--bronze);font-weight:500}
+.nav-links{display:flex;gap:34px;list-style:none;margin:0;padding:0}
+.nav-links a{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--paper);opacity:.72;transition:opacity .2s}
+.nav-links a:hover{opacity:1}
+.nav-cta{padding:10px 20px;border:1px solid var(--bronze);border-radius:2px;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--bronze-hot);transition:background .2s,color .2s}
+.nav-cta:hover{background:var(--bronze);color:var(--navy)}
+.nav-toggle{display:none;background:none;border:0;color:var(--paper)}
+
+/* hero */
+.hero{position:relative;background:var(--navy);color:var(--paper);overflow:hidden;padding:120px var(--gutter) 140px}
+.hero-grid{position:absolute;inset:0;opacity:.5;pointer-events:none}
+.hero-inner{position:relative;max-width:var(--shell);margin:0 auto}
+.hero h1{font-size:clamp(40px,6.4vw,84px);max-width:16ch;margin:22px 0 28px}
+.hero h1 i{font-style:italic;color:var(--bronze-hot)}
+.hero p{max-width:46ch;font-size:17px;line-height:1.7;color:#cfd4db;margin:0 0 40px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 26px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;border:1px solid var(--bronze);border-radius:2px;color:var(--bronze-hot);transition:background .25s,color .25s}
+.btn:hover{background:var(--bronze);color:var(--navy)}
+.btn.ghost{border-color:rgba(244,242,236,.3);color:var(--paper)}
+.btn.ghost:hover{background:rgba(244,242,236,.08);color:var(--paper)}
+.hero-meta{display:flex;gap:48px;margin-top:84px;padding-top:28px;border-top:1px solid var(--line);flex-wrap:wrap}
+.hero-meta div strong{display:block;font-family:var(--display);font-size:26px;color:var(--bronze-hot)}
+.hero-meta div span{font-size:11px;letter-spacing:1px;color:#9aa3ad;text-transform:uppercase}
+
+/* intro */
+.intro{padding:110px var(--gutter);background:var(--paper)}
+.intro-inner{max-width:var(--shell);margin:0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:60px}
+.intro h2{font-size:clamp(28px,3.4vw,42px);margin:16px 0 0}
+.intro-body p{font-size:16px;line-height:1.8;color:var(--ink-dim);max-width:52ch}
+
+/* services */
+.services{padding:110px var(--gutter);background:var(--ink)}
+.services-head{max-width:var(--shell);margin:0 auto 60px}
+.services-head h2{color:var(--paper);font-size:clamp(28px,3.4vw,42px)}
+.services-wrap{max-width:var(--shell);margin:0 auto;display:grid;grid-template-columns:.9fr 1.3fr;gap:0;border-top:1px solid var(--line)}
+.service-tabs{display:flex;flex-direction:column}
+.service-tab{text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:26px 24px 26px 0;display:flex;align-items:center;justify-content:space-between;color:var(--paper)}
+.service-tab .num{font-size:12px;color:#7a828d;margin-inline-end:14px;font-family:var(--body)}
+.service-tab .name{font-family:var(--display);font-size:20px;flex:1}
+.service-tab .arrow{opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .25s;color:var(--bronze-hot)}
+.service-tab[aria-selected="true"] .arrow{opacity:1;transform:none}
+.service-tab[aria-selected="true"] .name{color:var(--bronze-hot)}
+.service-tab:hover .name{color:var(--bronze-hot)}
+.service-detail{padding:8px 0 8px 56px;border-bottom:1px solid var(--line)}
+.service-panel{display:none;padding:10px 0 46px}
+.service-panel.active{display:block}
+.service-panel .eyebrow{color:#7a828d}
+.service-panel h3{color:var(--paper);font-family:var(--display);font-size:28px;margin:10px 0 16px}
+.service-panel p{color:#b7bec7;line-height:1.75;font-size:15px;max-width:48ch;margin:0 0 18px}
+.service-panel ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.service-panel li{display:flex;gap:10px;font-size:14px;color:#cfd4db}
+.service-panel li:before{content:'';width:5px;height:5px;margin-top:8px;background:var(--bronze);flex:none}
+
+/* challenges */
+.challenges{padding:110px var(--gutter);background:var(--paper)}
+.challenges-head{max-width:var(--shell);margin:0 auto 54px}
+.challenges-head h2{font-size:clamp(28px,3.4vw,42px)}
+.challenge-grid{max-width:var(--shell);margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-dark);border:1px solid var(--line-dark)}
+.challenge-card{background:var(--paper);padding:38px 30px}
+.challenge-card .num{font-family:var(--display);font-size:15px;color:var(--bronze)}
+.challenge-card h3{font-family:var(--display);font-size:21px;margin:18px 0 12px;font-weight:500}
+.challenge-card p{font-size:14.5px;line-height:1.7;color:var(--ink-dim);margin:0}
+
+/* approach */
+.approach{padding:110px var(--gutter);background:var(--navy-2)}
+.approach-inner{max-width:var(--shell);margin:0 auto}
+.approach h2{color:var(--paper);font-size:clamp(28px,3.4vw,42px);margin-bottom:60px}
+.approach-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;position:relative}
+.approach-steps:before{content:'';position:absolute;top:17px;left:4%;right:4%;height:1px;background:var(--line)}
+.step{position:relative}
+.step .dot{width:9px;height:9px;border-radius:50%;background:var(--bronze);margin-bottom:22px;position:relative;z-index:1}
+.step h3{color:var(--paper);font-family:var(--display);font-size:19px;margin:0 0 10px;font-weight:500}
+.step p{color:#aab1ba;font-size:13.5px;line-height:1.7;margin:0}
+
+/* inquiry */
+.inquiry{padding:120px var(--gutter);background:var(--paper)}
+.inquiry-inner{max-width:760px;margin:0 auto}
+.inquiry-head{text-align:center;margin-bottom:54px}
+.inquiry-head h2{font-size:clamp(28px,3.6vw,44px)}
+.inquiry-head p{color:var(--ink-dim);font-size:15px;max-width:48ch;margin:16px auto 0}
+.q-form{display:grid;grid-template-columns:1fr 1fr;gap:20px 24px}
+.q-form .full{grid-column:1/-1}
+.field label{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-dim);margin-bottom:8px}
+.field input,.field select,.field textarea{width:100%;padding:13px 14px;border:1px solid #d8d4c8;background:#fff;font-family:var(--body);font-size:14.5px;color:var(--ink);border-radius:2px;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--bronze)}
+.field textarea{min-height:110px;resize:vertical}
+.q-submit{margin-top:8px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.q-submit button{background:var(--navy);color:var(--paper);border:1px solid var(--navy);padding:16px 30px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;border-radius:2px;transition:background .2s}
+.q-submit button:hover{background:var(--bronze);border-color:var(--bronze);color:var(--navy)}
+.q-status{font-size:13.5px;color:var(--ink-dim)}
+.q-status.ok{color:#5f7a52}
+.demo-note{margin-top:14px;font-size:12px;color:#9a9388}
+
+/* footer */
+footer{padding:48px var(--gutter);background:var(--navy);color:#8c93a0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;font-size:12.5px}
+footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
+
+@media(max-width:860px){
+  .nav-links{display:none}
+  .nav-toggle{display:block}
+  .nav{padding:14px 16px}
+  .nav-cta{padding:9px 14px;font-size:10px}
+}
+@media(max-width:560px){
+  .nav-left{gap:10px}
+  .back-chip span{display:none}
+  .back-chip{padding:9px}
+  .nav .wordmark{font-size:16px}
+}
+@media(max-width:860px){
+  .intro-inner{grid-template-columns:1fr;gap:22px}
+  .services-wrap{grid-template-columns:1fr}
+  .service-detail{padding-left:0;border-bottom:none}
+  .challenge-grid{grid-template-columns:1fr}
+  .approach-steps{grid-template-columns:1fr 1fr;row-gap:36px}
+  .approach-steps:before{display:none}
+  .q-form{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .hero{padding-top:100px}
+  .hero-meta{gap:28px}
+  footer{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-left">
+    <a class="back-chip" href="../../index.html#showcase">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      <span>Back to Athar</span>
+    </a>
+    <a class="wordmark" href="#top">MERIDIAN <b>Partners</b></a>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#approach">Approach</a></li>
+    <li><a href="#inquiry">Inquiry</a></li>
+  </ul>
+  <a class="nav-cta" href="#inquiry">Request a Quotation</a>
+</header>
+
+<section class="hero" id="top">
+  <svg class="hero-grid" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 1200 760" aria-hidden="true">
+    <defs>
+      <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#b08968" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#b08968" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <g stroke="rgba(244,242,236,.08)">
+      <line x1="0" y1="120" x2="1200" y2="120"/><line x1="0" y1="260" x2="1200" y2="260"/>
+      <line x1="0" y1="400" x2="1200" y2="400"/><line x1="0" y1="540" x2="1200" y2="540"/>
+      <line x1="200" y1="0" x2="200" y2="760"/><line x1="500" y1="0" x2="500" y2="760"/>
+      <line x1="800" y1="0" x2="800" y2="760"/><line x1="1050" y1="0" x2="1050" y2="760"/>
+    </g>
+    <line x1="140" y1="760" x2="900" y2="60" stroke="url(#g1)" stroke-width="2"/>
+    <line x1="420" y1="760" x2="1180" y2="180" stroke="url(#g1)" stroke-width="1.4"/>
+    <circle cx="900" cy="60" r="4" fill="#d4a876"/>
+    <circle cx="1180" cy="180" r="3" fill="#d4a876"/>
+  </svg>
+  <div class="hero-inner">
+    <div class="eyebrow reveal">Business Advisory &amp; Growth Partners</div>
+    <h1 class="display reveal">Clarity before strategy. <i>Structure before scale.</i></h1>
+    <p class="reveal">MERIDIAN Partners works with ambitious businesses to diagnose what's actually slowing growth, then design the operating structure, digital systems, and plan to fix it — not a slide deck, a working path forward.</p>
+    <div class="hero-actions reveal">
+      <a class="btn" href="#inquiry">Request a Quotation</a>
+      <a class="btn ghost" href="#services">Explore Our Services</a>
+    </div>
+    <div class="hero-meta reveal">
+      <div><strong>04</strong><span>Advisory Lines</span></div>
+      <div><strong>01</strong><span>Engagement, Fully Scoped</span></div>
+      <div><strong>100%</strong><span>Qualified Inquiries Reviewed</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="intro">
+  <div class="intro-inner">
+    <div class="reveal">
+      <div class="eyebrow">Our Position</div>
+      <h2 class="display">A second, sharper opinion on how your business actually runs.</h2>
+    </div>
+    <div class="intro-body reveal">
+      <p>Most consultancies sell frameworks. We start by mapping how decisions, data, and operations actually move through your business today — then design the smallest structural change that unlocks the next stage of growth.</p>
+      <p>Every engagement is scoped around one objective, one owner, and one measurable outcome, so recommendations turn into decisions rather than another report on a shelf.</p>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="services">
+  <div class="services-head">
+    <div class="eyebrow reveal" style="color:#7a828d">What We Advise On</div>
+    <h2 class="display reveal">Four advisory lines, one coordinated plan.</h2>
+  </div>
+  <div class="services-wrap">
+    <div class="service-tabs reveal" role="tablist" aria-orientation="vertical" id="serviceTabs">
+      <button class="service-tab" role="tab" data-service="strategy" aria-selected="true"><span class="name"><span class="num">01</span>Business Strategy</span><span class="arrow">→</span></button>
+      <button class="service-tab" role="tab" data-service="digital" aria-selected="false"><span class="name"><span class="num">02</span>Digital Transformation</span><span class="arrow">→</span></button>
+      <button class="service-tab" role="tab" data-service="operations" aria-selected="false"><span class="name"><span class="num">03</span>Operations Advisory</span><span class="arrow">→</span></button>
+      <button class="service-tab" role="tab" data-service="growth" aria-selected="false"><span class="name"><span class="num">04</span>Growth Planning</span><span class="arrow">→</span></button>
+    </div>
+    <div class="service-detail reveal">
+      <div class="service-panel active" id="panel-strategy">
+        <div class="eyebrow">01 / Business Strategy</div>
+        <h3>A plan built around your actual constraints.</h3>
+        <p>We clarify where the business competes, where it shouldn't, and what has to be true in 12 months for the next stage to work — then translate that into a plan your team can actually execute.</p>
+        <ul>
+          <li>Market and competitive positioning review</li>
+          <li>Business model and revenue-structure assessment</li>
+          <li>12-month strategic roadmap with clear ownership</li>
+        </ul>
+      </div>
+      <div class="service-panel" id="panel-digital">
+        <div class="eyebrow">02 / Digital Transformation</div>
+        <h3>Systems that match how the business actually works.</h3>
+        <p>We assess where manual work, disconnected tools, and legacy systems are costing time, and design a practical digital operating plan — not a platform migration for its own sake.</p>
+        <ul>
+          <li>Digital maturity and tooling audit</li>
+          <li>Process-to-system mapping</li>
+          <li>Phased transformation roadmap</li>
+        </ul>
+      </div>
+      <div class="service-panel" id="panel-operations">
+        <div class="eyebrow">03 / Operations Advisory</div>
+        <h3>Fewer bottlenecks, clearer ownership.</h3>
+        <p>We study how work actually flows between teams, identify where decisions stall, and redesign the operating rhythm so execution speeds up without adding headcount.</p>
+        <ul>
+          <li>Operating-model and workflow review</li>
+          <li>Decision-rights and ownership mapping</li>
+          <li>Implementation support for agreed changes</li>
+        </ul>
+      </div>
+      <div class="service-panel" id="panel-growth">
+        <div class="eyebrow">04 / Growth Planning</div>
+        <h3>A growth plan sized to what the business can execute.</h3>
+        <p>We build growth plans around realistic capacity — commercial, operational, and financial — so expansion doesn't outrun the structure supporting it.</p>
+        <ul>
+          <li>Growth-readiness assessment</li>
+          <li>Channel and expansion prioritisation</li>
+          <li>Milestone-based growth roadmap</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="challenges">
+  <div class="challenges-head">
+    <div class="eyebrow reveal">Challenges We Solve</div>
+    <h2 class="display reveal">The problems that usually bring businesses to us.</h2>
+  </div>
+  <div class="challenge-grid">
+    <div class="challenge-card reveal">
+      <div class="num display">01</div>
+      <h3>Growth has outpaced structure</h3>
+      <p>Headcount and revenue grew faster than the systems and decision-making meant to support them.</p>
+    </div>
+    <div class="challenge-card reveal">
+      <div class="num display">02</div>
+      <h3>Decisions take too long</h3>
+      <p>Approvals and information move slowly between teams, and nobody is quite sure who owns what.</p>
+    </div>
+    <div class="challenge-card reveal">
+      <div class="num display">03</div>
+      <h3>Tools don't talk to each other</h3>
+      <p>Data lives in spreadsheets and disconnected systems, so reporting is manual and often out of date.</p>
+    </div>
+  </div>
+</section>
+
+<section class="approach" id="approach">
+  <div class="approach-inner">
+    <h2 class="display reveal">How an engagement runs.</h2>
+    <div class="approach-steps">
+      <div class="step reveal"><span class="dot"></span><h3>Discover</h3><p>We map the business as it actually runs today — not the org chart version.</p></div>
+      <div class="step reveal"><span class="dot"></span><h3>Diagnose</h3><p>We isolate the two or three structural issues actually limiting growth.</p></div>
+      <div class="step reveal"><span class="dot"></span><h3>Design</h3><p>We build a scoped plan with clear ownership, sequencing, and milestones.</p></div>
+      <div class="step reveal"><span class="dot"></span><h3>Deliver</h3><p>We stay engaged through implementation so the plan survives contact with reality.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="inquiry" id="inquiry">
+  <div class="inquiry-inner">
+    <div class="inquiry-head reveal">
+      <div class="eyebrow">Start a Conversation</div>
+      <h2 class="display">Request a qualified quotation.</h2>
+      <p>Tell us about the business challenge you're facing. This is a demonstration form built by ATHAR — no real inquiry is sent to MERIDIAN Partners.</p>
+    </div>
+    <form class="q-form reveal" id="quoteForm" novalidate>
+      <div class="field"><label for="mName">Your name</label><input id="mName" type="text" required></div>
+      <div class="field"><label for="mCompany">Company</label><input id="mCompany" type="text" required></div>
+      <div class="field"><label for="mEmail">Email</label><input id="mEmail" type="email" required></div>
+      <div class="field">
+        <label for="mService">Service of interest</label>
+        <select id="mService" required>
+          <option value="">Select a service</option>
+          <option>Business Strategy</option>
+          <option>Digital Transformation</option>
+          <option>Operations Advisory</option>
+          <option>Growth Planning</option>
+          <option>Not sure yet</option>
+        </select>
+      </div>
+      <div class="field"><label for="mBudget">Budget range</label>
+        <select id="mBudget">
+          <option value="">Prefer not to say</option>
+          <option>Under $10,000</option>
+          <option>$10,000 – $30,000</option>
+          <option>$30,000 – $75,000</option>
+          <option>$75,000+</option>
+        </select>
+      </div>
+      <div class="field"><label for="mTimeline">Desired timeline</label>
+        <select id="mTimeline">
+          <option value="">Flexible</option>
+          <option>Immediately</option>
+          <option>Within 1 month</option>
+          <option>1–3 months</option>
+          <option>Exploring options</option>
+        </select>
+      </div>
+      <div class="field full"><label for="mScope">Project scope</label><textarea id="mScope" required placeholder="Tell us what's driving this inquiry..."></textarea></div>
+      <div class="full q-submit">
+        <button type="submit" id="mSubmit">Submit Inquiry</button>
+        <span class="q-status" id="mStatus"></span>
+      </div>
+      <div class="full demo-note">This is a demo-only form built by ATHAR Digital Studio. No data is transmitted or stored.</div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <span class="f-word">MERIDIAN Partners</span>
+  <span>A fictional demonstration brand built by ATHAR Digital Studio — not a real company.</span>
+</footer>
+
+<script>
+(function(){
+  // service tab switching
+  var tabs = document.querySelectorAll('.service-tab');
+  var panels = document.querySelectorAll('.service-panel');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){ t.setAttribute('aria-selected','false'); });
+      tab.setAttribute('aria-selected','true');
+      panels.forEach(function(p){ p.classList.remove('active'); });
+      document.getElementById('panel-' + tab.dataset.service).classList.add('active');
+    });
+    tab.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tab.click(); }
+    });
+  });
+
+  // reveal on scroll
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add('show'); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });
+  }
+
+  // quote form (demo-only, no backend)
+  var form = document.getElementById('quoteForm');
+  var status = document.getElementById('mStatus');
+  var submitBtn = document.getElementById('mSubmit');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var required = ['mName','mCompany','mEmail','mService','mScope'];
+    var ok = true;
+    required.forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el.value || !el.value.trim()){ ok = false; el.style.borderColor = '#b4452f'; }
+      else { el.style.borderColor = ''; }
+    });
+    if(!ok){
+      status.className = 'q-status';
+      status.textContent = 'Please fill in all required fields.';
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    setTimeout(function(){
+      status.className = 'q-status ok';
+      status.textContent = 'This is a demo — no real inquiry was submitted.';
+      submitBtn.textContent = 'Submitted (Demo)';
+    }, 650);
+  });
+})();
+</script>
+</body>
+</html>
