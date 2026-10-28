@@ -44,6 +44,8 @@
   .btn:hover{background:var(--terracotta);border-color:var(--terracotta);transform:translateY(-2px)}
   .btn.outline{background:transparent;color:var(--ink);border-color:var(--ink)}
   .btn.outline:hover{background:var(--ink);color:var(--cream)}
+  .btn.light{background:var(--cream);color:var(--ink);border-color:var(--cream)}
+  .btn.light:hover{background:var(--terracotta);border-color:var(--terracotta);color:#fff}
   .btn svg{width:16px;height:16px}
 
   /* reveal-on-scroll, same mechanism as FORMA V10 */
@@ -81,29 +83,35 @@
   .dark p{color:#C8CBC0}
   .dark h2,.dark h3{color:var(--cream)}
 
-  /* ---------- 1. INTAKE: branching concern cards (replaces the old hero) ---------- */
-  .intake{padding-top:72px}
-  .intake-head{max-width:720px}
+  /* ================= 1. SPATIAL SCENE — scroll pull-back opening ================= */
+  .intake{padding:72px 0 0}
+  .intake-head{max-width:720px;margin:0 auto}
   .intake-head .eyebrow{color:var(--sage-dark)}
   .intake-head h1{font-family:var(--display);font-weight:500;font-size:clamp(36px,5.6vw,60px);margin-top:16px;letter-spacing:-.5px}
   .intake-head h1 em{font-style:italic;color:var(--sage-dark)}
   .intake-head p{margin-top:18px;font-size:17px;max-width:54ch}
 
-  .concern-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
-  .concern-card{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:14px;padding:28px 22px;border-radius:20px;border:1.5px solid var(--line);background:var(--paper);transition:border-color .25s,background .25s,transform .25s,box-shadow .25s}
-  .concern-card:hover{border-color:var(--sage);transform:translateY(-3px);box-shadow:0 18px 34px -22px rgba(43,46,39,.3)}
-  .concern-card:focus-visible{outline:2px solid var(--sage-dark);outline-offset:3px}
-  .concern-card[aria-pressed="true"]{border-color:var(--sage-dark);background:var(--sage-pale)}
-  .concern-card .ic{width:46px;height:46px;border-radius:14px;background:var(--sage-pale);display:flex;align-items:center;justify-content:center;flex:none;transition:background .25s}
-  .concern-card[aria-pressed="true"] .ic{background:var(--sage)}
-  .concern-card[aria-pressed="true"] .ic svg{stroke:#fff}
-  .concern-card .q{font-family:var(--display);font-size:19px;line-height:1.2}
-  .concern-card .sub{font-size:13px;color:var(--ink-soft)}
-  @media (max-width:980px){ .concern-grid{grid-template-columns:1fr 1fr} }
-  @media (max-width:560px){ .concern-grid{grid-template-columns:1fr} }
+  .scene-track{position:relative;height:230vh;margin-top:54px}
+  .scene-stage{position:sticky;top:36px;height:calc(100svh - 36px);min-height:560px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .scene-frame{width:min(1040px,92vw);aspect-ratio:16/10;position:relative}
+  .scene-inner{position:absolute;inset:0;transform-origin:50% 55%;will-change:transform}
+  .scene-inner svg{width:100%;height:100%;display:block;border-radius:28px;box-shadow:0 50px 90px -40px rgba(43,46,39,.4)}
+  .scene-caption{position:absolute;left:0;right:0;bottom:-8px;text-align:center;font-size:12.5px;letter-spacing:.6px;color:var(--ink-soft);opacity:0;transition:opacity .6s ease}
+  .scene-caption.show{opacity:1}
+
+  .hotspot{position:absolute;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:var(--paper);border:2px solid var(--sage-dark);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:13px;color:var(--sage-dark);box-shadow:0 10px 24px -10px rgba(43,46,39,.4);opacity:0;transition:opacity .5s ease,transform .25s ease,background .25s ease,color .25s ease;cursor:pointer}
+  .hotspot::before{content:'';position:absolute;inset:-10px;border-radius:50%;border:1px solid rgba(92,107,80,.35);animation:pulse 2.6s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+  .hotspot:hover,.hotspot:focus-visible{background:var(--sage-dark);color:#fff;transform:translate(-50%,-50%) scale(1.08)}
+  .hotspot[aria-pressed="true"]{background:var(--terracotta);border-color:var(--terracotta);color:#fff}
+  .hotspots.ready .hotspot{opacity:1}
+  .hs-desk{left:19%;top:63%}
+  .hs-chair{left:54%;top:55%}
+  .hs-mirror{left:80%;top:29%}
+  .hs-kids{left:12%;top:86%}
 
   /* branching result panel */
-  .intake-result{margin-top:40px;max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.22,.61,.36,1)}
+  .intake-result{max-width:var(--shell);margin:28px auto 0;padding:0 var(--gutter);max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.22,.61,.36,1)}
   .intake-result.open{max-height:900px}
   .intake-result-in{display:grid;grid-template-columns:1.1fr .9fr;gap:0;border-radius:24px;overflow:hidden;background:var(--paper);border:1px solid var(--line);box-shadow:0 30px 60px -32px rgba(43,46,39,.3)}
   .intake-result-copy{padding:40px}
@@ -117,7 +125,24 @@
   .intake-result-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(43,46,39,.25),transparent 55%)}
   @media (max-width:860px){ .intake-result-in{grid-template-columns:1fr} .intake-result-visual{order:-1;min-height:180px} }
 
-  /* ---------- 2. JOURNEY: horizontal scroll-snap timeline ---------- */
+  @media (prefers-reduced-motion:reduce){
+    .scene-track{height:auto;margin-top:40px}
+    .scene-stage{position:static;height:auto;min-height:0;padding:0 var(--gutter)}
+    .scene-inner{position:relative;inset:auto;transform:none!important}
+    .scene-caption{display:none}
+    .hotspots .hotspot{opacity:1!important}
+    .hotspot::before{animation:none}
+  }
+  @media (max-width:760px){
+    .scene-track{height:auto;margin-top:36px}
+    .scene-stage{position:static;height:auto;min-height:0;padding:0 16px}
+    .scene-frame{width:100%}
+    .scene-inner{position:relative;inset:auto;transform:none!important}
+    .scene-caption{display:none}
+    .hotspots .hotspot{opacity:1!important;width:34px;height:34px;font-size:12px}
+  }
+
+  /* ================= 2. JOURNEY — horizontal scroll-snap, pin annotations ================= */
   .journey{background:var(--paper);padding-bottom:40px}
   .journey-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:8px}
   .journey-nav{display:flex;gap:10px}
@@ -129,36 +154,49 @@
   .journey-track::-webkit-scrollbar{height:6px}
   .journey-track::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
   .journey-panel{scroll-snap-align:start;flex:0 0 min(640px,82vw);border-radius:24px;overflow:hidden;position:relative;aspect-ratio:4/3;background-size:cover;background-position:center}
-  .journey-panel::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(43,46,39,.78) 0%,rgba(43,46,39,.1) 55%)}
-  .journey-panel-in{position:absolute;left:0;right:0;bottom:0;padding:28px;color:#fff;z-index:1}
-  .journey-panel .idx{font-family:var(--display);font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#D7E2C9}
-  .journey-panel h3{color:#fff;font-size:26px;margin-top:8px}
-  .journey-panel p{color:#E6E8DF;margin-top:8px;font-size:14.5px;max-width:42ch}
-  @media (max-width:560px){ .journey-panel{flex-basis:88vw} }
+  .journey-panel::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(43,46,39,.32) 0%,rgba(43,46,39,0) 38%)}
+  .journey-idx-chip{position:absolute;left:24px;top:24px;z-index:1;font-family:var(--display);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#fff;background:rgba(43,46,39,.45);backdrop-filter:blur(6px);padding:6px 12px;border-radius:999px}
+  .pin-btn{position:absolute;z-index:2;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:#fff;border:2px solid var(--terracotta);color:var(--terracotta-dark);font-family:var(--display);font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px -10px rgba(0,0,0,.45);transition:transform .25s ease,background .25s ease,color .25s ease}
+  .pin-btn::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(199,123,82,.5);animation:pulse 2.6s ease-out infinite}
+  .pin-btn:hover,.pin-btn[aria-expanded="true"]{background:var(--terracotta);color:#fff;transform:translate(-50%,-50%) scale(1.1)}
+  .annotation{position:absolute;z-index:3;width:min(248px,72%);background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 22px 44px -18px rgba(0,0,0,.5);opacity:0;transform:translateY(8px) scale(.97);pointer-events:none;transition:opacity .3s ease,transform .3s ease}
+  .annotation.open{opacity:1;transform:none;pointer-events:auto}
+  .annotation h3{font-size:16.5px;margin:0}
+  .annotation p{font-size:13px;margin-top:6px;color:var(--ink-soft)}
+  .jp-0 .pin-btn{left:68%;top:74%} .jp-0 .annotation{left:40%;bottom:30%}
+  .jp-1 .pin-btn{left:24%;top:30%} .jp-1 .annotation{left:4%;top:38%}
+  .jp-2 .pin-btn{left:74%;top:32%} .jp-2 .annotation{right:4%;top:40%}
+  .jp-3 .pin-btn{left:28%;top:72%} .jp-3 .annotation{left:2%;bottom:30%}
+  @media (max-width:560px){ .journey-panel{flex-basis:88vw} .annotation{width:min(220px,76%)} }
   @media (prefers-reduced-motion:reduce){
     .journey-track{scroll-snap-type:none;flex-wrap:wrap;overflow-x:visible}
     .journey-panel{flex:1 1 260px;aspect-ratio:16/10}
+    .annotation{opacity:1;transform:none;pointer-events:auto;position:static;width:auto;margin-top:auto;border-radius:0 0 24px 24px;box-shadow:none}
+    .pin-btn{display:none}
   }
 
-  /* ---------- 3. TRUST CARD: practitioner, integrated not isolated ---------- */
-  .trust-wrap{background:var(--sage-pale)}
-  .trust-card{display:flex;align-items:center;gap:28px;background:var(--paper);border-radius:24px;padding:32px;border:1px solid var(--line)}
-  .trust-avatar{width:88px;height:88px;border-radius:50%;flex:none;background:linear-gradient(160deg,var(--sage-pale),var(--sage));position:relative;overflow:hidden}
-  .trust-avatar svg{position:absolute;inset:0;width:100%;height:100%}
-  .trust-card h3{font-size:21px}
-  .trust-card .role{color:var(--terracotta-dark);font-weight:600;font-size:13px;display:block;margin-top:2px}
-  .trust-card p{margin-top:10px;font-size:14.5px;max-width:62ch}
-  .trust-note{font-size:11.5px;color:var(--ink-soft);margin-top:10px;display:block}
-  @media (max-width:700px){ .trust-card{flex-direction:column;align-items:flex-start;text-align:left} }
+  /* ================= 3. TRUST — full-bleed photo, composited credential chip ================= */
+  .trust{position:relative;padding:0;min-height:560px;display:flex;align-items:stretch;background:linear-gradient(100deg, rgba(43,46,39,.78) 0%, rgba(43,46,39,.52) 46%, rgba(43,46,39,.1) 78%), url('images/reception.jpg') center/cover no-repeat}
+  .trust-in{position:relative;width:100%;max-width:var(--shell);margin:0 auto;padding:84px var(--gutter);display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:end}
+  .trust-chip{display:inline-flex;align-items:center;gap:16px;background:rgba(250,246,238,.96);backdrop-filter:blur(8px);border-radius:20px;padding:18px 22px;box-shadow:0 30px 54px -24px rgba(0,0,0,.5);max-width:420px}
+  .trust-chip .avatar{width:54px;height:54px;border-radius:50%;flex:none;background:linear-gradient(160deg,var(--sage-pale),var(--sage));position:relative;overflow:hidden}
+  .trust-chip .avatar svg{position:absolute;inset:0;width:100%;height:100%}
+  .trust-chip h3{font-size:17px;color:var(--ink)}
+  .trust-chip .role{color:var(--terracotta-dark);font-weight:600;font-size:12px;display:block;margin-top:2px}
+  .trust-text{color:#fff}
+  .trust-text .eyebrow{color:#D7E2C9}
+  .trust-text p{margin-top:16px;font-size:15.5px;color:#E7E9DF;max-width:46ch}
+  .trust-note{font-size:11.5px;color:#C8CBC0;margin-top:14px;display:block;max-width:48ch}
+  @media (max-width:860px){ .trust{min-height:0} .trust-in{grid-template-columns:1fr;padding:64px var(--gutter);gap:28px} .trust-chip{order:2} }
 
-  /* approach */
-  .approach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-  .approach-card{padding:30px 26px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(245,243,237,.14)}
-  .approach-card .ic{width:44px;height:44px;border-radius:12px;background:var(--sage);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
-  .approach-card h3{font-size:19px;color:var(--cream)}
-  .approach-card p{margin-top:10px;font-size:14px}
-  @media (max-width:980px){ .approach-grid{grid-template-columns:1fr 1fr} }
-  @media (max-width:560px){ .approach-grid{grid-template-columns:1fr} }
+  /* ================= approach — numbered editorial list, NOT a card grid ================= */
+  .approach-wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px}
+  .approach-list{list-style:none;margin:0;padding:0;border-top:1px solid rgba(245,243,237,.18)}
+  .approach-item{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:26px 0;border-bottom:1px solid rgba(245,243,237,.18)}
+  .approach-item .num{font-family:var(--display);font-size:26px;color:var(--sage-pale);opacity:.65}
+  .approach-item h3{font-size:19px;color:var(--cream)}
+  .approach-item p{margin-top:6px;font-size:14px}
+  @media (max-width:860px){ .approach-wrap{grid-template-columns:1fr} }
 
   /* appointment form */
   .appt{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px}
@@ -216,16 +254,84 @@
   </div>
 </nav>
 
-<!-- 1. INTAKE — branching concern cards replace the traditional hero -->
-<section id="intake" class="intake" style="padding-bottom:0">
+<!-- 1. SPATIAL SCENE — an illustrated clinic interior the visitor scroll-pulls-back from; the 4 hotspots anchored inside it replace a generic card row -->
+<section id="intake" class="intake">
   <div class="shell" id="top">
     <div class="intake-head reveal">
       <span class="eyebrow">Dental &amp; Wellness Clinic</span>
       <h1>What brings you in <em>today?</em></h1>
-      <p>Tell us why you're here, and we'll show you what to expect — no generic service list, just the path that matches you.</p>
+      <p>Tell us why you're here, and we'll show you what to expect — no generic service list, just the path that matches you. Scroll in, then choose a spot in the room.</p>
     </div>
+  </div>
 
-    <div class="concern-grid reveal" role="group" aria-label="What brings you in today?" id="concernGrid"></div>
+  <div class="scene-track" id="sceneTrack">
+    <div class="scene-stage">
+      <div class="scene-frame">
+        <div class="scene-inner" id="sceneInner">
+          <svg viewBox="0 0 960 600" role="img" aria-label="An illustrated view of the VERA Clinic reception, treatment chair, smile mirror and children's corner">
+            <defs>
+              <linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EFF1E7"/><stop offset="1" stop-color="#E2E6D7"/></linearGradient>
+              <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFE0D6"/><stop offset="1" stop-color="#F3EFE2"/></linearGradient>
+              <linearGradient id="mirrorG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7F5EE"/><stop offset="1" stop-color="#DCE3D4"/></linearGradient>
+            </defs>
+            <rect width="960" height="600" fill="var(--cream, #FAF6EE)"/>
+            <rect x="0" y="0" width="960" height="430" fill="url(#wallG)"/>
+            <rect x="0" y="420" width="960" height="180" fill="#F3EEE1"/>
+            <rect x="0" y="420" width="960" height="6" fill="#DCDED1"/>
+            <!-- window -->
+            <rect x="610" y="58" width="270" height="250" rx="6" fill="url(#skyG)" stroke="#5C6B50" stroke-width="4"/>
+            <line x1="745" y1="58" x2="745" y2="308" stroke="#5C6B50" stroke-width="4"/>
+            <line x1="610" y1="183" x2="880" y2="183" stroke="#5C6B50" stroke-width="4"/>
+            <circle cx="820" cy="110" r="22" fill="#F4D9A8" opacity=".85"/>
+            <path d="M625 250 q35 -70 70 0 q30 -50 60 0 q35 -60 65 0 q25 -40 45 0 L880 300 L610 300 Z" fill="#9BAE8A" opacity=".55"/>
+            <!-- smile mirror (cosmetic hotspot anchor) -->
+            <circle cx="760" cy="182" r="0" fill="none"/>
+            <!-- reception desk (checkup hotspot anchor) -->
+            <g>
+              <polygon points="70,330 330,330 360,420 40,420" fill="#5C6B50"/>
+              <polygon points="70,330 330,330 330,300 100,300" fill="#7C8B6F"/>
+              <polygon points="330,330 360,420 360,390 330,300" fill="#49553F"/>
+              <rect x="150" y="270" width="60" height="34" rx="6" fill="#C77B52"/>
+              <circle cx="180" cy="287" r="6" fill="#F3EEE1"/>
+              <rect x="40" y="420" width="320" height="10" fill="#3F4A38" opacity=".25"/>
+            </g>
+            <!-- plant left -->
+            <g transform="translate(55,470)">
+              <rect x="-18" y="40" width="36" height="46" rx="6" fill="#A85F3B"/>
+              <path d="M0 42 C -34 10 -30 -34 -4 -40 C 4 -12 -2 10 0 42 Z" fill="#5C6B50"/>
+              <path d="M0 42 C 30 6 36 -30 14 -38 C 2 -12 2 14 0 42 Z" fill="#7C8B6F"/>
+            </g>
+            <!-- dental chair (toothache hotspot anchor) -->
+            <g transform="translate(430,230)">
+              <ellipse cx="90" cy="195" rx="120" ry="14" fill="#3F4A38" opacity=".15"/>
+              <rect x="20" y="150" width="140" height="22" rx="10" fill="#7C8B6F"/>
+              <rect x="30" y="60" width="50" height="110" rx="22" fill="#FFFFFF" stroke="#DCDED1" stroke-width="3"/>
+              <rect x="60" y="30" width="110" height="46" rx="20" fill="#FFFFFF" stroke="#DCDED1" stroke-width="3" transform="rotate(14 60 30)"/>
+              <circle cx="60" cy="30" r="22" fill="#F3EEE1" stroke="#DCDED1" stroke-width="3"/>
+              <rect x="150" y="90" width="16" height="70" rx="6" fill="#C77B52"/>
+              <line x1="158" y1="90" x2="158" y2="20" stroke="#5C6B50" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="158" cy="12" r="16" fill="#F4D9A8" stroke="#5C6B50" stroke-width="4"/>
+            </g>
+            <!-- kids corner (pediatric hotspot anchor) -->
+            <g transform="translate(70,470)">
+              <ellipse cx="55" cy="98" rx="70" ry="10" fill="#3F4A38" opacity=".12"/>
+              <rect x="10" y="60" width="90" height="12" rx="6" fill="#C77B52"/>
+              <rect x="48" y="30" width="14" height="42" fill="#C77B52"/>
+              <circle cx="140" cy="76" r="20" fill="#7C8B6F"/>
+              <circle cx="-10" cy="84" r="12" fill="#A85F3B"/>
+              <circle cx="20" cy="94" r="8" fill="#5C6B50"/>
+            </g>
+            <circle cx="760" cy="182" r="72" fill="url(#mirrorG)" stroke="#A85F3B" stroke-width="6"/>
+            <circle cx="760" cy="182" r="72" fill="#fff" opacity=".08"/>
+          </svg>
+        </div>
+        <span class="scene-caption" id="sceneCaption">Scroll to step back — then choose a spot in the room</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <div class="hotspots" id="hotspotsWrap" role="group" aria-label="What brings you in today?"></div>
 
     <div class="intake-result" id="intakeResult">
       <div class="intake-result-in">
@@ -236,7 +342,7 @@
   </div>
 </section>
 
-<!-- 2. JOURNEY — horizontal scroll-snap timeline, a different scroll axis entirely -->
+<!-- 2. JOURNEY — horizontal scroll-snap timeline; pin annotations replace plain captions -->
 <section id="journey" class="journey">
   <div class="shell">
     <div class="journey-head reveal">
@@ -257,11 +363,17 @@
   <div class="journey-track reveal" id="journeyTrack" tabindex="0" aria-label="Scroll through the four stages of a VERA Clinic visit"></div>
 </section>
 
-<!-- 3. TRUST CARD — practitioner folded into the flow, not a split hero section -->
-<div class="trust-wrap">
-  <div class="shell" style="padding:56px var(--gutter)" id="team">
-    <div class="trust-card reveal">
-      <div class="trust-avatar" aria-hidden="true">
+<!-- 3. TRUST — full-bleed photo with the practitioner's credential chip composited onto it -->
+<section id="team" class="trust">
+  <div class="trust-in">
+    <div class="trust-text reveal">
+      <span class="eyebrow">Meet the team</span>
+      <h2 style="margin-top:14px;color:#fff;font-size:clamp(26px,3.4vw,40px)">Every first visit starts with a conversation.</h2>
+      <p>Not a form — so treatment plans are understood before they're agreed to. Dr. Haddad leads a small team of general and cosmetic dentists supported by a dedicated patient-care coordinator.</p>
+      <span class="trust-note">Dr. Lina Haddad and VERA Clinic are fictional, created for this ATHAR Digital Studio demonstration. No real clinic, practitioner, or patient outcome is represented.</span>
+    </div>
+    <div class="trust-chip reveal">
+      <div class="avatar" aria-hidden="true">
         <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
           <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EDF0E4"/><stop offset="1" stop-color="#8E9C80"/></linearGradient></defs>
           <rect width="400" height="400" fill="url(#g1)"/>
@@ -270,42 +382,36 @@
         </svg>
       </div>
       <div>
-        <h3>Dr. Lina Haddad<span class="role">Lead Dentist &amp; Founder, VERA Clinic (fictional)</span></h3>
-        <p>Every first visit starts with a conversation, not a form — so treatment plans are understood before they're agreed to. Dr. Haddad leads a small team of general and cosmetic dentists supported by a dedicated patient-care coordinator.</p>
-        <span class="trust-note">Dr. Lina Haddad and VERA Clinic are fictional, created for this ATHAR Digital Studio demonstration. No real clinic, practitioner, or patient outcome is represented.</span>
+        <h3>Dr. Lina Haddad<span class="role">Lead Dentist &amp; Founder (fictional)</span></h3>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<section id="approach" class="dark" style="background:linear-gradient(180deg, rgba(43,46,39,.92), rgba(43,46,39,.96)), url('images/treatment-detail.jpg') center/cover no-repeat">
-  <div class="shell">
-    <div class="section-head reveal">
+<section id="approach" class="dark">
+  <div class="shell approach-wrap">
+    <div class="section-head reveal" style="margin-bottom:0">
       <span class="eyebrow" style="color:#B9D1A8">Our approach</span>
       <h2>Four ideas behind <em style="color:#B9D1A8;font-style:italic">every visit.</em></h2>
     </div>
-    <div class="approach-grid">
-      <div class="approach-card reveal">
-        <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 7v5l3 3" stroke-linecap="round"/></svg></span>
-        <h3>Unhurried time</h3>
-        <p>Longer appointment slots, so questions get real answers.</p>
-      </div>
-      <div class="approach-card reveal">
-        <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <h3>Clear plans</h3>
-        <p>Every treatment explained in plain language, costs included upfront.</p>
-      </div>
-      <div class="approach-card reveal">
-        <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></span>
-        <h3>Comfort-first</h3>
-        <p>A calmer room, gentler tools, and pacing set by you.</p>
-      </div>
-      <div class="approach-card reveal">
-        <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 19V5a2 2 0 012-2h11l3 3v13a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-        <h3>Continuity</h3>
-        <p>The same dentist follows your care from first visit onward.</p>
-      </div>
-    </div>
+    <ul class="approach-list reveal">
+      <li class="approach-item">
+        <span class="num">01</span>
+        <div><h3>Unhurried time</h3><p>Longer appointment slots, so questions get real answers.</p></div>
+      </li>
+      <li class="approach-item">
+        <span class="num">02</span>
+        <div><h3>Clear plans</h3><p>Every treatment explained in plain language, costs included upfront.</p></div>
+      </li>
+      <li class="approach-item">
+        <span class="num">03</span>
+        <div><h3>Comfort-first</h3><p>A calmer room, gentler tools, and pacing set by you.</p></div>
+      </li>
+      <li class="approach-item">
+        <span class="num">04</span>
+        <div><h3>Continuity</h3><p>The same dentist follows your care from first visit onward.</p></div>
+      </li>
+    </ul>
   </div>
 </section>
 
@@ -394,10 +500,15 @@
 (function(){
   "use strict";
 
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var narrow = window.matchMedia('(max-width: 760px)').matches;
+  var sceneStatic = reduced || narrow;
+
   // ---------- Data: 4 concerns, each mapping to one of VERA's real services ----------
-  // Copy/points reused verbatim from the previous service-list implementation.
+  // Copy/points reused verbatim from the previous implementation; now anchored to room hotspots instead of cards.
   var concerns = [
     {
+      id: 'chair', hs: 'hs-chair', label: 'The chair',
       q: "A toothache or sudden pain",
       sub: "Something hurts right now",
       service: "Emergency Care",
@@ -408,10 +519,10 @@
         "Follow-up plan booked before you leave."
       ],
       note: "Dr. Haddad's team keeps same-day slots open specifically for moments like this.",
-      icon: '<path d="M12 9v4M12 17h.01" stroke-linecap="round"/><path d="M10.3 3.9a2 2 0 013.4 0l8.2 14.2a2 2 0 01-1.7 3H3.8a2 2 0 01-1.7-3z"/>',
       image: "images/hero.jpg"
     },
     {
+      id: 'mirror', hs: 'hs-mirror', label: 'The mirror',
       q: "A brighter, more confident smile",
       sub: "Cosmetic consultation",
       service: "Cosmetic Dentistry",
@@ -422,10 +533,10 @@
         "Transparent, itemised cost estimate before any work begins."
       ],
       note: "Every cosmetic plan starts with a conversation about what \"confident\" looks like for you.",
-      icon: '<path d="M8 13s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/>',
       image: "images/reception.jpg"
     },
     {
+      id: 'desk', hs: 'hs-desk', label: 'The front desk',
       q: "Due for a checkup or cleaning",
       sub: "Routine care",
       service: "General Dentistry",
@@ -436,10 +547,10 @@
         "Gentle approach for anxious or first-time patients."
       ],
       note: "Most first visits start here — a calm checkup, no pressure to commit to anything else.",
-      icon: '<path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/>',
       image: "images/treatment-detail.jpg"
     },
     {
+      id: 'kids', hs: 'hs-kids', label: "The kids' corner",
       q: "Bringing in my child",
       sub: "Family-friendly care",
       service: "Pediatric Care",
@@ -450,12 +561,11 @@
         "Preventive focus: sealants, fluoride and habit coaching."
       ],
       note: "Pediatric visits are paced for younger patients, with parents in the room throughout.",
-      icon: '<path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6c-2.5 4.5-9.5 9-9.5 9z"/>',
       image: "images/hero.jpg"
     }
   ];
 
-  var grid = document.getElementById('concernGrid');
+  var hotspotsWrap = document.getElementById('hotspotsWrap');
   var result = document.getElementById('intakeResult');
   var resultCopy = document.getElementById('intakeResultCopy');
   var resultVisual = document.getElementById('intakeResultVisual');
@@ -483,8 +593,8 @@
 
   function selectConcern(i){
     var wasOpen = activeIndex === i;
-    var cards = grid.querySelectorAll('.concern-card');
-    cards.forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+    var btns = hotspotsWrap.querySelectorAll('.hotspot');
+    btns.forEach(function(b){ b.setAttribute('aria-pressed','false'); });
     if (wasOpen) {
       activeIndex = null;
       result.classList.remove('open');
@@ -492,47 +602,88 @@
       return;
     }
     activeIndex = i;
-    cards[i].setAttribute('aria-pressed','true');
+    btns[i].setAttribute('aria-pressed','true');
     renderConcern(i);
     result.classList.add('open');
+    result.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
   }
 
   concerns.forEach(function(c, i){
     var b = document.createElement('button');
-    b.className = 'concern-card';
     b.type = 'button';
-    b.setAttribute('aria-pressed','false');
-    b.innerHTML = '<span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5C6B50" stroke-width="2">' + c.icon + '</svg></span>' +
-      '<span class="q">' + c.q + '</span><span class="sub">' + c.sub + '</span>';
+    b.className = 'hotspot ' + c.hs;
+    b.setAttribute('aria-pressed', 'false');
+    b.setAttribute('aria-label', c.label + ' — ' + c.q);
+    b.textContent = String(i + 1);
     b.addEventListener('click', function(){ selectConcern(i); });
-    grid.appendChild(b);
+    hotspotsWrap.appendChild(b);
   });
+  hotspotsWrap.classList.add('ready');
 
-  // ---------- Journey: horizontal scroll-snap timeline ----------
+  // ---------- Scroll-tied pull-back: scale the illustrated scene as the visitor scrolls through its track ----------
+  var track = document.getElementById('sceneTrack');
+  var inner = document.getElementById('sceneInner');
+  var caption = document.getElementById('sceneCaption');
+  var ticking = false;
+
+  function updateScene(){
+    ticking = false;
+    if (sceneStatic || !track) return;
+    var rect = track.getBoundingClientRect();
+    var vh = window.innerHeight;
+    var total = rect.height - vh;
+    var scrolled = -rect.top;
+    var progress = total > 0 ? Math.min(1, Math.max(0, scrolled / total)) : 1;
+    var scale = 1.30 - progress * 0.40; // 1.30 zoomed-in -> 0.90 pulled-back
+    inner.style.transform = 'scale(' + scale.toFixed(3) + ')';
+    inner.dataset.progress = progress.toFixed(3);
+    caption.classList.toggle('show', progress > 0.08 && progress < 0.85);
+  }
+  function onScroll(){
+    if (!ticking) { ticking = true; window.requestAnimationFrame(updateScene); }
+  }
+  if (sceneStatic) {
+    if (inner) inner.style.transform = 'none';
+  } else {
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    updateScene();
+  }
+
+  // ---------- Journey: horizontal scroll-snap timeline with pin-annotation captions ----------
   var steps = [
-    { idx: '01 — Arrive', title: 'Arrive', body: 'Check in at reception, five minutes early — no paperwork pile, just a short digital form on a tablet.', image: 'images/reception.jpg', pos: 'center' },
-    { idx: '02 — Consultation', title: 'Consultation', body: 'A real conversation first: what brought you in, what you want, what today\'s visit can realistically cover.', image: 'images/hero.jpg', pos: 'center 30%' },
-    { idx: '03 — Treatment', title: 'Treatment', body: 'Every step explained before it happens, with pacing set by you — not the clock.', image: 'images/treatment-detail.jpg', pos: 'center' },
-    { idx: '04 — Aftercare', title: 'Aftercare', body: 'You leave with a written plan, not just a reminder card — what to expect, and when to come back.', image: 'images/hero.jpg', pos: 'center 70%' }
+    { idx: '01', title: 'Arrive', body: 'Check in at reception, five minutes early — no paperwork pile, just a short digital form on a tablet.', image: 'images/reception.jpg', pos: 'center' },
+    { idx: '02', title: 'Consultation', body: 'A real conversation first: what brought you in, what you want, what today\'s visit can realistically cover.', image: 'images/hero.jpg', pos: 'center 30%' },
+    { idx: '03', title: 'Treatment', body: 'Every step explained before it happens, with pacing set by you — not the clock.', image: 'images/treatment-detail.jpg', pos: 'center' },
+    { idx: '04', title: 'Aftercare', body: 'You leave with a written plan, not just a reminder card — what to expect, and when to come back.', image: 'images/hero.jpg', pos: 'center 70%' }
   ];
-  var track = document.getElementById('journeyTrack');
-  steps.forEach(function(s){
+  var jtrack = document.getElementById('journeyTrack');
+  steps.forEach(function(s, i){
     var el = document.createElement('div');
-    el.className = 'journey-panel';
+    el.className = 'journey-panel jp-' + i;
     el.style.backgroundImage = "url('" + s.image + "')";
     el.style.backgroundPosition = s.pos;
-    el.innerHTML = '<div class="journey-panel-in"><span class="idx">' + s.idx + '</span><h3>' + s.title + '</h3><p>' + s.body + '</p></div>';
-    track.appendChild(el);
+    var pinId = 'pin-' + i, annId = 'ann-' + i;
+    el.innerHTML =
+      '<span class="journey-idx-chip">' + s.idx + ' — ' + s.title + '</span>' +
+      '<button type="button" class="pin-btn" id="' + pinId + '" aria-expanded="' + (i === 0 ? 'true' : 'false') + '" aria-controls="' + annId + '" aria-label="' + s.title + ' details">+</button>' +
+      '<div class="annotation' + (i === 0 ? ' open' : '') + '" id="' + annId + '" role="group" aria-label="' + s.title + '"><h3>' + s.title + '</h3><p>' + s.body + '</p></div>';
+    jtrack.appendChild(el);
+    el.querySelector('.pin-btn').addEventListener('click', function(){
+      var open = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', String(!open));
+      el.querySelector('.annotation').classList.toggle('open', !open);
+    });
   });
   function panelStep(){
-    var first = track.querySelector('.journey-panel');
+    var first = jtrack.querySelector('.journey-panel');
     return first ? (first.getBoundingClientRect().width + 20) : 300;
   }
   document.getElementById('journeyNext').addEventListener('click', function(){
-    track.scrollBy({ left: panelStep(), behavior: 'smooth' });
+    jtrack.scrollBy({ left: panelStep(), behavior: reduced ? 'auto' : 'smooth' });
   });
   document.getElementById('journeyPrev').addEventListener('click', function(){
-    track.scrollBy({ left: -panelStep(), behavior: 'smooth' });
+    jtrack.scrollBy({ left: -panelStep(), behavior: reduced ? 'auto' : 'smooth' });
   });
 
   // ---------- Appointment form: client-side validation + demo-only confirmation ----------
@@ -557,7 +708,6 @@
   });
 
   // ---------- Reveal-on-scroll (mirrors FORMA V10's technique) ----------
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) {
     document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });
   } else if ('IntersectionObserver' in window) {

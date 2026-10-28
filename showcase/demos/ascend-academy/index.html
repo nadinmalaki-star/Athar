@@ -56,6 +56,8 @@ button,input,select,textarea{font:inherit;color:inherit}
   .switcher-bg-layer{transition:none!important}
   .curriculum-pin-wrap{height:auto!important}
   .curriculum-pin-inner{position:static!important;height:auto!important}
+  .gesture-prompt{display:none!important}
+  .curriculum-particles{display:none!important}
 }
 
 /* ---------- back-to-athar chip ---------- */
@@ -90,12 +92,17 @@ button,input,select,textarea{font:inherit;color:inherit}
    ========================================================= */
 .switcher{position:relative;min-height:100svh;overflow:hidden;display:flex;flex-direction:column}
 .switcher-bg{position:absolute;inset:0;z-index:0}
-.switcher-bg-layer{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.1s cubic-bezier(.4,0,.2,1),filter 1.1s cubic-bezier(.4,0,.2,1)}
+.switcher-bg-layer{position:absolute;inset:-4%;background-size:cover;background-position:center;opacity:0;transform:scale(1);transition:opacity 1.3s cubic-bezier(.4,0,.2,1),filter 1.3s cubic-bezier(.4,0,.2,1),transform 1.6s cubic-bezier(.3,0,.1,1)}
 .switcher-bg-layer.active{opacity:1}
-.switcher-bg::after{content:'';position:absolute;inset:0;background:
-  radial-gradient(1100px 620px at 82% -8%, color-mix(in srgb, var(--acc) 22%, transparent), transparent 60%),
-  linear-gradient(180deg,rgba(10,10,12,.55), rgba(10,10,12,.72) 45%, rgba(10,10,12,.96));
+.switcher-bg::before{content:'';position:absolute;inset:0;z-index:1;mix-blend-mode:hard-light;opacity:.5;
+  background:radial-gradient(900px 500px at 78% 6%, color-mix(in srgb, var(--prog-tint, var(--acc)) 55%, transparent), transparent 62%);
   transition:background 1.1s ease}
+.switcher-bg::after{content:'';position:absolute;inset:0;z-index:1;background:
+  radial-gradient(1100px 620px at 82% -8%, color-mix(in srgb, var(--acc) 18%, transparent), transparent 60%),
+  linear-gradient(180deg,rgba(10,10,12,.58), rgba(10,10,12,.74) 45%, rgba(10,10,12,.96));
+  transition:background 1.1s ease}
+.switcher-grain{position:absolute;inset:0;z-index:1;opacity:.12;pointer-events:none;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .switcher-grid{position:absolute;inset:0;opacity:.4;pointer-events:none;z-index:1;
   background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
   background-size:72px 72px;mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent)}
@@ -132,6 +139,21 @@ button,input,select,textarea{font:inherit;color:inherit}
   .switcher-tabs{grid-template-columns:repeat(2,1fr)}
   .switcher-tab{padding:16px 18px}
 }
+
+/* ---------- gesture-gated first transition (drag to reveal) ---------- */
+.gesture-prompt{position:absolute;left:var(--gutter);right:var(--gutter);bottom:100%;margin-bottom:18px;z-index:3;display:flex;align-items:center;gap:16px;height:54px;pointer-events:none;opacity:1;transition:opacity .5s ease}
+.gesture-prompt.done{opacity:0;pointer-events:none}
+.gesture-prompt canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.gesture-track{position:relative;flex:1;height:2px;background:var(--line);pointer-events:none}
+.gesture-track::after{content:'';position:absolute;right:0;top:50%;width:7px;height:7px;border-right:1px solid var(--white-faint);border-top:1px solid var(--white-faint);transform:translateY(-50%) rotate(45deg)}
+.gesture-handle{position:relative;flex:none;width:46px;height:46px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;pointer-events:auto;box-shadow:0 0 0 1px rgba(10,10,12,.2),0 10px 24px -10px rgba(0,0,0,.6);transition:transform .35s cubic-bezier(.2,1.4,.3,1),background .3s}
+.gesture-handle:active{cursor:grabbing}
+.gesture-handle svg{width:16px;height:16px;color:var(--ink)}
+.gesture-label{flex:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--white-faint);white-space:nowrap}
+@media (max-width:760px){.gesture-prompt{bottom:100%;margin-bottom:12px}.gesture-label{display:none}}
+
+/* ---------- curriculum scroll-tied particle field ---------- */
+.curriculum-particles{position:absolute;inset:0;z-index:0;opacity:.55;pointer-events:none}
 
 /* =========================================================
    02 — SCROLL-PINNED CURRICULUM BUILD
@@ -253,6 +275,7 @@ footer a:hover{color:var(--lime)}
   <!-- ============== 01. PROGRAM SWITCHER (hero) ============== -->
   <section class="switcher" id="programs">
     <div class="switcher-bg" id="switcherBg" aria-hidden="true"></div>
+    <div class="switcher-grain" aria-hidden="true"></div>
     <div class="switcher-grid" aria-hidden="true"></div>
 
     <div class="switcher-in">
@@ -303,7 +326,15 @@ footer a:hover{color:var(--lime)}
       </div>
     </div>
 
-    <nav class="switcher-controls" aria-label="Choose a program">
+    <nav class="switcher-controls" aria-label="Choose a program" style="position:relative">
+      <div class="gesture-prompt" id="gesturePrompt" aria-hidden="true">
+        <canvas id="gestureCanvas"></canvas>
+        <button class="gesture-handle" id="gestureHandle" type="button" aria-label="Drag to explore the next program, or use the program buttons below">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="gesture-track" aria-hidden="true"></span>
+        <span class="gesture-label">Drag to explore</span>
+      </div>
       <div class="switcher-tabs" id="switcherTabs" role="tablist">
         <button class="switcher-tab" role="tab" aria-pressed="true" data-prog="design">
           <span class="t-num">01</span><span class="t-name">Product Design</span><span class="t-bar" aria-hidden="true"></span>
@@ -336,6 +367,7 @@ footer a:hover{color:var(--lime)}
     <div class="curriculum-pin-wrap" id="curriculumPinWrap">
       <div class="curriculum-pin-inner">
         <div class="curriculum-visual">
+          <canvas class="curriculum-particles" id="curriculumParticles" aria-hidden="true"></canvas>
           <img id="curriculumImg" src="images/lecture.jpg" alt="">
           <div class="curriculum-visual-meta">
             <span class="tag" id="curriculumTag">Studio track</span>
@@ -503,18 +535,22 @@ footer a:hover{color:var(--lime)}
   var programs = {
     design: {
       order: 0, tag: 'Studio track', title: 'Product Design', acc: '#D6FF3F', hue: '0deg', img: 'images/hero.jpg',
+      pos: '50% 42%', zoom: 1, tint: '#D6FF3F',
       curriculum: ['User research & problem framing','Interaction & systems design','Visual craft & design systems','Portfolio case study & critique']
     },
     eng: {
       order: 1, tag: 'Studio track', title: 'Software Engineering', acc: '#5FE1FF', hue: '140deg', img: 'images/workspace.jpg',
+      pos: '72% 30%', zoom: 1.12, tint: '#5FE1FF',
       curriculum: ['Core web fundamentals & tooling','Building & shipping full-stack features','Testing, review & collaboration','Capstone application']
     },
     growth: {
       order: 2, tag: 'Studio track', title: 'Digital Marketing', acc: '#FFB84F', hue: '40deg', img: 'images/lecture.jpg',
+      pos: '28% 65%', zoom: 1.06, tint: '#FFB84F',
       curriculum: ['Positioning & audience strategy','Channel planning & content','Measurement & iteration','Campaign capstone & review']
     },
     data: {
       order: 3, tag: 'Studio track', title: 'Data Fundamentals', acc: '#C792FF', hue: '260deg', img: 'images/hero.jpg',
+      pos: '15% 80%', zoom: 1.2, tint: '#C792FF',
       curriculum: ['Data literacy & tooling','Analysis for real questions','Reporting & visual communication','Applied capstone']
     }
   };
@@ -525,10 +561,13 @@ footer a:hover{color:var(--lime)}
   var bgHost = document.getElementById('switcherBg');
   var bgLayers = {};
   progKeys.forEach(function(key){
+    var pr = programs[key];
     var layer = document.createElement('div');
     layer.className = 'switcher-bg-layer' + (key === 'design' ? ' active' : '');
-    layer.style.backgroundImage = "url('" + programs[key].img + "')";
-    layer.style.filter = 'hue-rotate(' + programs[key].hue + ') saturate(1.15)';
+    layer.style.backgroundImage = "url('" + pr.img + "')";
+    layer.style.backgroundPosition = pr.pos;
+    layer.style.filter = 'hue-rotate(' + pr.hue + ') saturate(1.15)';
+    layer.style.transform = 'scale(' + pr.zoom + ')';
     bgHost.appendChild(layer);
     bgLayers[key] = layer;
   });
@@ -540,6 +579,7 @@ footer a:hover{color:var(--lime)}
     var p = programs[key];
 
     document.documentElement.style.setProperty('--acc', p.acc);
+    document.documentElement.style.setProperty('--prog-tint', p.tint);
 
     Object.keys(bgLayers).forEach(function(k){ bgLayers[k].classList.toggle('active', k === key); });
 
@@ -561,13 +601,111 @@ footer a:hover{color:var(--lime)}
   // ---------- switcher tab controls ----------
   var tabs = document.querySelectorAll('.switcher-tab');
   tabs.forEach(function(btn){
-    btn.addEventListener('click', function(){ setActiveProgram(btn.dataset.prog); });
+    btn.addEventListener('click', function(){ setActiveProgram(btn.dataset.prog); dismissGesturePrompt(); });
     btn.addEventListener('keydown', function(e){
       var idx = Array.prototype.indexOf.call(tabs, btn);
       if (e.key === 'ArrowRight') { e.preventDefault(); (tabs[idx+1] || tabs[0]).focus(); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); (tabs[idx-1] || tabs[tabs.length-1]).focus(); }
     });
   });
+
+  // ======================================================
+  // GESTURE-GATED FIRST TRANSITION — "drag to explore"
+  // A featured, delightful way to trigger the FIRST program
+  // switch: drag the handle along the track and its path is
+  // drawn live. Clicking/activating a tab (mouse or keyboard)
+  // always works too — this is an invitation, not a lock, so
+  // the always-available accessible fallback stays intact.
+  // After the first switch (by either path) the prompt is
+  // dismissed for the rest of the visit.
+  // ======================================================
+  var gesturePrompt = document.getElementById('gesturePrompt');
+  var gestureHandle = document.getElementById('gestureHandle');
+  var gestureCanvas = document.getElementById('gestureCanvas');
+  var gestureDismissed = false;
+
+  function dismissGesturePrompt(){
+    if (gestureDismissed || !gesturePrompt) return;
+    gestureDismissed = true;
+    gesturePrompt.classList.add('done');
+    setTimeout(function(){ if (gesturePrompt && gesturePrompt.parentNode) gesturePrompt.parentNode.removeChild(gesturePrompt); }, 600);
+  }
+
+  if (gestureHandle && gestureCanvas && !reducedMotion && window.PointerEvent) {
+    var gctx = gestureCanvas.getContext('2d');
+    var dragging = false, startX = 0, startY = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function sizeCanvas(){
+      var r = gesturePrompt.getBoundingClientRect();
+      gestureCanvas.width = Math.max(1, r.width * dpr);
+      gestureCanvas.height = Math.max(1, r.height * dpr);
+      gestureCanvas.style.width = r.width + 'px';
+      gestureCanvas.style.height = r.height + 'px';
+    }
+    sizeCanvas();
+    window.addEventListener('resize', sizeCanvas);
+
+    gestureHandle.addEventListener('pointerdown', function(e){
+      if (gestureDismissed) return;
+      dragging = true;
+      gestureHandle.setPointerCapture(e.pointerId);
+      var hr = gestureHandle.getBoundingClientRect();
+      var pr = gesturePrompt.getBoundingClientRect();
+      startX = hr.left + hr.width / 2 - pr.left;
+      startY = hr.top + hr.height / 2 - pr.top;
+      gctx.clearRect(0, 0, gestureCanvas.width, gestureCanvas.height);
+      gctx.beginPath();
+      gctx.moveTo(startX * dpr, startY * dpr);
+    });
+
+    gestureHandle.addEventListener('pointermove', function(e){
+      if (!dragging || gestureDismissed) return;
+      var pr = gesturePrompt.getBoundingClientRect();
+      var x = e.clientX - pr.left;
+      var y = e.clientY - pr.top;
+      var dx = Math.max(0, Math.min(x - startX, pr.width - startX - 10));
+      gestureHandle.style.transform = 'translateX(' + dx + 'px)';
+      gctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim() || '#D6FF3F';
+      gctx.lineWidth = 2.5 * dpr;
+      gctx.lineCap = 'round';
+      gctx.lineTo((startX + dx) * dpr, (startY + (y - startY) * 0.15) * dpr);
+      gctx.stroke();
+
+      if (dx > 110) {
+        gestureHandle.releasePointerCapture(e.pointerId);
+        dragging = false;
+        var nextIdx = (programs[activeProgram].order + 1) % progKeys.length;
+        var nextKey = progKeys.filter(function(k){ return programs[k].order === nextIdx; })[0];
+        setActiveProgram(nextKey);
+        gestureHandle.style.transform = 'translateX(0) scale(1.15)';
+        setTimeout(function(){ if (gestureHandle) gestureHandle.style.transform = 'translateX(0) scale(1)'; }, 300);
+        dismissGesturePrompt();
+      }
+    });
+
+    function endDrag(){
+      if (!dragging) return;
+      dragging = false;
+      gestureHandle.style.transform = 'translateX(0)';
+      gctx.clearRect(0, 0, gestureCanvas.width, gestureCanvas.height);
+    }
+    gestureHandle.addEventListener('pointerup', endDrag);
+    gestureHandle.addEventListener('pointercancel', endDrag);
+    gestureHandle.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        var nextIdx = (programs[activeProgram].order + 1) % progKeys.length;
+        var nextKey = progKeys.filter(function(k){ return programs[k].order === nextIdx; })[0];
+        setActiveProgram(nextKey);
+        dismissGesturePrompt();
+      }
+    });
+  } else if (gesturePrompt) {
+    // reduced-motion / no pointer-event support: hide the decorative prompt,
+    // the tabs (always keyboard/click operable) remain the only — and fully
+    // accessible — way to switch programs.
+    gesturePrompt.style.display = 'none';
+  }
 
   // ======================================================
   // SCROLL-PINNED CURRICULUM BUILD
@@ -583,6 +721,8 @@ footer a:hover{color:var(--lime)}
     var p = programs[key];
     curriculumImg.src = p.img;
     curriculumImg.style.filter = 'hue-rotate(' + p.hue + ') saturate(1.1)';
+    curriculumImg.style.objectPosition = p.pos;
+    curriculumImg.style.transform = 'scale(' + Math.max(1, p.zoom * 0.96) + ')';
     curriculumTag.textContent = p.tag;
     curriculumTitle.textContent = p.title;
     curriculumList.innerHTML = p.curriculum.map(function(c, i){
@@ -598,6 +738,7 @@ footer a:hover{color:var(--lime)}
     var items = curriculumList.querySelectorAll('li');
     items.forEach(function(li){ li.classList.toggle('active', Number(li.dataset.step) === stop); });
     curriculumDots.forEach(function(d, i){ d.classList.toggle('on', i === stop); });
+    particleTargetProgress = stop / 3;
   }
 
   // sentinels drive which curriculum stop is "active" while the panel is pinned
@@ -614,6 +755,68 @@ footer a:hover{color:var(--lime)}
   }
 
   renderCurriculum('design');
+
+  // ======================================================
+  // CURRICULUM SCROLL-TIED PARTICLE FIELD (decorative, cheap)
+  // A field of dots drifts upward and brightens as the pinned
+  // curriculum build progresses (stop 0 -> 3), filling the
+  // visual panel's negative space instead of adding more text.
+  // ======================================================
+  var particleCanvas = document.getElementById('curriculumParticles');
+  var particleTargetProgress = 0, particleProgress = 0;
+  if (particleCanvas && !reducedMotion) {
+    var pctx = particleCanvas.getContext('2d');
+    var pdpr = Math.min(window.devicePixelRatio || 1, 2);
+    var particles = [], particleRunning = false, pw = 0, ph = 0;
+
+    function sizeParticles(){
+      var host = particleCanvas.parentElement;
+      pw = host.clientWidth; ph = host.clientHeight;
+      particleCanvas.width = Math.max(1, pw * pdpr);
+      particleCanvas.height = Math.max(1, ph * pdpr);
+      particleCanvas.style.width = pw + 'px';
+      particleCanvas.style.height = ph + 'px';
+      var count = Math.round((pw * ph) / 9000);
+      particles = [];
+      for (var i = 0; i < count; i++) {
+        particles.push({ x: Math.random(), y: Math.random() + Math.random() * 0.4, r: 1 + Math.random() * 1.8, s: 0.15 + Math.random() * 0.35, o: 0.25 + Math.random() * 0.55 });
+      }
+    }
+    sizeParticles();
+    window.addEventListener('resize', sizeParticles);
+
+    function drawParticles(){
+      particleProgress += (particleTargetProgress - particleProgress) * 0.06;
+      pctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+      var acc = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim() || '#D6FF3F';
+      particles.forEach(function(p){
+        var y = (p.y - particleProgress * p.s * 2.2) % 1.3;
+        if (y < -0.1) y += 1.3;
+        var fade = Math.max(0, 1 - Math.abs(y - 0.5) * 1.1) * p.o * (0.35 + particleProgress * 0.65);
+        if (fade <= 0.01) return;
+        pctx.beginPath();
+        pctx.arc(p.x * pw * pdpr, y * ph * pdpr, p.r * pdpr, 0, Math.PI * 2);
+        pctx.fillStyle = acc;
+        pctx.globalAlpha = fade;
+        pctx.fill();
+      });
+      pctx.globalAlpha = 1;
+      if (particleRunning) requestAnimationFrame(drawParticles);
+    }
+
+    var pinWrap = document.getElementById('curriculumPinWrap');
+    if ('IntersectionObserver' in window && pinWrap) {
+      var pIO = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if (entry.isIntersecting && !particleRunning) { particleRunning = true; requestAnimationFrame(drawParticles); }
+          else if (!entry.isIntersecting) { particleRunning = false; }
+        });
+      }, { threshold: 0.01 });
+      pIO.observe(pinWrap);
+    } else {
+      particleRunning = true; requestAnimationFrame(drawParticles);
+    }
+  }
 
   // ======================================================
   // PATHWAY — scroll-highlighted rail (no click needed)
