@@ -86,11 +86,9 @@
   .hero-stats div strong{display:block;font-family:var(--display);font-size:30px;color:var(--sage-dark)}
   .hero-stats div span{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft)}
   .hero-visual{position:relative;aspect-ratio:4/5;border-radius:28px;background:
-      radial-gradient(120% 120% at 20% 15%, #EDF0E4 0%, var(--sage-pale) 45%, var(--sage) 100%);
+      linear-gradient(0deg, rgba(43,46,39,.32), rgba(43,46,39,0) 45%), url('images/hero.jpg') center/cover no-repeat;
     overflow:hidden;box-shadow:0 30px 60px -20px rgba(92,107,80,.35)}
-  .hero-visual .blob{position:absolute;border-radius:50%;filter:blur(2px)}
-  .hero-visual .b1{width:46%;aspect-ratio:1;background:rgba(255,255,255,.55);top:8%;left:10%}
-  .hero-visual .b2{width:60%;aspect-ratio:1;background:var(--terracotta);opacity:.18;bottom:-10%;right:-10%}
+  .hero-visual .blob{display:none}
   .hero-visual .ring{position:absolute;inset:14%;border:1px solid rgba(255,255,255,.55);border-radius:50%}
   .hero-visual .card{position:absolute;left:12%;bottom:12%;background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 18px 34px -14px rgba(43,46,39,.28);display:flex;align-items:center;gap:12px;max-width:220px}
   .hero-visual .card .ic{width:36px;height:36px;border-radius:10px;background:var(--sage-pale);display:flex;align-items:center;justify-content:center;flex:none}
@@ -118,7 +116,7 @@
   .service-btn .arrow{width:30px;height:30px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;transition:transform .25s}
   .service-btn[aria-selected="true"] .arrow{transform:rotate(45deg)}
   .service-detail{padding:44px;display:flex;flex-direction:column;gap:18px;background:
-      radial-gradient(140% 100% at 100% 0%, var(--sage-pale) 0%, var(--cream) 55%)}
+      linear-gradient(100deg, var(--cream) 0%, var(--cream) 38%, rgba(245,243,237,.78) 60%, rgba(245,243,237,.4) 100%), url('images/reception.jpg') center/cover no-repeat}
   .service-detail .tag{display:inline-flex;align-self:flex-start;padding:7px 14px;border-radius:999px;background:var(--terracotta);color:#fff;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600}
   .service-detail h3{font-size:30px}
   .service-detail ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
@@ -270,7 +268,7 @@
   </div>
 </section>
 
-<section id="approach" class="dark">
+<section id="approach" class="dark" style="background:linear-gradient(180deg, rgba(43,46,39,.92), rgba(43,46,39,.96)), url('images/treatment-detail.jpg') center/cover no-repeat">
   <div class="shell">
     <div class="section-head reveal">
       <span class="eyebrow" style="color:#B9D1A8">Our approach</span>

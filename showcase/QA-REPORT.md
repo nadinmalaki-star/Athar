@@ -1,5 +1,17 @@
 # QA Report — Athar Lab Industries Showcase
 
+## Update: Photography integration pass
+
+Re-tested all 5 pages (showcase + 4 demos) in Playwright/Chromium at 1440×900 and 390×844 after integrating real photography. Results:
+
+- **0 console/page errors** on all 5 pages at both widths (one intermittent, non-reproducing `favicon.ico` 404 on FORMA's untouched file — not a regression, not caused by this pass).
+- All 9 new demo photos (3 each for VERA/ASCEND/MERIDIAN) load with HTTP 200 and render correctly in their layout slots at both breakpoints — verified by screenshot, not just by status code.
+- **FORMA fix verified live in-browser**: clicked hero pagination to slide 2 directly — confirmed the new golden-hour living room photo renders with no embedded text/UI. Clicked the "Bathrooms" category button directly — confirmed both the thumbnail grid and the large detail panel now show the correct bathroom photo (freestanding tub, mountain view), replacing the old bedroom/watermarked image, and the tab-switching interaction still works correctly.
+- Re-verified prior interactivity is intact after the CSS-only photo edits: VERA's service selector, ASCEND's program tabs and pathway accordion, MERIDIAN's service selector — all still functional (no JS/markup was touched, only `background`/`style` attributes and two inline `<img>` additions).
+- Visually inspected (not just HTTP-checked) every one of the 11 final source photographs at full resolution before integration; this caught two real defects before they shipped — see CHANGELOG — which is why 2 of the 11 were regenerated.
+
+Screenshots for this pass: `/tmp/.../scratchpad/qa/photo_integration/` and `/tmp/.../scratchpad/qa/forma_images/` (not copied into the repo; ask if you'd like them attached).
+
 All testing below was done against a real locally rendered build (`python3 -m http.server`) driven by Playwright/Chromium (`/opt/pw-browsers/chromium`, headless), not by reading source or generating mockup images. Screenshots referenced are real browser captures, saved under the scratchpad's `qa/` folder (paths given per section — ask if you want them copied into the repo).
 
 ## 1. Showcase shell (`index.html`)

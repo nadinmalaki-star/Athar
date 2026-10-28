@@ -1,5 +1,17 @@
 # Change Log — Athar Lab Industries Showcase
 
+## Update: Full photography integration (this pass)
+
+Canva's quota was restored and `media.canva.com` + `export-download.canva.com` were added to this session's allowed domains, unblocking real full-resolution photography. What changed:
+
+**FORMA V10 — both approved fixes applied.** `demos/forma/index.html` is no longer a copy of the master; `_master-backups/patch_forma.py` was run with two newly generated, clean, high-resolution photographs (no embedded text/UI, correct room type, no watermarks). Verified byte-for-byte that *only* hero slide 2's image, the Bathrooms thumbnail, and the `cats.bath.img` JS entry changed — every other image, all text, all CSS/JS, and the cinematic-scroll section are untouched (automated diff in the QA report).
+
+**VERA / ASCEND / MERIDIAN — real photography replaces the CSS/SVG placeholders.** Each demo now has 3 professionally art-directed photos (own `images/` folder per demo), integrated into existing layout slots (hero, service/service-detail panel, and one supporting section) via CSS background-image + gradient overlays for text legibility — no structural or interaction changes, all previously-verified functionality (selectors, forms, accordions, reduced-motion) re-confirmed working after the edits.
+
+**Quality control applied, not just accepted on first generation**: two images failed inspection and were regenerated before use — a bathroom photo with a faint hallucinated "embossed watermark" texture on the tub, and an ASCEND photo showing clearly recognizable faces (replaced with a people-free version). Every one of the 11 final images was decoded and visually inspected (not just HTTP-200-checked) before integration.
+
+**Photo sourcing pipeline** (for reference): `generate-image` → wrap the single image in a `desktop_wallpaper`-type Canva design via `generate-design`'s `asset_ids` (the only reliable way found to get a clean, undecorated single photo — `photo_collage` and similar content-template types auto-added unwanted text/multi-image layouts) → `create-design-from-candidate` → `export-design` → download from `export-download.canva.com`.
+
 ## New files (nothing in the existing repo was modified)
 
 ```

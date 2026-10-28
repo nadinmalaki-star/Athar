@@ -75,7 +75,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 64px;overflow:hidden;background:
   radial-gradient(1100px 620px at 82% -8%, rgba(214,255,63,.16), transparent 60%),
-  linear-gradient(180deg,#0a0a0c, #0d0d10 55%, #0a0a0c)}
+  linear-gradient(180deg,#0a0a0c, rgba(10,10,12,.88) 55%, #0a0a0c),
+  url('images/hero.jpg') center/cover no-repeat}
 .hero-grid{position:absolute;inset:0;opacity:.5;pointer-events:none;
   background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
   background-size:72px 72px;mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent)}
@@ -233,6 +234,11 @@ footer a:hover{color:var(--lime)}
   </section>
 
   <section class="intro">
+    <div class="shell" style="margin-bottom:56px">
+      <div class="reveal" style="aspect-ratio:21/8;border-radius:2px;overflow:hidden">
+        <img src="images/lecture.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+      </div>
+    </div>
     <div class="shell intro-grid">
       <div>
         <span class="eyebrow">01 / Our approach</span>
@@ -267,6 +273,12 @@ footer a:hover{color:var(--lime)}
       </div>
     </div>
   </section>
+
+  <div class="shell" style="padding:72px var(--gutter) 0">
+    <div class="reveal" style="aspect-ratio:21/8;border-radius:2px;overflow:hidden">
+      <img src="images/workspace.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+    </div>
+  </div>
 
   <section class="section pathway" id="pathway">
     <div class="shell">

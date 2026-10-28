@@ -56,7 +56,10 @@ button{font:inherit;cursor:pointer}
 .nav-toggle{display:none;background:none;border:0;color:var(--paper)}
 
 /* hero */
-.hero{position:relative;background:var(--navy);color:var(--paper);overflow:hidden;padding:120px var(--gutter) 140px}
+.hero{position:relative;background:
+  linear-gradient(100deg, var(--navy) 0%, var(--navy) 42%, rgba(12,19,34,.82) 65%, rgba(12,19,34,.55) 100%),
+  url('images/hero.jpg') center/cover no-repeat;
+  color:var(--paper);overflow:hidden;padding:120px var(--gutter) 140px}
 .hero-grid{position:absolute;inset:0;opacity:.5;pointer-events:none}
 .hero-inner{position:relative;max-width:var(--shell);margin:0 auto}
 .hero h1{font-size:clamp(40px,6.4vw,84px);max-width:16ch;margin:22px 0 28px}
@@ -90,7 +93,7 @@ button{font:inherit;cursor:pointer}
 .service-tab[aria-selected="true"] .arrow{opacity:1;transform:none}
 .service-tab[aria-selected="true"] .name{color:var(--bronze-hot)}
 .service-tab:hover .name{color:var(--bronze-hot)}
-.service-detail{padding:8px 0 8px 56px;border-bottom:1px solid var(--line)}
+.service-detail{padding:8px 0 8px 56px;border-bottom:1px solid var(--line);background:linear-gradient(90deg, var(--ink) 0%, var(--ink) 38%, rgba(16,19,24,.7) 70%, rgba(16,19,24,.35) 100%), url('images/meeting.jpg') center/cover no-repeat}
 .service-panel{display:none;padding:10px 0 46px}
 .service-panel.active{display:block}
 .service-panel .eyebrow{color:#7a828d}
@@ -228,6 +231,9 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
 <section class="intro">
   <div class="intro-inner">
     <div class="reveal">
+      <div style="aspect-ratio:4/3;border-radius:2px;overflow:hidden;margin-bottom:28px">
+        <img src="images/abstract.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+      </div>
       <div class="eyebrow">Our Position</div>
       <h2 class="display">A second, sharper opinion on how your business actually runs.</h2>
     </div>
