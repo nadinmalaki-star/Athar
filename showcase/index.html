@@ -421,7 +421,25 @@ footer a:hover{color:var(--paper)}
     track.addEventListener('keydown', function(e){
       if (e.key === 'ArrowRight') { e.preventDefault(); goToZone(currentIndex() + 1); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); goToZone(currentIndex() - 1); }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        var link = zones[currentIndex()].querySelector('.zone-cta');
+        if (link) link.click();
+      }
     });
+
+    // Vertical mouse-wheel over the track pans between zones (matches the
+    // "scroll to explore" hint); once at the first/last zone, let an extra
+    // wheel tick fall through to normal page scroll instead of trapping it.
+    track.addEventListener('wheel', function(e){
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // real horizontal/trackpad input: leave native behavior alone
+      var i = currentIndex();
+      var atStart = i === 0 && e.deltaY < 0;
+      var atEnd = i === zones.length - 1 && e.deltaY > 0;
+      if (atStart || atEnd) return; // let the page scroll past the section
+      e.preventDefault();
+      goToZone(i + (e.deltaY > 0 ? 1 : -1));
+    }, { passive: false });
 
     updateDots();
   }

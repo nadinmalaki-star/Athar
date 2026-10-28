@@ -584,7 +584,11 @@ footer a:hover{color:var(--lime)}
     Object.keys(bgLayers).forEach(function(k){ bgLayers[k].classList.toggle('active', k === key); });
 
     document.querySelectorAll('.switcher-frame').forEach(function(f){
-      f.classList.toggle('active', f.dataset.prog === key);
+      var isActive = f.dataset.prog === key;
+      f.classList.toggle('active', isActive);
+      // keep inactive (opacity:0) frames out of tab order so keyboard focus
+      // never lands on invisible links belonging to a program not on screen
+      if (isActive) { f.removeAttribute('inert'); } else { f.setAttribute('inert', ''); }
     });
     document.querySelectorAll('.switcher-tab').forEach(function(t){
       t.setAttribute('aria-pressed', t.dataset.prog === key ? 'true' : 'false');
