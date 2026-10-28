@@ -1,5 +1,30 @@
 # QA Report — Athar Lab Industries Showcase
 
+## Update: Flagship WebGL entrance + VERA/ASCEND/MERIDIAN GSAP upgrades
+
+All testing against a real local build (`python3 -m http.server` from the repo root) driven by Playwright/Chromium (`/opt/pw-browsers/chromium`, headless), reading live computed styles and camera state off the running page — not source inspection, not mockups.
+
+**Final sweep, all 5 pages, 1440×900:** 0 console/page errors, 0 failed network requests, on showcase/index.html and all 4 demos.
+
+**Flagship WebGL entrance (showcase/index.html):**
+- Real depth/perspective: camera z measured at 5 scroll offsets (0%, 25%, 50%, 75%, 100%) — travels 8 → ‑119 along a `CatmullRomCurve3`, not a static or `scale()`-faked move.
+- Zone transitions correct at every sampled offset (`entrance → forma → vera → ascend → meridian`), each with the right "Open full demo" href.
+- Reversibility: sampled forward to 100%, then back to 50% and 0% — progress and zone index tracked correctly in both directions (GSAP ScrollTrigger `scrub`, not a one-shot animation).
+- Fallback gate verified by context, not assumption: `reducedMotion:'reduce'` context → `#flagshipStage` computed `display:none`; 390×844 touch/mobile context → same; in both cases the real `.zone-track`/`.zone-stack` sector grid is what actually renders, not a blank area.
+- EN/AR: toggled language mid-scroll — zone overlay text, nav, and CTA all updated correctly without losing the current scroll position or zone state; RTL layout mirrors correctly (nav, buttons, zone index numerals force-LTR via `unicode-bidi:isolate` so "02 / 04" doesn't visually reverse).
+- **Found and fixed during this pass**: toggling to Arabic (`dir="rtl"`) reliably blanked the entire page's paint in this browser — isolated via binary-search bisection of the page's own CSS (confirmed pre-existing on the untouched file, unrelated to WebGL) down to a single rule: the inquiry form's honeypot field used `left:-9999px` to hide off-screen, which produces a pathological scrollable-overflow region under RTL. Fixed by switching to the same safe clip-based hidden-field technique the page already uses for `.sr-only`. Re-tested: fixed on first application, confirmed at full-page and element-level screenshot granularity.
+- **Also found and fixed**: 3 of 4 mobile fallback sector cards (VERA/ASCEND/MERIDIAN) were silently 404ing their background photos due to a wrong relative path (one directory too high) — pre-existing, unrelated to this pass's own additions, fixed alongside the above.
+
+**VERA Clinic:** scroll-scrubbed photo-layer scene verified at 0/30/50/70/100% scroll — confirmed via computed `opacity`/`filter`/`transform3d` at each point, not just visual inspection. Reversibility confirmed: opacity values at 70% scrolling forward and 70% after scrolling back down matched exactly (`back:0.14 mid:0.6685 front:0.7582` both directions). A real quality defect caught in review — the three photo layers all reaching full opacity simultaneously read as a murky triple-exposure rather than spatial depth — was fixed by retuning the GSAP timeline into a sequential procession with a depth-of-field blur; re-verified by screenshot at all 5 scroll points after the fix.
+
+**ASCEND Academy:** keyboard-only session (Tab/ArrowRight/Enter, no mouse, gesture never triggered) reached all 4 programs and the enrollment submit button. Click-only session (tabs only, gesture never triggered) activated every program correctly (`aria-expanded`, `inert`, `pointer-events`, CTA visibility all correct). Curriculum section's GSAP ScrollTrigger scrub confirmed reversible (`activeStep`/zoom tracked 0→1→2→3 forward, back to 2/0 on reverse scroll).
+
+**MERIDIAN Partners:** particle `orderAmt`, the new photo's CSS filter, and the stage counter all sampled at 0/30/50/90% forward then 50%/0% backward — bit-for-bit identical on the way back down (real scrub, not a one-shot). 768px service-grid breakpoint re-checked after the changes — still no horizontal overflow.
+
+**Video evidence** (sent to the user as real Playwright-recorded `.webm` captures, not mockups): a desktop walkthrough of the flagship cinematic entrance scrolling into the sector grid; a VERA scene walkthrough scrolling forward then back to demonstrate reversibility; a mobile (iPhone 13 viewport) walkthrough of the fallback sector-grid experience.
+
+**Known gaps, stated plainly:** VERA/ASCEND/MERIDIAN did not receive the EN/AR bilingual treatment in this pass (showcase/index.html did); ASCEND's per-program imagery is still a shared photo set with hue-rotate tinting, not fully distinct photography per program; the pre-existing `#sectors` zone-card copy in showcase/index.html itself remains English-only even though the bilingual mechanism is proven elsewhere on that page.
+
 ## Update: Photography integration pass
 
 Re-tested all 5 pages (showcase + 4 demos) in Playwright/Chromium at 1440×900 and 390×844 after integrating real photography. Results:
