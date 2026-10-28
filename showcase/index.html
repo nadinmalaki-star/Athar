@@ -11,6 +11,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Almarai:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Space+Mono&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Space+Mono&display=swap"></noscript>
+<!-- Flagship cinematic entrance: real self-hosted three.js (vendor/three), matching
+     studioathar.studio's own import-map convention. Declaring the map costs nothing
+     over the wire by itself — three.module.min.js is only fetched if js/flagship-scene.js
+     is actually dynamically imported, which only happens when the WebGL/motion/viewport
+     gate in the boot script below passes. GSAP + ScrollTrigger are loaded the same
+     lazy way (classic <script> tags injected at runtime), not declared here, since
+     their cdnjs build is UMD and has no static ES export. -->
+<script type="importmap">{ "imports": { "three": "/vendor/three/0.186.1/three.module.min.js" } }</script>
 <style>
 :root{
   --void:#050505; --char:#0b0b0c; --graphite:#111113; --graphite-2:#18181b;
@@ -48,6 +56,11 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .btn-arrow{width:40px;height:40px;border-radius:1px;background:var(--ember);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .25s ease}
 .btn:hover .btn-arrow{transform:translateX(4px)}
 .btn-arrow svg{width:16px;height:16px}
+[dir="rtl"] .btn{padding:0 22px 0 7px}
+[dir="rtl"] .btn-ghost{padding:0 22px}
+[dir="rtl"] .btn:hover .btn-arrow{transform:translateX(-4px)}
+[dir="rtl"] .btn-arrow svg{transform:scaleX(-1)}
+[dir="rtl"] .label::before{order:1}
 
 /* ---------- Nav ---------- */
 .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:22px var(--gutter);mix-blend-mode:normal;background:linear-gradient(180deg,rgba(5,5,5,.75),transparent)}
@@ -57,6 +70,39 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .nav-links a{transition:color .2s}
 .nav-links a:hover{color:var(--paper)}
 @media(max-width:720px){.nav-links{display:none}}
+.lang-toggle{font-family:var(--mono);font-size:11px;letter-spacing:1px;background:transparent;border:1px solid var(--line-strong);color:var(--paper);min-width:40px;padding:6px 10px;border-radius:2px;cursor:pointer;transition:border-color .25s ease}
+.lang-toggle:hover{border-color:var(--paper-mute)}
+
+/* ---------- Skip link (keyboard-reachable escape from the cinematic intro) ---------- */
+.skip-link{position:absolute;top:-60px;left:var(--gutter);z-index:60;background:var(--paper);color:var(--void);font-family:var(--mono);font-size:12px;letter-spacing:1px;padding:12px 18px;border-radius:2px;transition:top .2s ease}
+.skip-link:focus{top:18px}
+[dir="rtl"] .skip-link{left:auto;right:var(--gutter)}
+
+/* ---------- Flagship cinematic entrance (real WebGL + GSAP ScrollTrigger) ---------- */
+#flagshipStage{display:none;position:relative;height:500vh}
+#flagshipStage.is-active{display:block}
+.flagship-sticky{position:sticky;top:0;height:100svh;overflow:hidden;background:var(--void)}
+#flagshipCanvas{position:absolute;inset:0;z-index:1}
+#flagshipCanvas canvas{display:block}
+.flagship-loading{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--paper-mute);background:var(--void);transition:opacity .4s ease}
+.flagship-loading.hide{opacity:0;pointer-events:none}
+.flagship-overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;padding:120px var(--gutter) 64px;pointer-events:none}
+.flagship-tile{pointer-events:auto;max-width:460px}
+.flagship-zone-index{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--ember-hot);display:block;margin-bottom:10px;direction:ltr;unicode-bidi:isolate;text-align:start}
+.flagship-zone-name{font-family:var(--display);font-weight:800;font-size:clamp(30px,4.6vw,58px);line-height:1.02;letter-spacing:-.015em;color:#fff;transition:opacity .35s ease}
+.flagship-zone-tag{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--paper-mute);margin-top:12px}
+.flagship-zone-desc{margin-top:14px;color:var(--paper-dim);font-size:14px;line-height:1.75;max-width:42ch}
+.flagship-bottom-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;pointer-events:none}
+.flagship-cta{pointer-events:auto;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
+.flagship-cta.is-visible{opacity:1;transform:none;pointer-events:auto}
+.flagship-dots{pointer-events:auto;display:flex;gap:10px}
+.flagship-dot{width:9px;height:9px;border-radius:50%;background:var(--line-strong);border:none;padding:0;cursor:pointer;transition:background .25s,transform .25s}
+.flagship-dot[aria-current="true"]{background:var(--ember);transform:scale(1.3)}
+.flagship-hint{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--paper-mute);margin-top:10px;display:flex;align-items:center;gap:10px}
+.flagship-hint .line{width:1px;height:28px;background:var(--line-strong);position:relative;overflow:hidden}
+.flagship-hint .line::after{content:'';position:absolute;top:-100%;left:0;right:0;height:100%;background:var(--ember);animation:scrollcue 2s ease-in-out infinite}
+@media(max-width:860px){#flagshipStage{display:none!important}}
+@media(prefers-reduced-motion:reduce){#flagshipStage{display:none!important}}
 
 /* ---------- A. Editorial opening ---------- */
 .opening{min-height:100svh;display:flex;flex-direction:column;justify-content:center;position:relative;padding-top:120px;padding-bottom:80px;background:
@@ -84,11 +130,11 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .zone-bg{position:absolute;inset:0;background-size:cover;background-position:center}
 .zone-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,5,5,.86) 0%,rgba(5,5,5,.42) 46%,rgba(5,5,5,.18) 100%)}
 .zone[data-id="forma"] .zone-bg{background-image:url('assets/sector-previews/forma.jpg')}
-.zone[data-id="vera"] .zone-bg{background-image:url('../demos/vera-clinic/images/hero.jpg')}
-.zone[data-id="ascend"] .zone-bg{background-image:url('../demos/ascend-academy/images/hero.jpg')}
-.zone[data-id="meridian"] .zone-bg{background-image:url('../demos/meridian-partners/images/hero.jpg')}
+.zone[data-id="vera"] .zone-bg{background-image:url('demos/vera-clinic/images/hero.jpg')}
+.zone[data-id="ascend"] .zone-bg{background-image:url('demos/ascend-academy/images/hero.jpg')}
+.zone[data-id="meridian"] .zone-bg{background-image:url('demos/meridian-partners/images/hero.jpg')}
 .zone-in{position:relative;z-index:1;padding:0 var(--gutter) 64px;width:100%;max-width:820px}
-.zone-num{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--ember-hot);margin-bottom:14px;display:block}
+.zone-num{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--ember-hot);margin-bottom:14px;display:block;direction:ltr;unicode-bidi:isolate;text-align:start}
 .zone-name{font-family:var(--display);font-weight:800;font-size:clamp(32px,5.2vw,76px);line-height:.98;letter-spacing:-.015em;color:#fff}
 .zone-tag{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--paper-mute);margin-top:14px;display:block}
 .zone-desc{margin-top:18px;color:var(--paper-dim);max-width:52ch;font-size:15px;line-height:1.8}
@@ -115,15 +161,26 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
   .zone-card{position:relative;border-radius:4px;overflow:hidden;min-height:380px;display:flex;align-items:flex-end;background-size:cover;background-position:center}
   .zone-card::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,5,5,.88),rgba(5,5,5,.25) 60%)}
   .zone-card[data-id="forma"]{background-image:url('assets/sector-previews/forma.jpg')}
-  .zone-card[data-id="vera"]{background-image:url('../demos/vera-clinic/images/hero.jpg')}
-  .zone-card[data-id="ascend"]{background-image:url('../demos/ascend-academy/images/hero.jpg')}
-  .zone-card[data-id="meridian"]{background-image:url('../demos/meridian-partners/images/hero.jpg')}
+  .zone-card[data-id="vera"]{background-image:url('demos/vera-clinic/images/hero.jpg')}
+  .zone-card[data-id="ascend"]{background-image:url('demos/ascend-academy/images/hero.jpg')}
+  .zone-card[data-id="meridian"]{background-image:url('demos/meridian-partners/images/hero.jpg')}
   .zone-card-in{position:relative;z-index:1;padding:28px}
   #sectorMotif{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   #sectorMotif{display:none}
 }
+
+/* ---------- D. Real Athar capabilities ---------- */
+.capabilities{padding:120px 0 100px}
+.cap-card{background:var(--char);border:1px solid var(--line);border-radius:4px;padding:36px clamp(20px,4vw,48px);max-width:640px}
+.cap-card-head{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.cap-name{font-family:var(--display);font-weight:800;font-size:clamp(24px,3vw,32px);color:#fff}
+.cap-name-ar{margin-inline-start:10px;font-size:16px;color:var(--paper-mute);font-weight:400}
+.cap-tag{margin-top:10px;color:var(--paper-dim);font-size:15px}
+.cap-list{list-style:none;margin-top:24px;display:grid;gap:14px}
+.cap-list li{display:flex;align-items:baseline;gap:12px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;color:var(--paper-dim)}
+.cap-list b{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ember-hot);min-width:90px}
 
 /* ---------- E. Offer ---------- */
 .offer{padding:120px 0;background:var(--char);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -151,7 +208,7 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ember)}
 .field textarea{min-height:110px;resize:vertical}
 .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%237d7c78'%3E%3Cpath d='M5.5 7.5l4.5 4.5 4.5-4.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.hp{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .form-status{min-height:22px;font-size:14px}
 .form-status.ok{color:#7CD9A0}
 .form-status.err{color:var(--ember-hot)}
@@ -169,14 +226,18 @@ footer a:hover{color:var(--paper)}
 </head>
 <body>
 
+<a class="skip-link" href="#sectors" data-ar="تخطّي المقدّمة السينمائية، روح مباشرة للقطاعات" data-en="Skip the cinematic intro, go straight to the sectors">Skip the cinematic intro, go straight to the sectors</a>
+
 <nav class="nav shell" style="max-width:100%">
   <a class="nav-brand" href="#top" aria-label="Athar">
     <img src="assets/athar-logo-wordmark-official.png" alt="Athar">
   </a>
   <div class="nav-links">
-    <a href="#sectors">Industries</a>
-    <a href="#offer">Pricing</a>
-    <a href="#inquiry">Start a project</a>
+    <a href="#sectors" data-ar="القطاعات" data-en="Industries">Industries</a>
+    <a href="#capabilities" data-ar="أعمالنا الحقيقية" data-en="Real work">Real work</a>
+    <a href="#offer" data-ar="السعر" data-en="Pricing">Pricing</a>
+    <a href="#inquiry" data-ar="ابدأ مشروعك" data-en="Start a project">Start a project</a>
+    <button id="langToggle" class="lang-toggle" type="button">AR</button>
   </div>
 </nav>
 
@@ -184,17 +245,46 @@ footer a:hover{color:var(--paper)}
 
   <!-- A. Editorial opening -->
   <section class="opening shell">
-    <div class="label reveal">ATHAR LAB — INDUSTRIES</div>
-    <h1 class="reveal" style="transition-delay:.1s">Every industry deserves a digital<br>experience built <i>around it.</i></h1>
-    <p class="lede reveal" style="transition-delay:.2s">We build websites, products and systems for real businesses — not templates. Pick a sector below and open a fully working demonstration of what we'd build for it, start to finish, interactive and in your browser right now.</p>
-    <div class="scroll-cue"><span class="line"></span><span>Scroll</span></div>
+    <div class="label reveal" data-ar="أثر لاب — القطاعات" data-en="ATHAR LAB — INDUSTRIES">ATHAR LAB — INDUSTRIES</div>
+    <h1 class="reveal" style="transition-delay:.1s" data-ar-html="كل قطاع بيستاهل تجربة رقمية مبنية <i>حواليه.</i>" data-en-html="Every industry deserves a digital<br>experience built <i>around it.</i>">Every industry deserves a digital<br>experience built <i>around it.</i></h1>
+    <p class="lede reveal" style="transition-delay:.2s" data-ar="بنبني مواقع ومنتجات وأنظمة لشركات حقيقية — مش قوالب جاهزة. تفرّج على رحلة سينمائية عبر أربع عوالم صناعية، وبعدين افتح نسخة تجريبية كاملة شغّالة فعليًا في المتصفح." data-en="We build websites, products and systems for real businesses — not templates. Take a cinematic tour through four industry worlds, then open a fully working demonstration of what we'd build for it, start to finish, interactive and in your browser right now.">We build websites, products and systems for real businesses — not templates. Take a cinematic tour through four industry worlds, then open a fully working demonstration of what we'd build for it, start to finish, interactive and in your browser right now.</p>
+    <div class="scroll-cue"><span class="line"></span><span data-ar="مرر للأسفل" data-en="Scroll">Scroll</span></div>
+  </section>
+
+  <!-- A.5 Flagship cinematic entrance: real Three.js (procedural geometry, no external
+       3D files) + GSAP ScrollTrigger. Gated behind a conservative WebGL/motion/viewport
+       check in the boot script below; falls through cleanly to the existing sector
+       grid for everyone else — see #sectors, which is itself a real, art-directed,
+       interactive experience, not a flat substitute. -->
+  <section id="flagshipStage" aria-label="A tour of four industry worlds, in 3D">
+    <div class="flagship-sticky">
+      <div id="flagshipCanvas" aria-hidden="true"></div>
+      <div class="flagship-loading" id="fsLoading" aria-hidden="true">
+        <span data-ar="عم نحمّل التجربة…" data-en="Loading the experience…">Loading the experience…</span>
+      </div>
+      <div class="flagship-overlay">
+        <div class="flagship-tile">
+          <span class="flagship-zone-index" id="fsZoneIndex">00 / 04</span>
+          <h2 class="flagship-zone-name" id="fsZoneName" data-ar="أثر" data-en="Athar">Athar</h2>
+          <p class="flagship-zone-tag" id="fsZoneTag" data-ar="استوديو منتجات رقمية" data-en="A digital product studio">A digital product studio</p>
+          <p class="flagship-zone-desc" id="fsZoneDesc" data-ar="مرر للأسفل لتدخل أربع عوالم صناعية — كل وحدة مبنية ومضاءة بهويتها الخاصة." data-en="Scroll to move through four industry worlds — each one built and lit in its own identity.">Scroll to move through four industry worlds — each one built and lit in its own identity.</p>
+        </div>
+        <div class="flagship-bottom-row">
+          <div>
+            <div class="flagship-hint"><span class="line"></span><span data-ar="مرر" data-en="Scroll">Scroll</span></div>
+          </div>
+          <a class="btn btn-primary flagship-cta" id="fsZoneCta" href="#sectors" target="_blank" rel="noopener"><span data-ar="افتح النسخة الكاملة" data-en="Open full demo">Open full demo</span><span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
+        </div>
+        <div class="flagship-dots" id="fsDots" role="tablist" aria-label="Jump to a world"></div>
+      </div>
+    </div>
   </section>
 
   <!-- B / C. Sector zones — spatial horizontal canvas -->
   <section class="sectors" id="sectors">
     <div class="sectors-head shell">
-      <div class="label reveal">01 — CHOOSE A SECTOR</div>
-      <h2 class="h2 reveal" style="margin-top:18px;max-width:16ch">Four industries. Four distinct worlds.</h2>
+      <div class="label reveal" data-ar="01 — اختار قطاع" data-en="01 — CHOOSE A SECTOR">01 — CHOOSE A SECTOR</div>
+      <h2 class="h2 reveal" style="margin-top:18px;max-width:16ch" data-ar="أربع قطاعات. أربع عوالم مختلفة." data-en="Four industries. Four distinct worlds.">Four industries. Four distinct worlds.</h2>
     </div>
 
     <div class="zone-stage reveal">
@@ -279,29 +369,49 @@ footer a:hover{color:var(--paper)}
     </div>
   </section>
 
+  <!-- D. Real Athar capabilities — clearly distinguished from the four fictional demo brands above -->
+  <section class="capabilities shell" id="capabilities">
+    <div class="label reveal" data-ar="02 — شغلنا الحقيقي" data-en="02 — REAL ATHAR WORK">02 — REAL ATHAR WORK</div>
+    <h2 class="h2 reveal" style="margin-top:18px;max-width:20ch" data-ar="الأربع قطاعات فوق تجارب توضيحية. هاد مشروع حقيقي اشتغلناه." data-en="The four sectors above are demonstrations. This is something real we actually built.">The four sectors above are demonstrations. This is something real we actually built.</h2>
+    <p class="lede reveal" style="margin-top:16px" data-ar="فورما، فيرا، أسيند وميريديان علامات تجارية خيالية بنيناها لنوريك قدرتنا. خزنتي منتج حقيقي شغّال، لزبون حقيقي، اليوم." data-en="FORMA, VERA, ASCEND and MERIDIAN are fictional brands we built to show you what we can do. KHZNTI is a real, live product, for a real client, running today.">FORMA, VERA, ASCEND and MERIDIAN are fictional brands we built to show you what we can do. KHZNTI is a real, live product, for a real client, running today.</p>
+
+    <article class="cap-card reveal" style="margin-top:44px">
+      <div class="cap-card-head">
+        <h3 class="cap-name">KHZNTI <bdi lang="ar" class="cap-name-ar">خزنتي</bdi></h3>
+        <a class="btn btn-ghost" href="https://khznti.app" target="_blank" rel="noopener" data-ar="افتح خزنتي ↗" data-en="Explore KHZNTI ↗">Explore KHZNTI ↗</a>
+      </div>
+      <p class="cap-tag" data-ar="إدارة أبسط. صورة أوضح." data-en="Simpler management. A clearer picture.">Simpler management. A clearer picture.</p>
+      <ul class="cap-list">
+        <li><b data-ar="العمليات" data-en="Operations">Operations</b><span data-ar="سجّل أي معاملة مرة وحدة" data-en="Record a transaction once">Record a transaction once</span></li>
+        <li><b data-ar="الخزائن" data-en="Vaults">Vaults</b><span data-ar="كاش وبنك، لكل عملة" data-en="Cash and bank, per currency">Cash and bank, per currency</span></li>
+        <li><b data-ar="التقارير" data-en="Reports">Reports</b><span data-ar="الشهر كلّه بنظرة وحدة" data-en="The month at a glance">The month at a glance</span></li>
+      </ul>
+    </article>
+  </section>
+
   <!-- E. Service offer -->
   <section class="offer" id="offer">
     <div class="shell offer-grid">
       <div class="reveal">
-        <div class="label">02 — THE ATHAR OFFER</div>
-        <h2 class="h2" style="margin-top:18px;font-size:clamp(28px,4vw,48px)">The landing page you just saw the quality of.</h2>
-        <div class="offer-price"><span class="num">₪2,190</span><span class="cur">starting, basic package</span></div>
-        <p class="lede">A custom-designed, responsive landing page built around one clear business goal — the same engineering discipline and visual care demonstrated in the four sectors above.</p>
+        <div class="label" data-ar="03 — عرض أثر" data-en="03 — THE ATHAR OFFER">03 — THE ATHAR OFFER</div>
+        <h2 class="h2" style="margin-top:18px;font-size:clamp(28px,4vw,48px)" data-ar="صفحة هبوط بنفس الجودة يلي شفتها هلأ." data-en="The landing page you just saw the quality of.">The landing page you just saw the quality of.</h2>
+        <div class="offer-price"><span class="num">₪2,190</span><span class="cur" data-ar="تبدأ من، الباقة الأساسية" data-en="starting, basic package">starting, basic package</span></div>
+        <p class="lede" data-ar="صفحة هبوط مصمَّمة خصيصًا وجاوبة، مبنية حول هدف عمل واحد واضح — بنفس الانضباط الهندسي والعناية البصرية يلي شفتها بالأربع قطاعات فوق." data-en="A custom-designed, responsive landing page built around one clear business goal — the same engineering discipline and visual care demonstrated in the four sectors above.">A custom-designed, responsive landing page built around one clear business goal — the same engineering discipline and visual care demonstrated in the four sectors above.</p>
         <div class="offer-terms">
-          <div><strong>7–10 business days</strong>estimated delivery</div>
-          <div><strong>50% / 50%</strong>upfront / on delivery</div>
+          <div><strong data-ar="٧–١٠ أيام عمل" data-en="7–10 business days">7–10 business days</strong><span data-ar="مدة التسليم المتوقعة" data-en="estimated delivery">estimated delivery</span></div>
+          <div><strong>50% / 50%</strong><span data-ar="مقدّم / عند التسليم" data-en="upfront / on delivery">upfront / on delivery</span></div>
         </div>
-        <p class="offer-note">The cinematic scroll, multi-step journeys and interactive systems shown in these demos go beyond the basic package — they're scoped and quoted separately based on what your project needs. Price is a provisional launch offer, subject to final approval.</p>
+        <p class="offer-note" data-ar="هاد السعر للباقة الأساسية فقط — صفحة هبوط واحدة. المشهد السينمائي ثلاثي الأبعاد يلي شفته بالأعلى، والسكرول السينمائي، والرحلات متعددة الخطوات، والأنظمة التفاعلية بالتجارب التوضيحية، كلها أبعد من الباقة الأساسية بكتير — وبتُحسب وتُسعّر لحالها حسب احتياج مشروعك. السعر عرض إطلاق مبدئي، وبخضع لموافقة نهائية من الإدارة." data-en="This price covers the basic single-page package only. The cinematic 3D scene you just scrolled through, the cinematic scroll, multi-step journeys and interactive systems shown in the demos go well beyond the basic package — they're scoped and quoted separately based on what your project needs. Price is a provisional launch offer, subject to final business approval.">This price covers the basic single-page package only. The cinematic 3D scene you just scrolled through, the cinematic scroll, multi-step journeys and interactive systems shown in the demos go well beyond the basic package — they're scoped and quoted separately based on what your project needs. Price is a provisional launch offer, subject to final business approval.</p>
       </div>
       <div class="reveal" style="transition-delay:.1s">
         <ul class="offer-list">
-          <li>Business-goal discovery</li>
-          <li>One custom-designed, fully responsive landing page</li>
-          <li>Clear information architecture &amp; one primary conversion goal</li>
-          <li>Basic inquiry / contact form</li>
-          <li>Foundational performance &amp; accessibility pass</li>
-          <li>Functional testing and deployment</li>
-          <li>Defined revision rounds, documented delivery scope</li>
+          <li data-ar="اكتشاف هدف العمل" data-en="Business-goal discovery">Business-goal discovery</li>
+          <li data-ar="صفحة هبوط واحدة مصمَّمة خصيصًا وجاوبة بالكامل" data-en="One custom-designed, fully responsive landing page">One custom-designed, fully responsive landing page</li>
+          <li data-ar="بنية معلومات واضحة وهدف تحويل أساسي واحد" data-en="Clear information architecture &amp; one primary conversion goal">Clear information architecture &amp; one primary conversion goal</li>
+          <li data-ar="نموذج استفسار / تواصل أساسي" data-en="Basic inquiry / contact form">Basic inquiry / contact form</li>
+          <li data-ar="فحص أداء وإتاحة أساسي" data-en="Foundational performance &amp; accessibility pass">Foundational performance &amp; accessibility pass</li>
+          <li data-ar="اختبار وظيفي ونشر" data-en="Functional testing and deployment">Functional testing and deployment</li>
+          <li data-ar="جولات تعديل محدّدة، ونطاق تسليم موثّق" data-en="Defined revision rounds, documented delivery scope">Defined revision rounds, documented delivery scope</li>
         </ul>
       </div>
     </div>
@@ -311,52 +421,52 @@ footer a:hover{color:var(--paper)}
   <section class="inquiry shell" id="inquiry">
     <div class="inquiry-grid">
       <div class="reveal">
-        <div class="label">03 — START A PROJECT</div>
-        <h2 class="h2" style="margin-top:18px;font-size:clamp(28px,4vw,48px)">Tell us about yours.</h2>
-        <p class="lede" style="margin-top:18px">This goes straight to Athar — a real person reads every inquiry. No fictional brand, no demo: this is the one that counts.</p>
+        <div class="label" data-ar="٠٤ — ابدأ مشروعك" data-en="04 — START A PROJECT">04 — START A PROJECT</div>
+        <h2 class="h2" style="margin-top:18px;font-size:clamp(28px,4vw,48px)" data-ar="احكيلنا عن مشروعك." data-en="Tell us about yours.">Tell us about yours.</h2>
+        <p class="lede" style="margin-top:18px" data-ar="هاد النموذج بيوصل مباشرة لأثر — شخص حقيقي بيقرأ كل استفسار. مش علامة خيالية ولا تجربة توضيحية: هاد الوحيد يلي بيهم فعلًا." data-en="This goes straight to Athar — a real person reads every inquiry. No fictional brand, no demo: this is the one that counts.">This goes straight to Athar — a real person reads every inquiry. No fictional brand, no demo: this is the one that counts.</p>
       </div>
       <form class="form reveal" id="athForm" style="transition-delay:.1s" novalidate>
         <div class="form-row">
-          <div class="field"><label for="athName">Your name</label><input id="athName" name="name" type="text" required autocomplete="name"></div>
-          <div class="field"><label for="athBiz">Business name</label><input id="athBiz" name="business" type="text" autocomplete="organization"></div>
+          <div class="field"><label for="athName" data-ar="اسمك" data-en="Your name">Your name</label><input id="athName" name="name" type="text" required autocomplete="name"></div>
+          <div class="field"><label for="athBiz" data-ar="اسم العمل" data-en="Business name">Business name</label><input id="athBiz" name="business" type="text" autocomplete="organization"></div>
         </div>
         <div class="form-row">
-          <div class="field"><label for="athEmail">Email</label><input id="athEmail" name="email" type="email" required autocomplete="email"></div>
-          <div class="field"><label for="athSector">Business sector</label>
+          <div class="field"><label for="athEmail" data-ar="البريد الإلكتروني" data-en="Email">Email</label><input id="athEmail" name="email" type="email" required autocomplete="email"></div>
+          <div class="field"><label for="athSector" data-ar="قطاع العمل" data-en="Business sector">Business sector</label>
             <select id="athSector" name="sector">
-              <option value="">Select one…</option>
-              <option>Interior design / Renovation</option>
-              <option>Clinics / Healthcare</option>
-              <option>Education / Training</option>
-              <option>Professional services</option>
-              <option>Other</option>
+              <option value="" data-ar="اختر…" data-en="Select one…">Select one…</option>
+              <option data-ar="تصميم داخلي / تجديد" data-en="Interior design / Renovation">Interior design / Renovation</option>
+              <option data-ar="عيادات / رعاية صحية" data-en="Clinics / Healthcare">Clinics / Healthcare</option>
+              <option data-ar="تعليم / تدريب" data-en="Education / Training">Education / Training</option>
+              <option data-ar="خدمات مهنية" data-en="Professional services">Professional services</option>
+              <option data-ar="غير ذلك" data-en="Other">Other</option>
             </select>
           </div>
         </div>
         <div class="form-row">
-          <div class="field"><label for="athScope">Approximate scope</label>
+          <div class="field"><label for="athScope" data-ar="نطاق المشروع تقريبًا" data-en="Approximate scope">Approximate scope</label>
             <select id="athScope" name="scope">
-              <option value="">Select one…</option>
-              <option>Single landing page</option>
-              <option>Multi-page website</option>
-              <option>Web application / system</option>
-              <option>Not sure yet</option>
+              <option value="" data-ar="اختر…" data-en="Select one…">Select one…</option>
+              <option data-ar="صفحة هبوط واحدة" data-en="Single landing page">Single landing page</option>
+              <option data-ar="موقع متعدد الصفحات" data-en="Multi-page website">Multi-page website</option>
+              <option data-ar="تطبيق ويب / نظام" data-en="Web application / system">Web application / system</option>
+              <option data-ar="مش متأكد بعد" data-en="Not sure yet">Not sure yet</option>
             </select>
           </div>
-          <div class="field"><label for="athTiming">Desired launch timing</label>
+          <div class="field"><label for="athTiming" data-ar="التوقيت المطلوب للإطلاق" data-en="Desired launch timing">Desired launch timing</label>
             <select id="athTiming" name="timing">
-              <option value="">Select one…</option>
-              <option>ASAP</option>
-              <option>Within a month</option>
-              <option>1–3 months</option>
-              <option>Just exploring</option>
+              <option value="" data-ar="اختر…" data-en="Select one…">Select one…</option>
+              <option data-ar="بأسرع وقت" data-en="ASAP">ASAP</option>
+              <option data-ar="خلال شهر" data-en="Within a month">Within a month</option>
+              <option data-ar="١–٣ أشهر" data-en="1–3 months">1–3 months</option>
+              <option data-ar="بس بستكشف هلأ" data-en="Just exploring">Just exploring</option>
             </select>
           </div>
         </div>
-        <div class="field"><label for="athBudget">Budget range (optional)</label><input id="athBudget" name="budget" type="text" placeholder="e.g. ₪2,000–5,000, or leave blank"></div>
-        <div class="field"><label for="athDetails">Project objective &amp; details</label><textarea id="athDetails" name="details" required placeholder="What are you trying to achieve?"></textarea></div>
+        <div class="field"><label for="athBudget" data-ar="نطاق الميزانية (اختياري)" data-en="Budget range (optional)">Budget range (optional)</label><input id="athBudget" name="budget" type="text" placeholder="e.g. ₪2,000–5,000, or leave blank" data-ar-placeholder="مثلًا ٢,٠٠٠–٥,٠٠٠ ₪، أو اتركه فاضي" data-en-placeholder="e.g. ₪2,000–5,000, or leave blank"></div>
+        <div class="field"><label for="athDetails" data-ar="هدف المشروع والتفاصيل" data-en="Project objective &amp; details">Project objective &amp; details</label><textarea id="athDetails" name="details" required placeholder="What are you trying to achieve?" data-ar-placeholder="شو يلي بتحاول توصّله؟" data-en-placeholder="What are you trying to achieve?"></textarea></div>
         <input class="hp" id="athWebsite" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <button class="btn btn-primary" type="submit" id="athSubmit">Send inquiry<span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></button>
+        <button class="btn btn-primary" type="submit" id="athSubmit"><span data-ar="أرسل الاستفسار" data-en="Send inquiry">Send inquiry</span><span class="btn-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span></button>
         <div class="form-status" id="athStatus" role="status" aria-live="polite"></div>
       </form>
     </div>
@@ -365,13 +475,59 @@ footer a:hover{color:var(--paper)}
 </main>
 
 <footer>
-  <span>© Athar — أثر. Digital Product Studio.</span>
+  <span data-ar="© أثر. استوديو منتجات رقمية." data-en="© Athar — أثر. Digital Product Studio.">© Athar — أثر. Digital Product Studio.</span>
   <span><a href="https://studioathar.studio" target="_blank" rel="noopener">studioathar.studio</a></span>
 </footer>
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
+  // ---------- Language toggle (EN/AR), same data-ar/data-en/-html/-placeholder
+  // convention as studioathar.studio's own site script, adapted: this page's
+  // literal markup is English (so it still reads correctly with JS disabled),
+  // and English is the default for new visitors — same default rule as the
+  // main site — rather than Arabic-first. ----------
+  var currentLang = 'en';
+  function applyLang(lang, skipPersist){
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    var btn = document.getElementById('langToggle');
+    if (btn) btn.textContent = lang === 'ar' ? 'EN' : 'AR';
+    document.querySelectorAll('[data-ar]').forEach(function(el){
+      var val = el.getAttribute('data-' + lang);
+      if (val !== null) el.textContent = val;
+    });
+    document.querySelectorAll('[data-ar-html]').forEach(function(el){
+      var val = el.getAttribute('data-' + lang + '-html');
+      if (val !== null) el.innerHTML = val;
+    });
+    document.querySelectorAll('[data-ar-placeholder]').forEach(function(el){
+      var val = el.getAttribute('data-' + lang + '-placeholder');
+      if (val !== null) el.setAttribute('placeholder', val);
+    });
+    document.title = lang === 'ar' ? 'أثر لاب — القطاعات | شوف شو بيبني أثر' : 'Athar Lab — Industries | See what Athar builds';
+    if (!skipPersist) {
+      try { localStorage.setItem('athar_showcase_lang', lang); } catch (e) {}
+      var url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      window.history.replaceState({}, '', url);
+    }
+  }
+  window.toggleLang = function(){
+    applyLang(currentLang === 'ar' ? 'en' : 'ar');
+    document.dispatchEvent(new CustomEvent('athar:langchange'));
+  };
+  var langBtn = document.getElementById('langToggle');
+  if (langBtn) langBtn.addEventListener('click', window.toggleLang);
+  (function(){
+    var urlLang = new URL(window.location.href).searchParams.get('lang');
+    var savedLang = null;
+    try { savedLang = localStorage.getItem('athar_showcase_lang'); } catch (e) {}
+    var initial = (urlLang === 'en' || urlLang === 'ar') ? urlLang : ((savedLang === 'en' || savedLang === 'ar') ? savedLang : 'en');
+    if (initial !== 'en') applyLang(initial, true);
+  })();
+
   // ---------- Reveal on scroll ----------
   var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
     entries.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
@@ -515,6 +671,8 @@ footer a:hover{color:var(--paper)}
   }
   document.addEventListener('DOMContentLoaded', getSupabase);
 
+  function t(en, ar){ return document.documentElement.lang === 'ar' ? ar : en; }
+
   var form = document.getElementById('athForm');
   form.addEventListener('submit', function(e){
     e.preventDefault();
@@ -527,7 +685,7 @@ footer a:hover{color:var(--paper)}
 
     if (!name || !email || !details) {
       statusEl.className = 'form-status err';
-      statusEl.textContent = 'Please fill in your name, email and project details.';
+      statusEl.textContent = t('Please fill in your name, email and project details.', 'فضلًا عبّي اسمك وإيميلك وتفاصيل المشروع.');
       return;
     }
     if (honeypot) return; // bot
@@ -545,30 +703,201 @@ footer a:hover{color:var(--paper)}
     var client = getSupabase();
     if (!client) {
       statusEl.className = 'form-status err';
-      statusEl.textContent = 'The service is unavailable right now. Please try again shortly, or email hello@studioathar.studio directly.';
+      statusEl.textContent = t('The service is unavailable right now. Please try again shortly, or email hello@studioathar.studio directly.', 'الخدمة مش متوفرة هلأ. جرّب كمان شوي، أو راسلنا على hello@studioathar.studio مباشرة.');
       return;
     }
 
     submitBtn.disabled = true;
     statusEl.className = 'form-status';
-    statusEl.textContent = 'Sending…';
+    statusEl.textContent = t('Sending…', 'عم نرسل…');
 
     client.from('projects_inquiries').insert([{ name: name, email: email, project_details: fullDetails }]).then(function(result){
       submitBtn.disabled = false;
       if (result.error) {
         statusEl.className = 'form-status err';
-        statusEl.textContent = 'Something went wrong. Please try again, or email hello@studioathar.studio directly.';
+        statusEl.textContent = t('Something went wrong. Please try again, or email hello@studioathar.studio directly.', 'صار في خطأ. جرّب كمان مرة، أو راسلنا على hello@studioathar.studio مباشرة.');
       } else {
         statusEl.className = 'form-status ok';
-        statusEl.textContent = "Thanks — we've received it. We'll be in touch soon.";
+        statusEl.textContent = t("Thanks — we've received it. We'll be in touch soon.", 'شكرًا — استلمناه. رح نتواصل معك قريبًا.');
         form.reset();
       }
     }).catch(function(){
       submitBtn.disabled = false;
       statusEl.className = 'form-status err';
-      statusEl.textContent = 'Something went wrong. Please try again, or email hello@studioathar.studio directly.';
+      statusEl.textContent = t('Something went wrong. Please try again, or email hello@studioathar.studio directly.', 'صار في خطأ. جرّب كمان مرة، أو راسلنا على hello@studioathar.studio مباشرة.');
     });
   });
+})();
+</script>
+
+<!-- Flagship cinematic entrance boot: conservative, several-signal gate (mirrors
+     studioathar.studio's own Signal tier-classification approach — never just one
+     check) + lazy-loaded GSAP/ScrollTrigger + dynamic import of the Three.js module.
+     Anyone who doesn't pass the gate never downloads any of this; they land on the
+     real, interactive #sectors grid directly, which is a legitimate art-directed
+     experience in its own right, not a flat stand-in. -->
+<script>
+(function(){
+  var ZONE_INFO = {
+    entrance: {
+      num: '00 / 04',
+      name: { en: 'Athar', ar: 'أثر' },
+      tag: { en: 'A digital product studio', ar: 'استوديو منتجات رقمية' },
+      desc: { en: 'Scroll to move through four industry worlds — each one built and lit in its own identity.', ar: 'مرر للأسفل لتدخل أربع عوالم صناعية — كل وحدة مبنية ومضاءة بهويتها الخاصة.' },
+      href: null
+    },
+    forma: {
+      num: '01 / 04',
+      name: { en: 'FORMA Living', ar: 'FORMA Living' },
+      tag: { en: 'Interior Design & Renovation', ar: 'تصميم داخلي وتجديد' },
+      desc: { en: 'A luxury architectural-editorial experience, cinematic and room-by-room.', ar: 'تجربة تحريرية معمارية فاخرة، سينمائية وغرفة بغرفة.' },
+      href: 'demos/forma/index.html'
+    },
+    vera: {
+      num: '02 / 04',
+      name: { en: 'VERA Clinic', ar: 'VERA Clinic' },
+      tag: { en: 'Clinics & Healthcare', ar: 'عيادات ورعاية صحية' },
+      desc: { en: 'A calm, contemporary healthcare experience built on trust.', ar: 'تجربة رعاية صحية هادئة ومعاصرة، مبنية على الثقة.' },
+      href: 'demos/vera-clinic/index.html'
+    },
+    ascend: {
+      num: '03 / 04',
+      name: { en: 'ASCEND Academy', ar: 'ASCEND Academy' },
+      tag: { en: 'Education & Training', ar: 'تعليم وتدريب' },
+      desc: { en: 'A bold, immersive training-brand experience.', ar: 'تجربة علامة تدريبية جريئة وغامرة.' },
+      href: 'demos/ascend-academy/index.html'
+    },
+    meridian: {
+      num: '04 / 04',
+      name: { en: 'MERIDIAN Partners', ar: 'MERIDIAN Partners' },
+      tag: { en: 'Professional Services', ar: 'خدمات مهنية' },
+      desc: { en: 'A sophisticated consultancy experience, challenge to solution.', ar: 'تجربة استشارية راقية، من التحدي إلى الحل.' },
+      href: 'demos/meridian-partners/index.html'
+    }
+  };
+  var ZONES_ORDER = ['entrance', 'forma', 'vera', 'ascend', 'meridian'];
+
+  function supportsCinematic(){
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    if (!(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('importmap'))) return false;
+    if (!window.WebGLRenderingContext) return false;
+    try {
+      var c = document.createElement('canvas');
+      if (!(c.getContext('webgl2') || c.getContext('webgl'))) return false;
+    } catch (e) { return false; }
+    var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    var narrow = window.innerWidth < 860;
+    if (coarse && narrow) return false; // phones: the already-interactive #sectors grid is their real experience
+    return true;
+  }
+
+  function loadScript(src){
+    return new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function(){ resolve(); };
+      s.onerror = function(){ reject(new Error('failed to load ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+  function withTimeout(promise, ms){
+    return new Promise(function(resolve, reject){
+      var timer = setTimeout(function(){ reject(new Error('flagship boot timed out after ' + ms + 'ms')); }, ms);
+      promise.then(function(v){ clearTimeout(timer); resolve(v); }, function(e){ clearTimeout(timer); reject(e); });
+    });
+  }
+
+  function lang(){ return document.documentElement.lang === 'ar' ? 'ar' : 'en'; }
+
+  function bootFlagship(){
+    var stage = document.getElementById('flagshipStage');
+    var loadingEl = document.getElementById('fsLoading');
+    stage.classList.add('is-active');
+
+    var zoneIndexEl = document.getElementById('fsZoneIndex');
+    var zoneNameEl = document.getElementById('fsZoneName');
+    var zoneTagEl = document.getElementById('fsZoneTag');
+    var zoneDescEl = document.getElementById('fsZoneDesc');
+    var ctaEl = document.getElementById('fsZoneCta');
+    var ctaLabelEl = ctaEl ? ctaEl.querySelector('span') : null;
+    var dotsWrap = document.getElementById('fsDots');
+    var currentZoneName = 'entrance';
+    document.addEventListener('athar:langchange', function(){ updateOverlay(currentZoneName); });
+
+    function updateOverlay(zoneName){
+      currentZoneName = zoneName;
+      var info = ZONE_INFO[zoneName] || ZONE_INFO.entrance;
+      var L = lang();
+      zoneIndexEl.textContent = info.num;
+      zoneNameEl.textContent = info.name[L];
+      zoneTagEl.textContent = info.tag[L];
+      if (zoneDescEl) zoneDescEl.textContent = info.desc[L];
+      if (info.href) {
+        ctaEl.href = info.href;
+        ctaEl.classList.add('is-visible');
+        if (ctaLabelEl) ctaLabelEl.textContent = (L === 'ar') ? ('افتح ' + info.name.en + ' الكاملة') : ('Open ' + info.name.en + ' full demo');
+      } else {
+        ctaEl.classList.remove('is-visible');
+      }
+      if (dotsWrap) {
+        dotsWrap.querySelectorAll('.flagship-dot').forEach(function(d){
+          d.setAttribute('aria-current', d.getAttribute('data-zone') === zoneName ? 'true' : 'false');
+        });
+      }
+    }
+
+    withTimeout(
+      Promise.all([
+        loadScript('/vendor/gsap/3.12.5/gsap.min.js'),
+        loadScript('/vendor/gsap/3.12.5/ScrollTrigger.min.js')
+      ]).then(function(){ return import('/showcase/js/flagship-scene.js'); }),
+      8000
+    ).then(function(mod){
+      var handle = mod.initFlagshipScene({
+        container: document.getElementById('flagshipCanvas'),
+        scrollSection: stage,
+        textures: {
+          forma: '/showcase/assets/sector-previews/forma-tex.jpg',
+          vera: '/showcase/assets/sector-previews/vera-tex.jpg',
+          ascend: '/showcase/assets/sector-previews/ascend-tex.jpg',
+          meridian: '/showcase/assets/sector-previews/meridian-tex.jpg'
+        },
+        onZoneChange: function(i, zoneName){ updateOverlay(zoneName); }
+      });
+
+      ZONES_ORDER.forEach(function(zoneName, i){
+        var dot = document.createElement('button');
+        dot.className = 'flagship-dot';
+        dot.type = 'button';
+        dot.setAttribute('data-zone', zoneName);
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', ZONE_INFO[zoneName].name.en);
+        dot.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+        dot.addEventListener('click', function(){ handle.setZoneByIndex(i); });
+        dotsWrap.appendChild(dot);
+      });
+      updateOverlay('entrance');
+
+      if (loadingEl) loadingEl.classList.add('hide');
+      window.addEventListener('pagehide', function(){ handle.destroy(); });
+    }).catch(function(err){
+      // Any failure (slow network, a lost WebGL context, GSAP/module fetch
+      // error, or the 8s cap above) falls through cleanly: hide the stage
+      // entirely rather than leave a stuck loading state or a broken canvas —
+      // the visitor lands on the real #sectors grid instead.
+      console.error('[flagship] falling back to the sector grid:', err);
+      stage.classList.remove('is-active');
+      stage.style.display = 'none';
+    });
+  }
+
+  if (supportsCinematic()) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootFlagship);
+    } else {
+      bootFlagship();
+    }
+  }
 })();
 </script>
 </body>

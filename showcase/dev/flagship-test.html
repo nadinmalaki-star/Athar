@@ -1,0 +1,57 @@
+<!doctype html>
+<!-- DEV-ONLY fidelity harness for the flagship Three.js/GSAP scene (js/flagship-scene.js).
+     Not linked anywhere; remove before release. Exposes window.__flagshipDebug for
+     Playwright to read real camera position/rotation at arbitrary scroll offsets. -->
+<html lang="en"><head><meta charset="utf-8"><title>flagship scene — dev harness</title>
+<style>
+  html,body{margin:0;background:#050505;color:#ddd;font:14px monospace}
+  #stage{position:relative}
+  #canvas-layer{position:sticky;top:0;height:100vh;overflow:hidden}
+  #hud{position:fixed;top:8px;left:8px;z-index:5;background:rgba(0,0,0,.6);padding:8px 10px;white-space:pre;pointer-events:none}
+  .spacer{height:100vh;border-top:1px dashed #333;display:flex;align-items:center;justify-content:center;opacity:.35}
+</style>
+<script type="importmap">{ "imports": { "three": "/vendor/three/0.186.1/three.module.min.js" } }</script>
+<script src="/vendor/gsap/3.12.5/gsap.min.js"></script>
+<script src="/vendor/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head><body>
+<div id="hud">loading…</div>
+<section id="stage" style="height:500vh">
+  <div id="canvas-layer"></div>
+</section>
+<div class="spacer">end of scroll section (for manual scroll testing)</div>
+<script type="module">
+  import { initFlagshipScene, isWebGLAvailable, ZONES } from '../js/flagship-scene.js';
+
+  const hud = document.getElementById('hud');
+  if (!isWebGLAvailable()) {
+    hud.textContent = 'WebGL not available';
+    window.__flagshipReady = false;
+  } else {
+    const handle = initFlagshipScene({
+      container: document.getElementById('canvas-layer'),
+      scrollSection: document.getElementById('stage'),
+      textures: {
+        forma: '/showcase/assets/sector-previews/forma-tex.jpg',
+        vera: '/showcase/assets/sector-previews/vera-tex.jpg',
+        ascend: '/showcase/assets/sector-previews/ascend-tex.jpg',
+        meridian: '/showcase/assets/sector-previews/meridian-tex.jpg',
+      },
+      debug: true,
+      onZoneChange: (i, name) => { window.__lastZone = { i, name }; },
+      onProgress: (p) => { window.__lastProgress = p; },
+    });
+    window.__flagshipHandle = handle;
+    window.__flagshipReady = true;
+    window.__ZONES = ZONES;
+
+    function tickHud() {
+      const d = window.__flagshipDebug;
+      hud.textContent = d
+        ? `progress ${d.progress.toFixed(3)}  zone ${ZONES[d.zoneIndex]}\ncamPos ${d.cameraPosition.map(n => n.toFixed(2)).join(', ')}\ncamRot ${d.cameraRotation.map(n => n.toFixed(3)).join(', ')}`
+        : 'no debug frame yet';
+      requestAnimationFrame(tickHud);
+    }
+    tickHud();
+  }
+</script>
+</body></html>
