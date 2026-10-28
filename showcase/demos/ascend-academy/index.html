@@ -510,9 +510,17 @@ footer a:hover{color:var(--lime)}
   <div class="f-right"><a href="../../index.html#showcase">Built by ATHAR</a><a href="#top">↑ Top</a></div>
 </footer>
 
+<!-- GSAP + ScrollTrigger (self-hosted, vendor/gsap/3.12.5 — cdnjs UMD build, GreenSock
+     Standard No Charge license). Classic <script> tags, not an ES import: the cdnjs
+     build has no static ES `export`, so it sets window.gsap / window.ScrollTrigger. -->
+<script src="/vendor/gsap/3.12.5/gsap.min.js"></script>
+<script src="/vendor/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
 (function(){
   "use strict";
+
+  var hasGSAP = !!(window.gsap && window.ScrollTrigger);
+  if (hasGSAP) gsap.registerPlugin(ScrollTrigger);
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -720,13 +728,14 @@ footer a:hover{color:var(--lime)}
   var curriculumList = document.getElementById('curriculumList');
   var curriculumDots = document.querySelectorAll('#curriculumDots i');
   var currentStop = 0;
+  var particleTargetProgress = 0;
 
   function renderCurriculum(key){
     var p = programs[key];
     curriculumImg.src = p.img;
     curriculumImg.style.filter = 'hue-rotate(' + p.hue + ') saturate(1.1)';
     curriculumImg.style.objectPosition = p.pos;
-    curriculumImg.style.transform = 'scale(' + Math.max(1, p.zoom * 0.96) + ')';
+    applyContinuousProgress(particleTargetProgress);
     curriculumTag.textContent = p.tag;
     curriculumTitle.textContent = p.title;
     curriculumList.innerHTML = p.curriculum.map(function(c, i){
@@ -742,20 +751,56 @@ footer a:hover{color:var(--lime)}
     var items = curriculumList.querySelectorAll('li');
     items.forEach(function(li){ li.classList.toggle('active', Number(li.dataset.step) === stop); });
     curriculumDots.forEach(function(d, i){ d.classList.toggle('on', i === stop); });
-    particleTargetProgress = stop / 3;
   }
 
-  // sentinels drive which curriculum stop is "active" while the panel is pinned
-  var sentinels = document.querySelectorAll('.curriculum-sentinel');
-  if ('IntersectionObserver' in window && sentinels.length && window.innerWidth > 860) {
-    var curIO = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-          setStop(Number(entry.target.dataset.stop));
-        }
-      });
-    }, { threshold: [0.5] });
-    sentinels.forEach(function(s){ curIO.observe(s); });
+  var curriculumPinWrap = document.getElementById('curriculumPinWrap');
+  var curriculumScrollTrigger = null;
+
+  // The visual panel's Ken Burns zoom and the particle field's rise both read
+  // this 0..1 value, which GSAP ScrollTrigger drives continuously when
+  // available; the stepped text list still snaps to the nearest of the 4
+  // stages (text crossfading continuously between stages reads as noise,
+  // not motion), but the imagery and particles move as a true scrub.
+  function applyContinuousProgress(progress){
+    particleTargetProgress = progress;
+    var p = programs[activeProgram];
+    var zoom = Math.max(1, p.zoom * 0.96) + progress * 0.07;
+    curriculumImg.style.transform = 'scale(' + zoom + ')';
+  }
+
+  if (hasGSAP && curriculumPinWrap && window.innerWidth > 860 && !reducedMotion) {
+    // GSAP ScrollTrigger: real scroll-synchronized, scrubbed, reversible-in-
+    // both-directions motion — not a plain IntersectionObserver step. The
+    // existing CSS `position:sticky` panel already does the pinning, so this
+    // ScrollTrigger only reads progress across the wrap's scroll range; it
+    // does not take over pinning itself (keeps the sticky layout untouched).
+    curriculumScrollTrigger = ScrollTrigger.create({
+      trigger: curriculumPinWrap,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.6,
+      onUpdate: function(self){
+        var raw = self.progress * 3; // 0..3 continuous across the 4 stages
+        setStop(Math.min(3, Math.round(raw)));
+        applyContinuousProgress(self.progress);
+      }
+    });
+  } else {
+    // Fallback (GSAP failed to load, mobile layout, or reduced-motion):
+    // the original discrete sentinel/IntersectionObserver stepping.
+    var sentinels = document.querySelectorAll('.curriculum-sentinel');
+    if ('IntersectionObserver' in window && sentinels.length && window.innerWidth > 860) {
+      var curIO = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            var stop = Number(entry.target.dataset.stop);
+            setStop(stop);
+            applyContinuousProgress(stop / 3);
+          }
+        });
+      }, { threshold: [0.5] });
+      sentinels.forEach(function(s){ curIO.observe(s); });
+    }
   }
 
   renderCurriculum('design');
@@ -767,7 +812,7 @@ footer a:hover{color:var(--lime)}
   // visual panel's negative space instead of adding more text.
   // ======================================================
   var particleCanvas = document.getElementById('curriculumParticles');
-  var particleTargetProgress = 0, particleProgress = 0;
+  var particleProgress = 0;
   if (particleCanvas && !reducedMotion) {
     var pctx = particleCanvas.getContext('2d');
     var pdpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -842,7 +887,22 @@ footer a:hover{color:var(--lime)}
     railSteps.forEach(function(step, i){ step.classList.toggle('on', i <= activeIdx); });
   }
 
-  if (!reducedMotion) {
+  if (hasGSAP && rail && !reducedMotion) {
+    // GSAP ScrollTrigger scrub in place of the plain scroll listener —
+    // same visual result, genuinely scroll-synchronized and reversible.
+    ScrollTrigger.create({
+      trigger: rail,
+      start: 'top 60%',
+      end: 'bottom 60%',
+      scrub: 0.3,
+      onUpdate: function(self){
+        var pct = self.progress * 100;
+        railFill.style.height = pct + '%';
+        var activeIdx = Math.floor(self.progress * railSteps.length);
+        railSteps.forEach(function(step, i){ step.classList.toggle('on', i <= activeIdx); });
+      }
+    });
+  } else if (!reducedMotion) {
     window.addEventListener('scroll', updateRail, { passive: true });
     window.addEventListener('resize', updateRail);
     updateRail();

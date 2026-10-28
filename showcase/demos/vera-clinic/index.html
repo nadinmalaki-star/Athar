@@ -83,7 +83,7 @@
   .dark p{color:#C8CBC0}
   .dark h2,.dark h3{color:var(--cream)}
 
-  /* ================= 1. SPATIAL SCENE — scroll pull-back opening ================= */
+  /* ================= 1. SPATIAL SCENE — cinematic photography, assembled in 3D as you scroll ================= */
   .intake{padding:72px 0 0}
   .intake-head{max-width:720px;margin:0 auto}
   .intake-head .eyebrow{color:var(--sage-dark)}
@@ -91,25 +91,31 @@
   .intake-head h1 em{font-style:italic;color:var(--sage-dark)}
   .intake-head p{margin-top:18px;font-size:17px;max-width:54ch}
 
-  .scene-track{position:relative;height:230vh;margin-top:54px}
-  .scene-stage{position:sticky;top:36px;height:calc(100svh - 36px);min-height:560px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-  .scene-frame{width:min(1040px,92vw);aspect-ratio:16/10;position:relative}
-  .scene-inner{position:absolute;inset:0;transform-origin:50% 55%;will-change:transform}
-  .scene-inner svg{width:100%;height:100%;display:block;border-radius:28px;box-shadow:0 50px 90px -40px rgba(43,46,39,.4)}
+  .scene-track{position:relative;height:260vh;margin-top:54px}
+  .scene-stage{position:sticky;top:36px;height:calc(100svh - 36px);min-height:560px;display:flex;align-items:center;justify-content:center;overflow:hidden;perspective:1600px}
+  .scene-frame{width:min(1040px,92vw);aspect-ratio:16/10;position:relative;transform-style:preserve-3d}
+  .scene-inner{position:absolute;inset:0;transform-style:preserve-3d}
+  .scene-layer{position:absolute;inset:0;border-radius:28px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 50px 90px -40px rgba(43,46,39,.45);opacity:0;will-change:transform,opacity}
+  .scene-layer::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(43,46,39,0) 60%,rgba(43,46,39,.22) 100%)}
+  .scene-layer-front{z-index:3}
+  .scene-layer-mid{z-index:2}
+  .scene-layer-back{z-index:1}
   .scene-caption{position:absolute;left:0;right:0;bottom:-8px;text-align:center;font-size:12.5px;letter-spacing:.6px;color:var(--ink-soft);opacity:0;transition:opacity .6s ease}
   .scene-caption.show{opacity:1}
 
-  .hotspots{position:absolute;inset:0;z-index:2}
+  .hotspots{position:absolute;inset:0;z-index:5}
   .hotspot{position:absolute;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:var(--paper);border:2px solid var(--sage-dark);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:13px;color:var(--sage-dark);box-shadow:0 10px 24px -10px rgba(43,46,39,.4);opacity:0;transition:opacity .5s ease,transform .25s ease,background .25s ease,color .25s ease;cursor:pointer}
   .hotspot::before{content:'';position:absolute;inset:-10px;border-radius:50%;border:1px solid rgba(92,107,80,.35);animation:pulse 2.6s ease-out infinite}
   @keyframes pulse{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
   .hotspot:hover,.hotspot:focus-visible{background:var(--sage-dark);color:#fff;transform:translate(-50%,-50%) scale(1.08)}
+  .hotspot:focus-visible{opacity:1}
   .hotspot[aria-pressed="true"]{background:var(--terracotta);border-color:var(--terracotta);color:#fff}
   .hotspots.ready .hotspot{opacity:1}
-  .hs-desk{left:19%;top:63%}
-  .hs-chair{left:54%;top:55%}
-  .hs-mirror{left:80%;top:29%}
-  .hs-kids{left:12%;top:86%}
+  /* anchored to real points in the front photo layer (treatment-detail.jpg) */
+  .hs-chair{left:46%;top:62%}
+  .hs-desk{left:88%;top:60%}
+  .hs-mirror{left:76%;top:33%}
+  .hs-kids{left:11%;top:38%}
 
   /* branching result panel */
   .intake-result{max-width:var(--shell);margin:28px auto 0;padding:0 var(--gutter);max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.22,.61,.36,1)}
@@ -126,19 +132,29 @@
   .intake-result-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(43,46,39,.25),transparent 55%)}
   @media (max-width:860px){ .intake-result-in{grid-template-columns:1fr} .intake-result-visual{order:-1;min-height:180px} }
 
+  /* Art-directed static fallback (reduced-motion and narrow viewports): the
+     scene stops being a pinned 3D composition and becomes a single, fully
+     art-directed full-bleed photo (the front/treatment layer) with the same
+     4 real hotspots already in their final positions — not a shrunk or
+     broken copy of the desktop scene. */
   @media (prefers-reduced-motion:reduce){
     .scene-track{height:auto;margin-top:40px}
-    .scene-stage{position:static;height:auto;min-height:0;padding:0 var(--gutter)}
-    .scene-inner{position:relative;inset:auto;transform:none!important}
+    .scene-stage{position:static;height:auto;min-height:0;padding:0 var(--gutter);perspective:none}
+    .scene-frame{height:auto;aspect-ratio:4/3}
+    .scene-layer{opacity:0!important;transform:none!important}
+    .scene-layer-front{opacity:1!important}
+    .scene-layer-back,.scene-layer-mid{display:none}
     .scene-caption{display:none}
     .hotspots .hotspot{opacity:1!important}
     .hotspot::before{animation:none}
   }
   @media (max-width:760px){
     .scene-track{height:auto;margin-top:36px}
-    .scene-stage{position:static;height:auto;min-height:0;padding:0 16px}
-    .scene-frame{width:100%}
-    .scene-inner{position:relative;inset:auto;transform:none!important}
+    .scene-stage{position:static;height:auto;min-height:0;padding:0 16px;perspective:none}
+    .scene-frame{width:100%;height:auto;aspect-ratio:4/3}
+    .scene-layer{opacity:0!important;transform:none!important}
+    .scene-layer-front{opacity:1!important}
+    .scene-layer-back,.scene-layer-mid{display:none}
     .scene-caption{display:none}
     .hotspots .hotspot{opacity:1!important;width:34px;height:34px;font-size:12px}
   }
@@ -270,65 +286,12 @@
     <div class="scene-stage">
       <div class="scene-frame">
         <div class="scene-inner" id="sceneInner">
-          <svg viewBox="0 0 960 600" role="img" aria-label="An illustrated view of the VERA Clinic reception, treatment chair, smile mirror and children's corner">
-            <defs>
-              <linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EFF1E7"/><stop offset="1" stop-color="#E2E6D7"/></linearGradient>
-              <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFE0D6"/><stop offset="1" stop-color="#F3EFE2"/></linearGradient>
-              <linearGradient id="mirrorG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7F5EE"/><stop offset="1" stop-color="#DCE3D4"/></linearGradient>
-            </defs>
-            <rect width="960" height="600" fill="var(--cream, #FAF6EE)"/>
-            <rect x="0" y="0" width="960" height="430" fill="url(#wallG)"/>
-            <rect x="0" y="420" width="960" height="180" fill="#F3EEE1"/>
-            <rect x="0" y="420" width="960" height="6" fill="#DCDED1"/>
-            <!-- window -->
-            <rect x="610" y="58" width="270" height="250" rx="6" fill="url(#skyG)" stroke="#5C6B50" stroke-width="4"/>
-            <line x1="745" y1="58" x2="745" y2="308" stroke="#5C6B50" stroke-width="4"/>
-            <line x1="610" y1="183" x2="880" y2="183" stroke="#5C6B50" stroke-width="4"/>
-            <circle cx="820" cy="110" r="22" fill="#F4D9A8" opacity=".85"/>
-            <path d="M625 250 q35 -70 70 0 q30 -50 60 0 q35 -60 65 0 q25 -40 45 0 L880 300 L610 300 Z" fill="#9BAE8A" opacity=".55"/>
-            <!-- smile mirror (cosmetic hotspot anchor) -->
-            <circle cx="760" cy="182" r="0" fill="none"/>
-            <!-- reception desk (checkup hotspot anchor) -->
-            <g>
-              <polygon points="70,330 330,330 360,420 40,420" fill="#5C6B50"/>
-              <polygon points="70,330 330,330 330,300 100,300" fill="#7C8B6F"/>
-              <polygon points="330,330 360,420 360,390 330,300" fill="#49553F"/>
-              <rect x="150" y="270" width="60" height="34" rx="6" fill="#C77B52"/>
-              <circle cx="180" cy="287" r="6" fill="#F3EEE1"/>
-              <rect x="40" y="420" width="320" height="10" fill="#3F4A38" opacity=".25"/>
-            </g>
-            <!-- plant left -->
-            <g transform="translate(55,470)">
-              <rect x="-18" y="40" width="36" height="46" rx="6" fill="#A85F3B"/>
-              <path d="M0 42 C -34 10 -30 -34 -4 -40 C 4 -12 -2 10 0 42 Z" fill="#5C6B50"/>
-              <path d="M0 42 C 30 6 36 -30 14 -38 C 2 -12 2 14 0 42 Z" fill="#7C8B6F"/>
-            </g>
-            <!-- dental chair (toothache hotspot anchor) -->
-            <g transform="translate(430,230)">
-              <ellipse cx="90" cy="195" rx="120" ry="14" fill="#3F4A38" opacity=".15"/>
-              <rect x="20" y="150" width="140" height="22" rx="10" fill="#7C8B6F"/>
-              <rect x="30" y="60" width="50" height="110" rx="22" fill="#FFFFFF" stroke="#DCDED1" stroke-width="3"/>
-              <rect x="60" y="30" width="110" height="46" rx="20" fill="#FFFFFF" stroke="#DCDED1" stroke-width="3" transform="rotate(14 60 30)"/>
-              <circle cx="60" cy="30" r="22" fill="#F3EEE1" stroke="#DCDED1" stroke-width="3"/>
-              <rect x="150" y="90" width="16" height="70" rx="6" fill="#C77B52"/>
-              <line x1="158" y1="90" x2="158" y2="20" stroke="#5C6B50" stroke-width="5" stroke-linecap="round"/>
-              <circle cx="158" cy="12" r="16" fill="#F4D9A8" stroke="#5C6B50" stroke-width="4"/>
-            </g>
-            <!-- kids corner (pediatric hotspot anchor) -->
-            <g transform="translate(70,470)">
-              <ellipse cx="55" cy="98" rx="70" ry="10" fill="#3F4A38" opacity=".12"/>
-              <rect x="10" y="60" width="90" height="12" rx="6" fill="#C77B52"/>
-              <rect x="48" y="30" width="14" height="42" fill="#C77B52"/>
-              <circle cx="140" cy="76" r="20" fill="#7C8B6F"/>
-              <circle cx="-10" cy="84" r="12" fill="#A85F3B"/>
-              <circle cx="20" cy="94" r="8" fill="#5C6B50"/>
-            </g>
-            <circle cx="760" cy="182" r="72" fill="url(#mirrorG)" stroke="#A85F3B" stroke-width="6"/>
-            <circle cx="760" cy="182" r="72" fill="#fff" opacity=".08"/>
-          </svg>
+          <div class="scene-layer scene-layer-back" id="sceneLayerBack" role="img" aria-label="The VERA Clinic waiting area, soft daylight through tall windows" style="background-image:url('images/reception.jpg')"></div>
+          <div class="scene-layer scene-layer-mid" id="sceneLayerMid" role="img" aria-label="The VERA Clinic reception corner with seating and plants" style="background-image:url('images/hero.jpg')"></div>
+          <div class="scene-layer scene-layer-front" id="sceneLayerFront" role="img" aria-label="A VERA Clinic treatment room, chair ready" style="background-image:url('images/treatment-detail.jpg')"></div>
           <div class="hotspots" id="hotspotsWrap" role="group" aria-label="What brings you in today?"></div>
         </div>
-        <span class="scene-caption" id="sceneCaption">Scroll to step back — then choose a spot in the room</span>
+        <span class="scene-caption" id="sceneCaption">Scroll to move through the clinic — then choose a spot in the room</span>
       </div>
     </div>
   </div>
@@ -619,36 +582,80 @@
     b.addEventListener('click', function(){ selectConcern(i); });
     hotspotsWrap.appendChild(b);
   });
-  hotspotsWrap.classList.add('ready');
+  // .ready (reveals the hotspots) is toggled below, once the scene scroll settles —
+  // for the static/reduced-motion/no-GSAP fallback paths it's applied immediately instead.
 
-  // ---------- Scroll-tied pull-back: scale the illustrated scene as the visitor scrolls through its track ----------
+  // ---------- Cinematic assembly: 3 real photos settle into a layered, depth-separated
+  // composition in genuine 3D (perspective + translateZ + rotateX/Y on .scene-frame's
+  // preserve-3d stage), scrubbed to scroll via GSAP ScrollTrigger — not a flat scale().
+  // Reversible both directions because scrub ties straight to scroll position; the
+  // reduced-motion/narrow-viewport path below never loads GSAP at all and instead
+  // shows the single front photo, fully resolved, as a static art-directed fallback.
   var track = document.getElementById('sceneTrack');
-  var inner = document.getElementById('sceneInner');
   var caption = document.getElementById('sceneCaption');
-  var ticking = false;
+  var layerBack = document.getElementById('sceneLayerBack');
+  var layerMid = document.getElementById('sceneLayerMid');
+  var layerFront = document.getElementById('sceneLayerFront');
 
-  function updateScene(){
-    ticking = false;
-    if (sceneStatic || !track) return;
-    var rect = track.getBoundingClientRect();
-    var vh = window.innerHeight;
-    var total = rect.height - vh;
-    var scrolled = -rect.top;
-    var progress = total > 0 ? Math.min(1, Math.max(0, scrolled / total)) : 1;
-    var scale = 1.30 - progress * 0.40; // 1.30 zoomed-in -> 0.90 pulled-back
-    inner.style.transform = 'scale(' + scale.toFixed(3) + ')';
-    inner.dataset.progress = progress.toFixed(3);
-    caption.classList.toggle('show', progress > 0.08 && progress < 0.85);
+  function loadScript(src){
+    return new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = src; s.onload = function(){ resolve(); }; s.onerror = function(){ reject(new Error('failed ' + src)); };
+      document.head.appendChild(s);
+    });
   }
-  function onScroll(){
-    if (!ticking) { ticking = true; window.requestAnimationFrame(updateScene); }
-  }
+
   if (sceneStatic) {
-    if (inner) inner.style.transform = 'none';
+    // Static fallback: front photo only, fully visible, no pin, no 3D.
+    [layerBack, layerMid, layerFront].forEach(function(l){ if (l) l.style.opacity = '1'; });
+    hotspotsWrap.classList.add('ready');
   } else {
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    updateScene();
+    Promise.all([
+      loadScript('/vendor/gsap/3.12.5/gsap.min.js'),
+      loadScript('/vendor/gsap/3.12.5/ScrollTrigger.min.js')
+    ]).then(function(){
+      var gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
+      if (!gsap || !ScrollTrigger || !track) throw new Error('gsap unavailable');
+      gsap.registerPlugin(ScrollTrigger);
+
+      // A sequential procession through the room, not an additive stack: only one
+      // layer is ever near full strength at a given scroll position. Each layer
+      // rises to its moment, then recedes to a soft, blurred backdrop presence
+      // (not back to invisible) as the next one takes over — reads as moving
+      // further into the clinic, not three photos ghosting on top of each other.
+      gsap.set(layerBack, { opacity: 0, filter: 'blur(7px)', transformOrigin: '70% 50%', x: '-10%', y: '2%', rotateY: 14, rotateX: 2, z: -320, scale: 0.84 });
+      gsap.set(layerMid,  { opacity: 0, filter: 'blur(7px)', transformOrigin: '30% 50%', x: '9%',  y: '-3%', rotateY: -11, rotateX: -1, z: -160, scale: 0.9 });
+      gsap.set(layerFront,{ opacity: 0.22, filter: 'blur(4px)', transformOrigin: '50% 60%', y: '6%', rotateX: 7, z: 40, scale: 1.08 });
+
+      var tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: track,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.8,
+          onUpdate: function(self){
+            caption.classList.toggle('show', self.progress > 0.04 && self.progress < 0.62);
+            hotspotsWrap.classList.toggle('ready', self.progress > 0.68);
+          }
+        }
+      });
+      // Back: arrives in focus first, then dims and softens into a faint backdrop.
+      tl.to(layerBack, { opacity: 0.88, filter: 'blur(0px)', x: '-8%', y: 0, rotateY: 5, rotateX: 0, z: -150, scale: 0.92, duration: 0.32, ease: 'none' }, 0);
+      tl.to(layerBack, { opacity: 0.14, filter: 'blur(5px)', duration: 0.28, ease: 'none' }, 0.5);
+      // Mid: takes over next, then also recedes once front arrives.
+      tl.to(layerMid, { opacity: 0.92, filter: 'blur(0px)', x: '7%', y: 0, rotateY: -4, rotateX: 0, z: -60, scale: 0.97, duration: 0.32, ease: 'none' }, 0.26);
+      tl.to(layerMid, { opacity: 0.18, filter: 'blur(4px)', duration: 0.26, ease: 'none' }, 0.72);
+      // Front: the resting state the visitor settles on — fully in focus, holds.
+      tl.to(layerFront, { opacity: 1, filter: 'blur(0px)', y: 0, rotateX: 0, z: 0, scale: 1, duration: 0.36, ease: 'none' }, 0.56);
+    }).catch(function(err){
+      // GSAP/ScrollTrigger failed to load (offline cdnjs mirror, etc.) — fall back to the
+      // same static resolved-photo presentation used for reduced-motion, not a blank scene.
+      console.error('[vera] scene animation unavailable, showing static fallback:', err);
+      [layerBack, layerMid].forEach(function(l){ if (l) l.style.display = 'none'; });
+      if (layerFront) { layerFront.style.opacity = '1'; layerFront.style.filter = 'none'; layerFront.style.transform = 'none'; }
+      if (caption) caption.classList.remove('show');
+      hotspotsWrap.classList.add('ready');
+    });
   }
 
   // ---------- Journey: horizontal scroll-snap timeline with pin-annotation captions ----------
