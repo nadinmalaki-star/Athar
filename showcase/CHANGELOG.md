@@ -1,5 +1,21 @@
 # Change Log — Athar Lab Industries Showcase
 
+## Update: Research-driven creative upgrade (VERA priority)
+
+Preceded by real competitive research (`DESIGN-RESEARCH.md`) — live Playwright visits to Dentalux, WorkFin (a Three.js 3D dental-room diorama), LK Denta, Why Zero (Awwwards Site of the Day), and Hear.ai, studied for interaction mechanics, not editorial layout.
+
+**VERA Clinic (deepest change, client priority)**: the uniform concern-card grid is replaced by an original illustrated clinic scene the visitor scroll-pulls-back from (CSS transform, no WebGL — scale measured monotonic 1.300→0.905 across the scroll range), with 4 numbered hotspots replacing the cards. Dr. Haddad's credential now composites onto an environmental photo instead of an avatar circle. The journey timeline's captions became click-to-expand pin annotations. No two sections share the same visual structure. One real bug found in my own review and fixed: the reduced-motion fallback had the stage-number chip overlapping the heading text — now hidden in favor of a clean bottom caption band.
+
+**ASCEND Academy**: the first program switch is now gesture-gated (drag past a threshold, with the drag path drawn live) in the spirit of Why Zero's "draw to reveal," falling back to ordinary click/keyboard for every switch after that and as a day-one accessible alternative. Added a scroll-tied particle field in the curriculum panel and genuinely distinct per-program photo crops/tints (not just a shared hue-rotate).
+
+**MERIDIAN Partners**: added a Canvas 2D particle field that resolves from chaos to an ordered bronze grid exactly at the narrative's Challenge→Solution pivot (verified via a live order-value read at 7 scroll checkpoints: 0, 0, 0.696, 1, 1, 1, 1), plus film-grain texture and an irregular (featured + 3 equal) service-grid layout replacing the uniform 2×2.
+
+**Athar showcase shell**: the accordion sector list is replaced with a full-viewport horizontal scroll-snap zone track — one full-bleed panel per sector using each demo's own real hero photo (FORMA's own hero photo copied read-only for its panel; FORMA's file itself untouched) — with scroll-snap/drag/arrow-button/keyboard navigation and a Canvas 2D ember-dot motif in Athar's own palette. Also fixes a real pre-existing bug: the Athar logo PNG has no alpha channel, so the old `brightness(0) invert(1)` recolor filter rendered a solid white box over light content — replaced with a plain white chip so the real logo displays correctly.
+
+All 4 "Open full demo" links re-verified by actually clicking them from the live, rebuilt showcase (not just inspecting hrefs) — each opens the correct, updated demo with the right title. 0 console errors across every page at desktop, mobile, and reduced-motion.
+
+**Honest limitation, stated in `DESIGN-RESEARCH.md`**: WorkFin and Why Zero are 4-month Three.js/custom-GLSL productions. What's built here are original CSS/Canvas-2D/SVG equivalents capturing the *principle* (spatial scenes, gesture-gated reveals, particle resolution) within this project's vanilla-JS, no-new-library constraint — distinctive and premium for the medium, not literal parity with a custom WebGL build.
+
 ## Update: Full photography integration (this pass)
 
 Canva's quota was restored and `media.canva.com` + `export-download.canva.com` were added to this session's allowed domains, unblocking real full-resolution photography. What changed:
