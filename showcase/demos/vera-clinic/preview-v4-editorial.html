@@ -45,16 +45,18 @@ p{margin:0;color:var(--ink-soft)}
 
 /* --------------------------------------------------------------- intro */
 body.intro-active{overflow:hidden}
-.intro{position:fixed;inset:0;z-index:2000;background:var(--sage-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.intro{position:fixed;inset:0;z-index:2000;overflow:hidden}
+.intro-panel{position:absolute;top:0;bottom:0;width:50%;background:var(--sage-deep)}
+.intro-panel-l{left:0}
+.intro-panel-r{right:0}
+.intro-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
 .intro-glow{position:absolute;inset:-25%;background:radial-gradient(circle at 50% 38%,rgba(199,123,82,.22),transparent 58%);opacity:0;pointer-events:none}
 .intro-logo{display:flex;align-items:center;gap:16px;position:relative}
 .intro-mark{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--sage),var(--terracotta));display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--display);font-size:20px;font-weight:600;opacity:0;transform:scale(.6)}
-.intro-word{display:flex}
-.intro-word span{display:inline-block;font-family:var(--display);font-size:clamp(40px,8vw,84px);font-weight:500;color:var(--cream);letter-spacing:.01em;opacity:0;transform:translateY(46px)}
+.intro-word-mask{display:inline-block;overflow:hidden}
+.intro-word{display:inline-block;font-family:var(--display);font-size:clamp(40px,8vw,84px);font-weight:500;color:var(--cream);letter-spacing:.01em}
 .intro-lines{position:absolute;left:0;right:0;bottom:clamp(34px,8vh,64px);display:flex;flex-direction:column;gap:9px;align-items:center;padding:0 24px;text-align:center}
 .intro-line{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#C9D0BE;opacity:0;transform:translateY(14px)}
-.intro-progress{position:absolute;bottom:clamp(14px,4vh,28px);width:140px;height:2px;background:rgba(250,246,238,.18);border-radius:2px;overflow:hidden}
-.intro-progress-bar{display:block;height:100%;width:0%;background:var(--terracotta)}
 @media(prefers-reduced-motion:reduce){.intro{display:none!important}}
 
 .athar-strip{position:fixed;top:0;left:0;right:0;z-index:999;height:36px;background:var(--sage-deep);display:flex;align-items:center;justify-content:center}
@@ -88,19 +90,24 @@ section{padding:110px var(--gutter)}
 .hero-facts{display:flex;gap:30px;margin-top:10px;flex-wrap:wrap}
 .hero-fact{font-size:12px;color:var(--ink-faint);max-width:17ch;padding-left:14px;border-left:1px solid var(--line)}
 .hero-media{position:relative;min-height:460px}
-.hero-media-main{position:absolute;inset:0;overflow:hidden;border-radius:0}
-.hero-media-main img{transform:scale(1.14);transition:transform 1.6s cubic-bezier(.16,.9,.3,1)}
-.hero.loaded .hero-media-main img{transform:scale(1)}
+.hero-media-main{position:absolute;inset:0;overflow:hidden}
 .hero-media-main::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,var(--cream) 0%,rgba(250,246,238,0) 14%);pointer-events:none}
-.hero-media-accent{position:absolute;z-index:3;width:clamp(150px,30%,230px);aspect-ratio:4/5;left:-7%;bottom:9%;border-radius:16px;overflow:hidden;border:7px solid var(--cream);box-shadow:0 36px 70px -24px rgba(32,31,26,.4);opacity:0;transform:translateY(46px) scale(.9)}
-.hero-media-accent img{transform:scale(1.08)}
-.hero-cap{position:absolute;left:24px;bottom:22px;z-index:2;background:rgba(32,31,26,.55);backdrop-filter:blur(6px);color:#fff;font-size:11px;padding:7px 13px;border-radius:999px;letter-spacing:.02em}
+.hero-media-accent{position:absolute;z-index:3;width:clamp(150px,30%,230px);aspect-ratio:4/5;left:-7%;bottom:9%;border-radius:16px;overflow:hidden;border:7px solid var(--cream);box-shadow:0 36px 70px -24px rgba(32,31,26,.4)}
+.hero-float-card{position:absolute;top:8%;right:6%;z-index:4;background:rgba(250,246,238,.94);backdrop-filter:blur(8px);border-radius:14px;padding:13px 17px;display:flex;align-items:center;gap:10px;box-shadow:0 20px 40px -18px rgba(32,31,26,.35)}
+.hfc-num{font-family:var(--display);font-size:19px;color:var(--terracotta-dark)}
+.hfc-label{font-size:11.5px;font-weight:600;color:var(--ink);max-width:13ch;line-height:1.3}
 @media(max-width:900px){
-  .hero{grid-template-columns:1fr;min-height:0}
-  .hero-media{min-height:56vh;order:-1}
-  .hero-media-main::after{background:linear-gradient(0deg,var(--cream) 0%,rgba(250,246,238,0) 18%)}
-  .hero-media-accent{width:clamp(120px,36%,170px);left:auto;right:6%;bottom:-8%}
-  .hero-copy{padding:40px var(--gutter) 56px}
+  .hero{display:block;grid-template-columns:1fr;position:relative;min-height:100svh;overflow:hidden}
+  .hero-media{position:absolute;inset:0;min-height:0;height:100%}
+  .hero-media-main::after{background:linear-gradient(0deg,rgba(26,25,20,.72) 0%,rgba(26,25,20,.08) 45%,rgba(26,25,20,0) 62%)}
+  .hero-copy{position:relative;z-index:5;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:32px var(--gutter) 52px;gap:16px}
+  .hero-copy .eyebrow{color:#E9E7DE}
+  .hero-copy h1{color:#fff}
+  .hero-sub{color:#E9E7DE}
+  .hero-fact{color:#C9D0BE;border-left-color:rgba(255,255,255,.3)}
+  .hero-copy .btn.outline{border-color:#fff;color:#fff}
+  .hero-media-accent{width:clamp(108px,30%,150px);left:auto;right:7%;bottom:auto;top:9%}
+  .hero-float-card{top:9%;left:6%;right:auto;bottom:auto;padding:10px 14px}
 }
 
 /* ------------------------------------------------- B: what brings you */
@@ -120,8 +127,8 @@ section{padding:110px var(--gutter)}
 .concern-row[aria-pressed="true"] h3{color:var(--terracotta-dark)}
 .concern-row[aria-pressed="true"] .arrow,.concern-row:hover .arrow,.concern-row:focus-visible .arrow{opacity:1;transform:translateX(0)}
 .concern-visual{position:relative;border-radius:22px;overflow:hidden;min-height:460px;background:var(--sage-pale)}
-.concern-visual-img{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
-.concern-visual-img.active{opacity:1}
+.concern-visual-img{position:absolute;inset:0;opacity:0;clip-path:inset(0 100% 0 0);transition:opacity .55s ease,clip-path .65s cubic-bezier(.22,.61,.36,1)}
+.concern-visual-img.active{opacity:1;clip-path:inset(0 0% 0 0)}
 .concern-visual-panel{position:absolute;left:0;right:0;bottom:0;padding:30px 30px 26px;background:linear-gradient(0deg,rgba(32,31,26,.82) 0%,rgba(32,31,26,.1) 100%);color:#fff}
 .concern-visual-panel .tag{display:inline-flex;padding:6px 13px;border-radius:999px;background:var(--terracotta);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
 .concern-visual-panel h4{font-family:var(--display);font-size:24px;font-weight:500;margin-top:14px;color:#fff}
@@ -146,8 +153,8 @@ section{padding:110px var(--gutter)}
 .journey-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:46px}
 .journey-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:52px;align-items:center}
 .journey-media{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:4/3}
-.journey-media img{opacity:0;position:absolute;inset:0;transition:opacity .5s ease}
-.journey-media img.active{opacity:1}
+.journey-media img{opacity:0;position:absolute;inset:0;clip-path:inset(0 0 100% 0);transition:opacity .6s ease,clip-path .7s cubic-bezier(.22,.61,.36,1)}
+.journey-media img.active{opacity:1;clip-path:inset(0 0 0% 0)}
 .journey-idx{position:absolute;top:18px;left:18px;font-size:12px;letter-spacing:.1em;color:#fff;background:rgba(32,31,26,.5);padding:6px 12px;border-radius:999px;backdrop-filter:blur(4px)}
 .journey-copy .stage-eyebrow{color:var(--terracotta-dark);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
 .journey-copy h3{font-size:clamp(24px,3vw,34px);margin-top:12px}
@@ -159,7 +166,9 @@ section{padding:110px var(--gutter)}
 .jdots{display:flex;gap:8px}
 .jdot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:width .25s,background .25s}
 .jdot[aria-current="true"]{width:22px;border-radius:4px;background:var(--sage-dark)}
-@media(max-width:900px){.journey-grid{grid-template-columns:1fr}}
+.jrail{position:relative;width:64px;height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-left:6px}
+.jrail-fill{display:block;height:100%;width:0%;background:var(--terracotta)}
+@media(max-width:900px){.journey-grid{grid-template-columns:1fr}.jrail{display:none}}
 
 /* ---------------------------------------------------- E: explore clinic */
 .explore{background:var(--sage-deep);color:var(--cream)}
@@ -204,24 +213,25 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
 .foot-col h4{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-faint);margin:0 0 14px}
 .foot-col a,.foot-col span{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:9px}
 .foot-bottom{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-
-.proof-badge{position:fixed;bottom:16px;left:16px;z-index:1000;background:rgba(32,31,26,.9);color:#F5F3ED;font-size:11px;padding:8px 12px;border-radius:8px}
 </style>
 </head>
 <body>
 
 <div class="intro" id="intro" aria-hidden="true">
-  <div class="intro-glow"></div>
-  <div class="intro-logo">
-    <span class="intro-mark">V</span>
-    <span class="intro-word" aria-label="VERA"><span>V</span><span>E</span><span>R</span><span>A</span></span>
+  <div class="intro-panel intro-panel-l"></div>
+  <div class="intro-panel intro-panel-r"></div>
+  <div class="intro-content">
+    <div class="intro-glow"></div>
+    <div class="intro-logo">
+      <span class="intro-mark">V</span>
+      <span class="intro-word-mask"><span class="intro-word">VERA</span></span>
+    </div>
+    <div class="intro-lines">
+      <span class="intro-line">General &amp; Cosmetic Dentistry</span>
+      <span class="intro-line">Guided First Visits</span>
+      <span class="intro-line">Calm, Modern Care</span>
+    </div>
   </div>
-  <div class="intro-lines">
-    <span class="intro-line">General &amp; Cosmetic Dentistry</span>
-    <span class="intro-line">Guided First Visits</span>
-    <span class="intro-line">Calm, Modern Care</span>
-  </div>
-  <div class="intro-progress"><span class="intro-progress-bar" id="introBar"></span></div>
 </div>
 
 <div class="athar-strip">
@@ -267,9 +277,12 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
       <img src="images/v4/hero-consultation.jpg" alt="A dentist and assistant reviewing a treatment plan on a tablet with a patient in a bright, modern clinic">
     </div>
     <div class="hero-media-accent" id="heroAccent">
-      <img src="images/v4/detail.jpg" alt="A close, careful dental examination in progress">
+      <img src="images/v4/consultation.jpg" alt="A dentist consulting with a smiling patient in a calm, modern treatment room">
     </div>
-    <span class="hero-cap">A real consultation moment — not a staged chair</span>
+    <div class="hero-float-card" id="heroFloatCard">
+      <span class="hfc-num">01</span>
+      <span class="hfc-label">Guided, unhurried visits</span>
+    </div>
   </div>
 </section>
 
@@ -334,6 +347,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
           <button type="button" class="jbtn" id="jPrev" aria-label="Previous stage"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M10 3L4 8l6 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <div class="jdots" id="jDots"></div>
           <button type="button" class="jbtn" id="jNext" aria-label="Next stage"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="jrail" aria-hidden="true"><span class="jrail-fill" id="jRailFill"></span></div>
         </div>
       </div>
     </div>
@@ -428,8 +442,6 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
   </div>
 </footer>
 
-<div class="proof-badge">VERA — V4 editorial preview (unreviewed)</div>
-
 <script>
 (function(){
   "use strict";
@@ -457,111 +469,143 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
 
   requestAnimationFrame(function(){ document.getElementById('hero').classList.add('loaded'); });
 
-  // ---------------------------------------------------------- A: intro ---
-  function runIntro(){
+  function showEverythingNoAnim(){
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });
+  }
+
+  // ------------------------------------------- A+B: opening sequence ----
+  // One timeline covers the intro AND the hero's entrance, overlapped at the
+  // 'open' label — the curtain split, the hero's frame-expand and the
+  // headline reveal all happen together, so the exit motion visibly carries
+  // into the entering imagery rather than handing off to a separate fade.
+  function playOpening(gsap){
     var intro = document.getElementById('intro');
-    if (!intro) return Promise.resolve();
-    if (reduced) { intro.remove(); return Promise.resolve(); }
+
+    document.querySelectorAll('.hero-copy h1, .section-head h2').forEach(splitWords);
+    gsap.set('.split-word', { opacity: 0, y: '100%' });
+    gsap.set('.hero-media-main', { clipPath: 'inset(14% 14% 14% 14% round 6px)' });
+    gsap.set('.hero-media-main img', { scale: 1.18 });
+    gsap.set('#heroAccent', { opacity: 0, x: -50, y: 70, scale: .78, rotate: -7 });
+    gsap.set('#heroFloatCard', { opacity: 0, x: 24, y: -18, scale: .9 });
+    gsap.set('.hero-copy .eyebrow, .hero-sub, .hero-ctas, .hero-facts', { opacity: 0, y: 18 });
+    var introWordEl = intro ? intro.querySelector('.intro-word') : null;
+    if (introWordEl) gsap.set(introWordEl, { y: introWordEl.offsetHeight });
+
+    if (!intro || reduced) {
+      if (intro) intro.remove();
+      gsap.set(['.split-word', '.hero-media-main', '.hero-media-main img', '#heroAccent', '#heroFloatCard', '.hero-copy .eyebrow', '.hero-sub', '.hero-ctas', '.hero-facts'], { clearProps: 'all' });
+      return Promise.resolve();
+    }
+
     document.body.classList.add('intro-active');
     return new Promise(function(resolve){
       function finish(){ intro.remove(); document.body.classList.remove('intro-active'); resolve(); }
-      function withGsap(g){
-        var tl = g.timeline({ onComplete: finish });
-        tl.to('#intro .intro-glow', { opacity: 1, duration: 1.1, ease: 'sine.out' })
-          .to('#intro .intro-mark', { opacity: 1, scale: 1, duration: .6, ease: 'back.out(2)' }, .1)
-          .to('#intro .intro-word span', { opacity: 1, y: 0, duration: .85, stagger: .07, ease: 'power3.out' }, .25)
-          .to('#intro .intro-line', { opacity: 1, y: 0, duration: .6, stagger: .12, ease: 'power2.out' }, .6)
-          .to('#introBar', { width: '100%', duration: 1.5, ease: 'power1.inOut' }, .65)
-          .to('#intro .intro-line, #intro .intro-word span', { opacity: 0, y: -16, duration: .45, ease: 'power2.in' }, '+=.45')
-          .to('#intro .intro-mark', { scale: 1.3, opacity: 0, duration: .5, ease: 'power2.in' }, '<')
-          .to('#intro', { yPercent: -100, duration: .85, ease: 'power4.inOut' }, '-=.05');
-      }
-      if (window.gsap) { withGsap(window.gsap); }
-      else {
-        loadScript('/vendor/gsap/3.12.5/gsap.min.js').then(function(){ withGsap(window.gsap); }).catch(finish);
-      }
+      var tl = gsap.timeline({ onComplete: finish });
+
+      tl.to('#intro .intro-glow', { opacity: 1, duration: .9, ease: 'sine.out' })
+        .to('#intro .intro-mark', { opacity: 1, scale: 1, duration: .55, ease: 'back.out(2.2)' }, .1)
+        .to('#intro .intro-word', { y: 0, duration: .8, ease: 'power4.out' }, .35)
+        .to('#intro .intro-line', { opacity: 1, y: 0, duration: .55, stagger: .1, ease: 'power2.out' }, .62)
+        .addLabel('open', 1.3)
+        // Curtain opens and the hero's own entrance begins in the same breath.
+        .to('#intro .intro-panel-l', { xPercent: -100, duration: .9, ease: 'power4.inOut' }, 'open')
+        .to('#intro .intro-panel-r', { xPercent: 100, duration: .9, ease: 'power4.inOut' }, 'open')
+        .to('#intro .intro-content', { opacity: 0, scale: .92, duration: .5, ease: 'power2.in' }, 'open')
+        .to('.hero-media-main', { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 1, ease: 'power3.out' }, 'open+=.1')
+        .to('.hero-media-main img', { scale: 1, duration: 1.15, ease: 'power3.out' }, 'open+=.1')
+        .to('.hero-copy .eyebrow', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 'open+=.15')
+        .to('.hero-copy h1 .split-word', { opacity: 1, y: '0%', duration: .8, stagger: .03, ease: 'power3.out' }, 'open+=.25')
+        .to('#heroAccent', { opacity: 1, x: 0, y: 0, scale: 1, rotate: -2, duration: .9, ease: 'power3.out' }, 'open+=.35')
+        .to('#heroFloatCard', { opacity: 1, x: 0, y: 0, scale: 1, duration: .7, ease: 'back.out(1.6)' }, 'open+=.55')
+        .to('.hero-sub, .hero-ctas, .hero-facts', { opacity: 1, y: 0, duration: .7, stagger: .08, ease: 'power3.out' }, 'open+=.5');
     });
   }
 
   // --------------------------------------------- scroll choreography ----
-  function initScrollChoreography(){
-    if (reduced || !window.gsap) {
-      document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });
-      return;
+  function initScrollChoreography(gsap, ScrollTrigger){
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Section-head words lift in, line by line, as each section enters.
+    document.querySelectorAll('.section-head h2').forEach(function(h){
+      gsap.to(h.querySelectorAll('.split-word'), {
+        opacity: 1, y: '0%', duration: .8, stagger: .025, ease: 'power3.out',
+        scrollTrigger: { trigger: h, start: 'top 85%' }
+      });
+    });
+
+    // Generic reveal elements: fade/rise.
+    document.querySelectorAll('.reveal').forEach(function(el){
+      gsap.fromTo(el, { opacity: 0, y: 36 }, {
+        opacity: 1, y: 0, duration: .9, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      });
+    });
+
+    // Concern rows / path items stagger in as a group once the grid enters.
+    ['.concern-list .concern-row', '.path-strip .path-item'].forEach(function(sel){
+      var items = gsap.utils.toArray(sel);
+      if (!items.length) return;
+      gsap.fromTo(items, { opacity: 0, y: 24 }, {
+        opacity: 1, y: 0, duration: .7, stagger: .08, ease: 'power3.out',
+        scrollTrigger: { trigger: items[0].closest('.concern-grid, .path-strip'), start: 'top 82%' }
+      });
+    });
+
+    // Hero, continued: as the hero scrolls away its frame reframes/settles —
+    // the three layers move independently rather than a single flat parallax.
+    gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } })
+      .to('.hero-media-main', { clipPath: 'inset(0% 0% 18% 0% round 28px)', scale: .96, transformOrigin: '50% 0%', ease: 'none' }, 0)
+      .to('.hero-media-main img', { yPercent: 8, scale: 1.08, ease: 'none' }, 0)
+      .to('#heroAccent', { yPercent: -22, xPercent: -8, rotate: -6, ease: 'none' }, 0)
+      .to('#heroFloatCard', { yPercent: 30, opacity: .35, ease: 'none' }, 0);
+
+    // Visual panels in concerns/journey/explore: a soft scale-in as the
+    // active photo changes, read by MutationObserver on class="active" —
+    // layered on top of each section's own clip-path/slide transition.
+    function scaleInOnActivate(container){
+      if (!container) return;
+      var mo = new MutationObserver(function(muts){
+        muts.forEach(function(m){
+          var t = m.target;
+          if (t.classList && t.classList.contains('active')) {
+            gsap.fromTo(t, { scale: 1.08 }, { scale: 1, duration: .6, ease: 'power3.out' });
+          }
+        });
+      });
+      container.querySelectorAll('img, .concern-visual-img').forEach(function(img){
+        mo.observe(img, { attributes: true, attributeFilter: ['class'] });
+      });
     }
-    var gsap = window.gsap;
-    function withScrollTrigger(){
-      gsap.registerPlugin(window.ScrollTrigger);
+    scaleInOnActivate(document.getElementById('concernVisual'));
+    scaleInOnActivate(document.querySelector('.journey-media'));
 
-      // Headline / section-head words lift in, line by line, as they enter.
-      document.querySelectorAll('.hero-copy h1, .section-head h2').forEach(splitWords);
-      gsap.utils.toArray('.split-word').forEach(function(w){ gsap.set(w, { opacity: 0, y: '100%' }); });
-      gsap.to('.hero-copy h1 .split-word', { opacity: 1, y: '0%', duration: .9, stagger: .035, ease: 'power3.out', delay: .15 });
-      document.querySelectorAll('.section-head h2').forEach(function(h){
-        gsap.to(h.querySelectorAll('.split-word'), {
-          opacity: 1, y: '0%', duration: .8, stagger: .025, ease: 'power3.out',
-          scrollTrigger: { trigger: h, start: 'top 85%' }
-        });
-      });
-
-      // Generic reveal elements: fade/rise, with stagger when siblings share a parent reveal group.
-      document.querySelectorAll('.reveal').forEach(function(el){
-        gsap.fromTo(el, { opacity: 0, y: 36 }, {
-          opacity: 1, y: 0, duration: .9, ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 88%' }
-        });
-      });
-
-      // Concern rows / path items stagger in as a group once the grid enters.
-      ['.concern-list .concern-row', '.path-strip .path-item'].forEach(function(sel){
-        var items = gsap.utils.toArray(sel);
-        if (!items.length) return;
-        gsap.fromTo(items, { opacity: 0, y: 24 }, {
-          opacity: 1, y: 0, duration: .7, stagger: .08, ease: 'power3.out',
-          scrollTrigger: { trigger: items[0].closest('.concern-grid, .path-strip'), start: 'top 82%' }
-        });
-      });
-
-      // Hero: layered-photo entrance (accent polaroid slides/scales in after the
-      // main photo settles) and a slow cross-axis parallax tied to scroll.
-      gsap.to('#heroAccent', { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: 'power3.out', delay: .5 });
-      gsap.to('.hero-media-main img', { yPercent: 6, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-      gsap.to('#heroAccent', { yPercent: -16, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-
-      // Visual panels in concerns/journey/explore: a soft scale-in as the
-      // active photo changes, read by MutationObserver on class="active".
-      function scaleInOnActivate(container){
-        if (!container) return;
-        var mo = new MutationObserver(function(muts){
-          muts.forEach(function(m){
-            var t = m.target;
-            if (t.classList && t.classList.contains('active')) {
-              gsap.fromTo(t, { scale: 1.08 }, { scale: 1, duration: .6, ease: 'power3.out' });
-            }
-          });
-        });
-        container.querySelectorAll('img, .concern-visual-img').forEach(function(img){
-          mo.observe(img, { attributes: true, attributeFilter: ['class'] });
-        });
-      }
-      scaleInOnActivate(document.getElementById('concernVisual'));
-      scaleInOnActivate(document.querySelector('.journey-media'));
-      scaleInOnActivate(document.getElementById('exploreMedia'));
-    }
-    if (window.ScrollTrigger) { withScrollTrigger(); }
-    else { loadScript('/vendor/gsap/3.12.5/ScrollTrigger.min.js').then(withScrollTrigger); }
+    initJourneyPin(gsap, ScrollTrigger);
   }
 
-  runIntro().then(function(){
-    if (reduced) {
-      document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });
-      return;
-    }
-    if (window.gsap) { initScrollChoreography(); }
-    else { loadScript('/vendor/gsap/3.12.5/gsap.min.js').then(initScrollChoreography).catch(function(){
-      document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });
-    }); }
-  });
+  (function boot(){
+    // Wait for the display webfont to be ready before measuring/animating
+    // anything percentage-based (the masked VERA reveal in particular) —
+    // a font swap mid-tween changes the element's box and corrupts a
+    // yPercent-based transform computed against the pre-swap size.
+    var fontsReady = (window.document && document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function(){}) : Promise.resolve();
+    Promise.all([
+      loadScript('/vendor/gsap/3.12.5/gsap.min.js').then(function(){
+        return reduced ? null : loadScript('/vendor/gsap/3.12.5/ScrollTrigger.min.js');
+      }),
+      fontsReady
+    ]).then(function(){
+      var gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
+      if (!gsap) { showEverythingNoAnim(); document.getElementById('intro') && document.getElementById('intro').remove(); return; }
+      playOpening(gsap).then(function(){
+        if (reduced || !ScrollTrigger) { showEverythingNoAnim(); return; }
+        initScrollChoreography(gsap, ScrollTrigger);
+      });
+    }).catch(function(){
+      showEverythingNoAnim();
+      var intro = document.getElementById('intro'); if (intro) intro.remove();
+      document.body.classList.remove('intro-active');
+    });
+  })();
 
   // ---------------------------------------------------- B: concerns ----
   var concerns = [
@@ -605,6 +649,28 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     cList.appendChild(row);
   });
 
+  // Delegated once: the "Request this appointment" CTA is re-created inside
+  // cPanel's innerHTML on every selection, so a single listener on the
+  // panel itself (rather than re-binding per render) stays correct even
+  // while the panel fade is still in flight.
+  cPanel.addEventListener('click', function(e){
+    var cta = e.target.closest('#concernCta');
+    if (!cta || !cActive) return;
+    var c = concerns.filter(function(x){ return x.id === cActive; })[0];
+    if (c) apptService.value = c.service;
+  });
+
+  function setConcernPanel(html){
+    if (window.gsap) {
+      gsap.to(cPanel, { opacity: 0, y: -8, duration: .2, ease: 'power1.in', onComplete: function(){
+        cPanel.innerHTML = html;
+        gsap.fromTo(cPanel, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' });
+      }});
+    } else {
+      cPanel.innerHTML = html;
+    }
+  }
+
   function selectConcern(c, row){
     var wasActive = cActive === c.id;
     Array.prototype.forEach.call(cList.children, function(r){ r.setAttribute('aria-pressed', 'false'); });
@@ -613,7 +679,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     if (wasActive) {
       cActive = null;
       cDefault.classList.add('active');
-      cPanel.innerHTML = '<span class="tag">Start here</span><h4>Choose what\'s on your mind</h4><p style="color:#E9E7DE;margin-top:12px;font-size:13.5px">Select any item on the left — the service, what it covers, and your next step will appear here.</p>';
+      setConcernPanel('<span class="tag">Start here</span><h4>Choose what\'s on your mind</h4><p style="color:#E9E7DE;margin-top:12px;font-size:13.5px">Select any item on the left — the service, what it covers, and your next step will appear here.</p>');
       return;
     }
     cActive = c.id;
@@ -624,9 +690,8 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
       html += '<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>' + p + '</span></li>';
     });
     html += '</ul><div class="cta"><a class="btn light" href="#appointment" id="concernCta">Request this appointment</a></div>';
-    cPanel.innerHTML = html;
+    setConcernPanel(html);
     apptHeading.innerHTML = 'You told us: <em>' + c.label.charAt(0).toLowerCase() + c.label.slice(1) + '.</em> Let\'s get it booked.';
-    document.getElementById('concernCta').addEventListener('click', function(){ apptService.value = c.service; });
   }
 
   // ---------------------------------------------------- D: journey ----
@@ -637,8 +702,9 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     { eyebrow:'Stage 04 — Aftercare', title:'A written plan, not just a reminder card.', body:"You leave knowing exactly what to expect next, and when to come back — in plain language." }
   ];
   var jIdx = 0;
+  var journeyST = null; // set by initJourneyPin() once the pinned ScrollTrigger exists
   var jEyebrow = document.getElementById('jEyebrow'), jTitle = document.getElementById('jTitle'), jBody = document.getElementById('jBody'), jIdxEl = document.getElementById('journeyIdx');
-  var jDots = document.getElementById('jDots'), jPrev = document.getElementById('jPrev'), jNext = document.getElementById('jNext');
+  var jDots = document.getElementById('jDots'), jPrev = document.getElementById('jPrev'), jNext = document.getElementById('jNext'), jRailFill = document.getElementById('jRailFill');
   var jImgs = [0, 1, 2, 3].map(function(i){ return document.getElementById('jImg' + i); });
 
   stages.forEach(function(s, i){
@@ -646,7 +712,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     d.type = 'button'; d.className = 'jdot';
     d.setAttribute('aria-label', 'Go to ' + s.eyebrow);
     d.setAttribute('aria-current', i === 0 ? 'true' : 'false');
-    d.addEventListener('click', function(){ setStage(i); });
+    d.addEventListener('click', function(){ gotoStage(i); });
     jDots.appendChild(d);
   });
 
@@ -658,16 +724,54 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     jImgs.forEach(function(im, ii){ im.classList.toggle('active', ii === jIdx); });
     Array.prototype.forEach.call(jDots.children, function(d, di){ d.setAttribute('aria-current', di === jIdx ? 'true' : 'false'); });
     jPrev.disabled = jIdx === 0; jNext.disabled = jIdx === stages.length - 1;
+    if (jRailFill && !journeyST) jRailFill.style.width = (jIdx / (stages.length - 1) * 100) + '%';
   }
-  jPrev.addEventListener('click', function(){ setStage(jIdx - 1); });
-  jNext.addEventListener('click', function(){ setStage(jIdx + 1); });
+
+  // When the section is pinned (desktop), stage changes are driven by
+  // scroll position via initJourneyPin()'s onUpdate — so prev/next/dots
+  // move the scroll position rather than jumping the stage directly,
+  // keeping scroll as the single source of truth. Unpinned (mobile, or
+  // reduced motion), they fall back to setting the stage immediately.
+  function gotoStage(i){
+    i = Math.max(0, Math.min(stages.length - 1, i));
+    if (journeyST) {
+      var prog = (i + .5) / stages.length;
+      var y = journeyST.start + (journeyST.end - journeyST.start) * prog;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    } else {
+      setStage(i);
+    }
+  }
+  jPrev.addEventListener('click', function(){ gotoStage(jIdx - 1); });
+  jNext.addEventListener('click', function(){ gotoStage(jIdx + 1); });
   setStage(0);
+
+  // Desktop only: pin the journey section for a short scroll distance and
+  // scrub the stage/image/rail progression to scroll position directly —
+  // the strongest scroll-driven moment on the page. Skipped on narrow
+  // viewports and reduced-motion so mobile never gets scroll-trapped.
+  function initJourneyPin(gsap, ScrollTrigger){
+    if (reduced || !window.matchMedia('(min-width: 901px)').matches) return;
+    journeyST = ScrollTrigger.create({
+      trigger: '#journey .journey-grid',
+      start: 'top top+=110',
+      end: '+=160%',
+      pin: true,
+      anticipatePin: 1,
+      scrub: .4,
+      onUpdate: function(self){
+        var idx = Math.min(stages.length - 1, Math.floor(self.progress * stages.length));
+        if (idx !== jIdx) setStage(idx);
+        if (jRailFill) jRailFill.style.width = (self.progress * 100) + '%';
+      }
+    });
+  }
 
   var journeySection = document.getElementById('journey');
   journeySection.setAttribute('tabindex', '-1');
   journeySection.addEventListener('keydown', function(e){
-    if (e.key === 'ArrowRight') setStage(jIdx + 1);
-    else if (e.key === 'ArrowLeft') setStage(jIdx - 1);
+    if (e.key === 'ArrowRight') gotoStage(jIdx + 1);
+    else if (e.key === 'ArrowLeft') gotoStage(jIdx - 1);
   });
 
   // ------------------------------------------------- E: explore clinic --
@@ -680,6 +784,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
   var exMedia = document.getElementById('exploreMedia');
   var exInfo = document.getElementById('exploreInfo');
   var exImgs = Array.prototype.slice.call(exMedia.querySelectorAll('img'));
+  var exActiveIdx = 0;
   areas.forEach(function(a, i){
     var t = document.createElement('button');
     t.type = 'button'; t.className = 'explore-tab'; t.setAttribute('role', 'tab');
@@ -688,11 +793,32 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     t.addEventListener('click', function(){ setArea(i); });
     exTabs.appendChild(t);
   });
+  // A spatial transition rather than a tab swap: the incoming photo slides
+  // and scales in from the direction of travel while the outgoing one
+  // recedes the opposite way, with the info panel crossfading in step —
+  // a distinct motion language from the concerns wipe and the journey pin.
   function setArea(i){
+    if (i === exActiveIdx) return;
+    var dir = i > exActiveIdx ? 1 : -1;
     Array.prototype.forEach.call(exTabs.children, function(t, ti){ t.setAttribute('aria-selected', ti === i ? 'true' : 'false'); });
-    exImgs.forEach(function(im, ii){ im.classList.toggle('active', ii === i); });
+    var outgoing = exImgs[exActiveIdx], incoming = exImgs[i];
     var a = areas[i];
-    exInfo.innerHTML = '<span class="tag">' + a.tag + '</span><h3>' + a.title + '</h3><p>' + a.body + '</p>';
+    if (window.gsap) {
+      gsap.set(incoming, { zIndex: 2 }); gsap.set(outgoing, { zIndex: 1 });
+      incoming.classList.add('active');
+      gsap.fromTo(incoming, { opacity: 0, xPercent: dir * 12, scale: 1.08 }, { opacity: 1, xPercent: 0, scale: 1, duration: .85, ease: 'power3.out' });
+      gsap.to(outgoing, { opacity: 0, xPercent: -dir * 8, scale: .96, duration: .6, ease: 'power2.inOut', onComplete: function(){
+        outgoing.classList.remove('active'); gsap.set(outgoing, { clearProps: 'transform' });
+      }});
+      gsap.to(exInfo, { opacity: 0, y: -8, duration: .22, ease: 'power1.in', onComplete: function(){
+        exInfo.innerHTML = '<span class="tag">' + a.tag + '</span><h3>' + a.title + '</h3><p>' + a.body + '</p>';
+        gsap.fromTo(exInfo, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .4, ease: 'power2.out' });
+      }});
+    } else {
+      exImgs.forEach(function(im, ii){ im.classList.toggle('active', ii === i); });
+      exInfo.innerHTML = '<span class="tag">' + a.tag + '</span><h3>' + a.title + '</h3><p>' + a.body + '</p>';
+    }
+    exActiveIdx = i;
   }
 
   // ------------------------------------------------------- appt form ----
