@@ -56,7 +56,9 @@ def box(name, size, loc, rot=(0, 0, 0), mat=clay, bevel=0.0):
     bpy.ops.mesh.primitive_cube_add(size=1.0)
     o = bpy.context.object
     o.name = name
-    o.scale = (size[0] / 2.0, size[1] / 2.0, size[2] / 2.0)
+    # primitive_cube_add(size=1.0) already creates a full 1.0-unit cube
+    # (vertices at +/-0.5), so scale == desired size directly here.
+    o.scale = (size[0], size[1], size[2])
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     o.rotation_euler = Euler([math.radians(a) for a in rot], 'XYZ')
     o.location = loc
