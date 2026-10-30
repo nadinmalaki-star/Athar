@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VERA Clinic — Dental &amp; Wellness Care</title>
+<meta name="description" content="VERA Clinic — calm, modern dental and wellness care. A demonstration site built by ATHAR Digital Studio.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sage:#7C8B6F; --sage-dark:#5C6B50; --sage-pale:#E7EADF; --sage-deep:#3C4636;
+  --cream:#FAF6EE; --paper:#FFFFFF;
+  --terracotta:#C77B52; --terracotta-dark:#A85F3B;
+  --ink:#201F1A; --ink-soft:#5B5F54; --ink-faint:#8B8F82;
+  --line:#E2E1D6;
+  --display:'Fraunces',Georgia,serif; --body:'Figtree',Arial,sans-serif;
+  --shell:1320px; --gutter:clamp(20px,5vw,80px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important} .reveal{opacity:1!important;transform:none!important} }
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;padding-top:36px}
+img{display:block;max-width:100%;width:100%;height:100%;object-fit:cover}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;background:none;border:none}
+.shell{max-width:var(--shell);margin:0 auto;padding:0 var(--gutter)}
+.eyebrow{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--sage-dark)}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;letter-spacing:-.01em;line-height:1.05}
+em{font-style:italic;color:var(--terracotta-dark)}
+p{margin:0;color:var(--ink-soft)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--cream);font-weight:600;font-size:14px;transition:background .25s,transform .25s,border-color .25s,color .25s}
+.btn:hover{background:var(--terracotta);border-color:var(--terracotta);transform:translateY(-2px)}
+.btn.outline{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn.outline:hover{background:var(--ink);color:var(--cream)}
+.btn.light{background:var(--cream);color:var(--ink);border-color:var(--cream)}
+.btn.light:hover{background:var(--terracotta);color:#fff;border-color:var(--terracotta)}
+.btn svg{width:15px;height:15px}
+
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .8s cubic-bezier(.22,.61,.36,1)}
+.reveal.show{opacity:1;transform:none}
+.split-word{display:inline-block;will-change:transform,opacity}
+
+/* --------------------------------------------------------------- intro */
+body.intro-active{overflow:hidden}
+.intro{position:fixed;inset:0;z-index:2000}
+/* The reveal IS the transition: a dark veil with a donut-shaped clip-path
+   hole sits over the real, already-in-place hero photo. As the hole grows
+   (updated every frame in JS, not a CSS transform) the same hero photo is
+   progressively uncovered in its real position — not swapped in after a
+   curtain, but continuously there the whole time. A separate bordered div
+   tracks the hole's rect so the growing window reads as an actual
+   photographic frame, not just an edge wipe. */
+.intro-veil{position:fixed;inset:0;background:var(--sage-deep);will-change:clip-path}
+.intro-frame-border{position:fixed;border:2px solid rgba(250,246,238,.9);border-radius:10px;pointer-events:none;box-sizing:border-box}
+.intro-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none}
+.intro-glow{position:absolute;inset:-25%;background:radial-gradient(circle at 50% 38%,rgba(199,123,82,.22),transparent 58%);opacity:0;pointer-events:none}
+.intro-logo{display:flex;align-items:center;gap:16px;position:relative}
+.intro-mark{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--sage),var(--terracotta));display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--display);font-size:20px;font-weight:600;opacity:0;transform:scale(.6)}
+.intro-word-mask{display:inline-block;overflow:hidden}
+.intro-word{display:inline-block;font-family:var(--display);font-size:clamp(40px,8vw,84px);font-weight:500;color:var(--cream);letter-spacing:.01em}
+.intro-lines{position:absolute;left:0;right:0;bottom:clamp(34px,8vh,64px);display:flex;flex-direction:column;gap:9px;align-items:center;padding:0 24px;text-align:center}
+.intro-line{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#C9D0BE;opacity:0;transform:translateY(14px)}
+@media(prefers-reduced-motion:reduce){.intro{display:none!important}}
+
+.athar-strip{position:fixed;top:0;left:0;right:0;z-index:999;height:36px;background:var(--sage-deep);display:flex;align-items:center;justify-content:center}
+.athar-chip{display:inline-flex;align-items:center;gap:8px;color:#F5F3ED;font-size:12px;letter-spacing:.4px;opacity:.92}
+.athar-chip:hover{opacity:1}
+.athar-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--terracotta)}
+
+.nav{position:sticky;top:36px;z-index:50;background:rgba(250,246,238,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;padding:18px var(--gutter)}
+.brand{font-family:var(--display);font-size:21px;display:flex;align-items:center;gap:9px}
+.brand .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--sage),var(--sage-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
+.nav-links{display:flex;gap:30px;font-size:13.5px;font-weight:500}
+.nav-links a{color:var(--ink-soft);transition:color .2s}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{display:flex;align-items:center;gap:16px}
+.menu-btn{display:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);align-items:center;justify-content:center}
+@media(max-width:900px){.nav-links{display:none}.menu-btn{display:flex}}
+
+section{padding:110px var(--gutter)}
+.dark{background:var(--sage-deep);color:var(--cream)}
+.dark p{color:#C9D0BE}
+.dark h2,.dark h3{color:var(--cream)}
+
+/* ---------------------------------------------------------------- hero */
+.hero{position:relative;min-height:92svh;display:grid;grid-template-columns:1.05fr .95fr;align-items:stretch;padding:0;overflow:hidden}
+.hero-copy{display:flex;flex-direction:column;justify-content:center;padding:clamp(100px,14vh,160px) var(--gutter) 60px;gap:26px}
+.hero-copy .eyebrow{display:block}
+.hero-copy h1{font-size:clamp(42px,5.6vw,80px)}
+.hero-sub{font-size:17px;max-width:42ch;line-height:1.65}
+.hero-ctas{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px}
+.hero-facts{display:flex;gap:30px;margin-top:10px;flex-wrap:wrap}
+.hero-fact{font-size:12px;color:var(--ink-faint);max-width:17ch;padding-left:14px;border-left:1px solid var(--line)}
+.hero-media{position:relative;min-height:460px}
+.hero-media-main{position:absolute;inset:0;overflow:hidden;border-radius:4px}
+.hero-media-main::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,var(--cream) 0%,rgba(250,246,238,0) 14%);pointer-events:none}
+/* The secondary photo is a real storytelling layer, not a decorative
+   sticker: larger, framed to match the primary's radius/border language,
+   and it emerges from behind the primary's own edge (negative inset,
+   lower stacking order on entrance) rather than floating independently. */
+.hero-media-accent{position:absolute;z-index:3;width:clamp(190px,34%,300px);aspect-ratio:4/5;left:-9%;bottom:-6%;border-radius:16px;overflow:hidden;border:7px solid var(--cream);box-shadow:0 40px 80px -26px rgba(32,31,26,.45)}
+@media(max-width:900px){
+  .hero{display:block;grid-template-columns:1fr;position:relative;min-height:0;overflow:visible}
+  .hero-media{position:relative;height:42vh;min-height:300px;overflow:visible}
+  .hero-media-main{border-radius:0}
+  .hero-media-main img{object-position:center 32%}
+  .hero-media-main::after{background:linear-gradient(0deg,var(--cream) 0%,rgba(250,246,238,0) 24%)}
+  .hero-copy{position:relative;z-index:2;background:var(--cream);padding:26px var(--gutter) 44px;gap:14px}
+  .hero-media-accent{width:clamp(108px,34%,150px);left:auto;right:6%;bottom:-11%;top:auto;z-index:4}
+}
+
+/* ------------------------------------------------- B: what brings you */
+.concerns{background:var(--paper)}
+.section-head{max-width:640px;margin-bottom:56px}
+.section-head h2{font-size:clamp(30px,3.8vw,48px);margin-top:14px}
+.section-head p{margin-top:16px;font-size:15.5px;max-width:52ch}
+.concern-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:0;border-top:1px solid var(--line)}
+.concern-list{display:flex;flex-direction:column}
+.concern-row{display:grid;grid-template-columns:52px 1fr 24px;align-items:center;gap:18px;padding:26px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:padding-left .3s ease}
+.concern-row:hover,.concern-row:focus-visible{padding-left:10px}
+.concern-row .n{font-family:var(--display);font-size:14px;color:var(--ink-faint)}
+.concern-row h3{font-size:clamp(20px,2.4vw,28px);transition:color .2s}
+.concern-row .sub{font-size:13px;color:var(--ink-faint);margin-top:4px;display:block}
+.concern-row .arrow{width:22px;height:22px;opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .25s;color:var(--terracotta-dark)}
+.concern-row[aria-pressed="true"]{padding-left:10px}
+.concern-row[aria-pressed="true"] h3{color:var(--terracotta-dark)}
+.concern-row[aria-pressed="true"] .arrow,.concern-row:hover .arrow,.concern-row:focus-visible .arrow{opacity:1;transform:translateX(0)}
+.concern-visual{position:relative;border-radius:22px;overflow:hidden;min-height:460px;background:var(--sage-pale)}
+.concern-visual-img{position:absolute;inset:0;opacity:0;clip-path:inset(0 100% 0 0);transition:opacity .55s ease,clip-path .65s cubic-bezier(.22,.61,.36,1)}
+.concern-visual-img.active{opacity:1;clip-path:inset(0 0% 0 0)}
+.concern-visual-panel{position:absolute;left:0;right:0;bottom:0;padding:30px 30px 26px;background:linear-gradient(0deg,rgba(32,31,26,.82) 0%,rgba(32,31,26,.1) 100%);color:#fff}
+.concern-visual-panel .tag{display:inline-flex;padding:6px 13px;border-radius:999px;background:var(--terracotta);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.concern-visual-panel h4{font-family:var(--display);font-size:24px;font-weight:500;margin-top:14px;color:#fff}
+.concern-visual-panel ul{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.concern-visual-panel li{font-size:13.5px;color:#E9E7DE;display:flex;gap:8px}
+.concern-visual-panel li svg{flex:none;width:16px;height:16px;color:var(--terracotta);margin-top:2px}
+.concern-visual-panel .cta{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}
+@media(max-width:900px){.concern-grid{grid-template-columns:1fr}.concern-visual{min-height:340px;margin-top:28px}}
+
+/* ------------------------------------------------------------ C: paths */
+.paths{background:var(--cream)}
+.path-strip{display:flex;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.path-item{flex:1 1 220px;padding:30px 26px;border-right:1px solid var(--line)}
+.path-item:last-child{border-right:none}
+.path-item .n{font-family:var(--display);font-size:13px;color:var(--ink-faint)}
+.path-item h3{font-size:19px;margin-top:10px}
+.path-item p{font-size:13.5px;margin-top:8px}
+@media(max-width:760px){.path-item{flex:1 1 50%;border-right:1px solid var(--line)}.path-item:nth-child(2n){border-right:none}}
+
+/* --------------------------------------------------------- D: journey */
+.journey{background:var(--paper)}
+.journey-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:46px}
+.journey-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:52px;align-items:center}
+.journey-media{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:4/3}
+.journey-media img{opacity:0;position:absolute;inset:0;clip-path:inset(0 0 100% 0);transition:opacity .6s ease,clip-path .7s cubic-bezier(.22,.61,.36,1)}
+.journey-media img.active{opacity:1;clip-path:inset(0 0 0% 0)}
+.journey-media img.wipe-h{clip-path:inset(0 100% 0 0)}
+.journey-media img.wipe-h.active{clip-path:inset(0 0% 0 0)}
+.journey-idx{position:absolute;top:18px;left:18px;font-size:12px;letter-spacing:.1em;color:#fff;background:rgba(32,31,26,.5);padding:6px 12px;border-radius:999px;backdrop-filter:blur(4px)}
+.journey-copy .stage-eyebrow{color:var(--terracotta-dark);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.journey-copy h3{font-size:clamp(24px,3vw,34px);margin-top:12px}
+.journey-copy p.body{margin-top:16px;font-size:15.5px;line-height:1.7}
+.journey-controls{display:flex;align-items:center;gap:16px;margin-top:32px}
+.jbtn{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
+.jbtn:hover{border-color:var(--sage-dark);color:var(--sage-dark)}
+.jbtn:disabled{opacity:.3}
+.jdots{display:flex;gap:8px}
+.jdot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:width .25s,background .25s}
+.jdot[aria-current="true"]{width:22px;border-radius:4px;background:var(--sage-dark)}
+.jrail{position:relative;width:64px;height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-left:6px}
+.jrail-fill{display:block;height:100%;width:0%;background:var(--terracotta)}
+@media(max-width:900px){.journey-grid{grid-template-columns:1fr}.jrail{display:none}}
+
+/* ---------------------------------------------------- E: explore clinic */
+.explore{background:var(--sage-deep);color:var(--cream)}
+.explore-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:34px}
+.explore-tab{padding:11px 20px;border-radius:999px;border:1px solid rgba(250,246,238,.28);font-size:13.5px;color:#E9E7DE;transition:background .2s,border-color .2s,color .2s}
+.explore-tab[aria-selected="true"]{background:var(--cream);color:var(--ink);border-color:var(--cream)}
+.explore-tab:hover:not([aria-selected="true"]){border-color:rgba(250,246,238,.6)}
+.explore-stage{display:grid;grid-template-columns:1.2fr .8fr;gap:0;border-radius:22px;overflow:hidden;background:rgba(0,0,0,.15)}
+.explore-media{position:relative;min-height:440px}
+.explore-media img{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
+.explore-media img.active{opacity:1}
+.explore-info{padding:40px}
+.explore-info .tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#B9D1A8;font-weight:600}
+.explore-info h3{color:#fff;font-size:26px;margin-top:14px}
+.explore-info p{color:#D6D9CC;margin-top:14px;font-size:14.5px;line-height:1.7}
+@media(max-width:900px){.explore-stage{grid-template-columns:1fr}.explore-media{min-height:300px}}
+
+/* ------------------------------------------------------- F: trust/appt */
+.trust{background:var(--cream)}
+.appt{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px}
+.appt-aside ul{list-style:none;padding:0;margin:26px 0 0;display:flex;flex-direction:column;gap:16px}
+.appt-aside li{display:flex;gap:12px;font-size:14.5px;color:var(--ink-soft)}
+.appt-aside li svg{flex:none;width:19px;height:19px;color:var(--sage-dark);margin-top:1px}
+form.appt-form{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:40px;display:flex;flex-direction:column;gap:18px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+.field input,.field select,.field textarea{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--cream);font:inherit;color:var(--ink)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--sage);outline-offset:1px;border-color:transparent}
+.field textarea{min-height:92px;resize:vertical}
+.appt-form .submit-row{display:flex;align-items:center;gap:16px;margin-top:4px;flex-wrap:wrap}
+.form-status{font-size:13.5px;padding:12px 16px;border-radius:12px;display:none}
+.form-status.show{display:block}
+.form-status.ok{background:var(--sage-pale);color:var(--sage-dark)}
+.form-status.err{background:#F7E4DA;color:var(--terracotta-dark)}
+.demo-note{font-size:11.5px;color:var(--ink-faint)}
+@media(max-width:900px){.appt{grid-template-columns:1fr}form.appt-form{padding:26px}.row2{grid-template-columns:1fr}}
+
+footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);background:var(--paper)}
+.foot-in{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px}
+.foot-cols{display:flex;gap:64px;flex-wrap:wrap}
+.foot-col h4{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-faint);margin:0 0 14px}
+.foot-col a,.foot-col span{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:9px}
+.foot-bottom{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro-veil" id="introVeil"></div>
+  <div class="intro-frame-border" id="introFrameBorder"></div>
+  <div class="intro-content">
+    <div class="intro-glow"></div>
+    <div class="intro-logo">
+      <span class="intro-mark">V</span>
+      <span class="intro-word-mask"><span class="intro-word">VERA</span></span>
+    </div>
+    <div class="intro-lines">
+      <span class="intro-line">General &amp; Cosmetic Dentistry</span>
+      <span class="intro-line">Guided First Visits</span>
+      <span class="intro-line">Calm, Modern Care</span>
+    </div>
+  </div>
+</div>
+
+<div class="athar-strip">
+  <a class="athar-chip" href="../../index.html#showcase"><span class="dot" aria-hidden="true"></span>A demo by ATHAR — back to showcase</a>
+</div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true">V</span>VERA Clinic</a>
+    <div class="nav-links">
+      <a href="#concerns">What brings you in</a>
+      <a href="#journey">Your visit</a>
+      <a href="#explore">The clinic</a>
+      <a href="#appointment">Appointment</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn outline" href="#appointment" style="padding:11px 20px;font-size:13px">Book a visit</a>
+      <button class="menu-btn" aria-label="Open menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+<section class="hero" id="hero">
+  <div class="hero-copy">
+    <span class="eyebrow">Before the chair</span>
+    <h1>The unknown<br>feels <em>bigger.</em></h1>
+    <p class="hero-sub">At VERA, we turn uncertainty into clarity — showing you exactly what a visit involves, at your own pace, before you ever sit down.</p>
+    <div class="hero-ctas">
+      <a class="btn" href="#concerns">Explore Your Visit
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
+      <a class="btn outline" href="#appointment">Request a Consultation</a>
+    </div>
+    <div class="hero-facts">
+      <span class="hero-fact">Clear information before you arrive</span>
+      <span class="hero-fact">A calmer, guided first visit</span>
+      <span class="hero-fact">Nothing explained twice</span>
+    </div>
+  </div>
+  <div class="hero-media" id="heroMedia">
+    <div class="hero-media-main" id="heroMain">
+      <img src="images/v4/hero-consultation.jpg" alt="A dentist and assistant reviewing a treatment plan on a tablet with a patient in a bright, modern clinic">
+    </div>
+    <div class="hero-media-accent" id="heroAccent">
+      <img src="images/reception.jpg" alt="A calm, light-filled clinic space with natural wood and sage-green walls">
+    </div>
+  </div>
+</section>
+
+<section class="concerns" id="concerns">
+  <div class="shell">
+    <div class="section-head reveal">
+      <span class="eyebrow">What brings you in?</span>
+      <h2>Start with what's actually<br>on your mind.</h2>
+      <p>Choose the one that fits, and we'll show you the path that matches it — not a generic list of services.</p>
+    </div>
+    <div class="concern-grid reveal">
+      <div class="concern-list" id="concernList" role="list"></div>
+      <div class="concern-visual" id="concernVisual">
+        <div class="concern-visual-img active" id="concernVisualDefault" style="background:url('images/v4/consultation.jpg') center/cover"></div>
+        <div class="concern-visual-panel" id="concernPanel">
+          <span class="tag">Start here</span>
+          <h4>Choose what's on your mind</h4>
+          <p style="color:#E9E7DE;margin-top:12px;font-size:13.5px">Select any item on the left — the service, what it covers, and your next step will appear here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="paths">
+  <div class="shell">
+    <div class="section-head reveal">
+      <span class="eyebrow">Understanding your options</span>
+      <h2>Four care pathways,<br>plainly explained.</h2>
+      <p>General guidance on what each pathway involves. Not a diagnosis, and not a promised outcome — a starting point for a conversation.</p>
+    </div>
+  </div>
+  <div class="path-strip reveal">
+    <div class="path-item"><span class="n">01</span><h3>General Dentistry</h3><p>Checkups, cleanings and early prevention — where most first visits begin.</p></div>
+    <div class="path-item"><span class="n">02</span><h3>Cosmetic Dentistry</h3><p>Whitening, veneers and bonding, planned around your goals, costs shared upfront.</p></div>
+    <div class="path-item"><span class="n">03</span><h3>Emergency Care</h3><p>Same-day slots for pain, breaks or swelling, with guidance before you arrive.</p></div>
+    <div class="path-item"><span class="n">04</span><h3>Pediatric Care</h3><p>Shorter, playful appointments, paced for younger patients, parents in the room.</p></div>
+  </div>
+</section>
+
+<section class="journey" id="journey">
+  <div class="shell">
+    <div class="journey-top reveal">
+      <div>
+        <span class="eyebrow">Your visit, start to finish</span>
+        <h2 style="margin-top:14px;font-size:clamp(28px,3.6vw,42px)">Nothing about your visit<br>is a surprise.</h2>
+      </div>
+    </div>
+    <div class="journey-grid reveal">
+      <div class="journey-media">
+        <span class="journey-idx" id="journeyIdx">01 / 04</span>
+        <img id="jImg0" class="active" src="../vera-clinic/images/reception.jpg" alt="A calm, light-filled clinic reception area">
+        <img id="jImg1" src="images/v4/consultation.jpg" alt="A dentist consulting with a smiling patient">
+        <img id="jImg2" src="images/v4/treatment.jpg" alt="A dentist adjusting the overhead light before treatment">
+        <img id="jImg3" src="images/v4/detail.jpg" alt="A close, careful dental examination in progress">
+      </div>
+      <div class="journey-copy">
+        <span class="stage-eyebrow" id="jEyebrow">Stage 01 — Arrive</span>
+        <h3 id="jTitle">A warm welcome, no paperwork pile.</h3>
+        <p class="body" id="jBody">Check in at reception, five minutes early — a short digital form on a tablet, nothing more.</p>
+        <div class="journey-controls">
+          <button type="button" class="jbtn" id="jPrev" aria-label="Previous stage"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M10 3L4 8l6 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="jdots" id="jDots"></div>
+          <button type="button" class="jbtn" id="jNext" aria-label="Next stage"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="jrail" aria-hidden="true"><span class="jrail-fill" id="jRailFill"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="explore dark" id="explore">
+  <div class="shell">
+    <div class="section-head reveal">
+      <span class="eyebrow" style="color:#B9D1A8">Explore the clinic</span>
+      <h2>A space built for calm,<br>not just function.</h2>
+      <p style="color:#D6D9CC">Three real areas of the clinic — tap to look around before you visit.</p>
+    </div>
+    <div class="explore-tabs reveal" id="exploreTabs" role="tablist"></div>
+    <div class="explore-stage reveal">
+      <div class="explore-media" id="exploreMedia">
+        <img class="active" data-i="0" src="../vera-clinic/images/reception.jpg" alt="Reception area">
+        <img data-i="1" src="images/v4/consultation.jpg" alt="Consultation room">
+        <img data-i="2" src="images/v4/treatment.jpg" alt="Treatment room">
+      </div>
+      <div class="explore-info" id="exploreInfo">
+        <span class="tag">Reception</span>
+        <h3>Arrival &amp; check-in</h3>
+        <p>Natural light, a short digital form, and a seat while your room is readied — nothing to fill out twice.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trust" id="trust">
+  <div class="shell">
+    <div class="section-head reveal">
+      <span class="eyebrow">Clarity and trust</span>
+      <h2>A first consultation,<br>explained plainly.</h2>
+      <p>A first visit is a conversation, not a commitment. Here's what that generally involves.</p>
+    </div>
+  </div>
+</section>
+
+<section id="appointment" style="padding-top:0">
+  <div class="shell appt">
+    <div class="appt-aside reveal">
+      <span class="eyebrow">Request an appointment</span>
+      <h2 style="margin-top:14px" id="apptHeading">Tell us what you <em>need,</em> we'll take it from there.</h2>
+      <p style="margin-top:16px">A simulated inquiry for demonstration — submitting it does not book a real appointment or contact an actual clinic.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>We reply within one business day (in a real deployment)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6"/></svg>No obligation, no charge for inquiries</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Flexible morning &amp; evening slots</li>
+      </ul>
+    </div>
+    <form class="appt-form reveal" id="apptForm" novalidate>
+      <div class="row2">
+        <div class="field"><label for="vName">Full name</label><input id="vName" name="name" type="text" required placeholder="Your name"></div>
+        <div class="field"><label for="vContact">Email or phone</label><input id="vContact" name="contact" type="text" required placeholder="you@example.com"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="vService">Service of interest</label>
+          <select id="vService" name="service" required>
+            <option value="" disabled selected>Select a service</option>
+            <option>General Dentistry</option><option>Cosmetic Dentistry</option>
+            <option>Pediatric Care</option><option>Emergency Care</option>
+          </select>
+        </div>
+        <div class="field"><label for="vDate">Preferred date &amp; time</label><input id="vDate" name="when" type="text" placeholder="e.g. Weekday mornings"></div>
+      </div>
+      <div class="field"><label for="vMsg">Anything we should know?</label><textarea id="vMsg" name="message" placeholder="Briefly describe what you'd like help with"></textarea></div>
+      <div class="submit-row">
+        <button class="btn" type="submit">Submit request<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="demo-note">Demo form — no data is sent or stored.</span>
+      </div>
+      <div class="form-status" id="apptStatus" role="status"></div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="shell foot-in">
+    <div>
+      <a class="brand" href="#top"><span class="mark" aria-hidden="true">V</span>VERA Clinic</a>
+      <p style="max-width:34ch;margin-top:8px">A fictional clinic brand, designed and built by ATHAR Digital Studio as a capability demonstration.</p>
+    </div>
+    <div class="foot-cols">
+      <div class="foot-col"><h4>Clinic (fictional)</h4><span>12 Wellness Ave, Example City</span><span>Mon–Sat · 9am–6pm</span><span>hello@vera-clinic.example</span></div>
+      <div class="foot-col"><h4>Explore</h4><a href="#concerns">What brings you in</a><a href="#journey">Your visit</a><a href="#appointment">Appointment</a></div>
+    </div>
+  </div>
+  <div class="shell foot-bottom">
+    <span>© 2026 VERA Clinic — a fictional brand built by ATHAR Digital Studio. Photography: Pexels (Olly/Andrea Piacquadio, Dr ADEL, Anna Shvets) — Pexels License.</span>
+    <a href="../../index.html#showcase">Back to the ATHAR showcase →</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function loadScript(src){
+    return new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = src; s.onload = function(){ resolve(); }; s.onerror = function(){ reject(new Error('failed ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+
+  // Wrap each word of an element's text in a span so GSAP can stagger-reveal
+  // it line by line, without hand-splitting markup.
+  function splitWords(el){
+    if (!el || el.dataset.split) return;
+    el.dataset.split = '1';
+    var html = el.innerHTML;
+    el.innerHTML = html.replace(/(<[^>]+>)|([^\s<>]+)(\s*)/g, function(m, tag, word, space){
+      if (tag) return tag;
+      return '<span class="split-word">' + word + '</span>' + (space || '');
+    });
+  }
+
+  requestAnimationFrame(function(){ document.getElementById('hero').classList.add('loaded'); });
+
+  function showEverythingNoAnim(){
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('show'); });
+  }
+
+  // ------------------------------------------- A+B: opening sequence ----
+  // The hero photo is never a separate layer that appears after the intro —
+  // it is real and in place from the first frame. A small bordered "iris"
+  // window sits over it, painting everything else dark via an oversized
+  // box-shadow; as that window scales up it progressively uncovers the
+  // same photo in its real position, so the intro IS the hero's reveal,
+  // not a splash screen that hands off to an unrelated hero animation.
+  function playOpening(gsap){
+    var intro = document.getElementById('intro');
+    var veil = document.getElementById('introVeil');
+    var frameBorder = document.getElementById('introFrameBorder');
+    var heroMedia = document.getElementById('heroMedia');
+
+    document.querySelectorAll('.hero-copy h1, .section-head h2').forEach(splitWords);
+    gsap.set('.split-word', { opacity: 0, y: '100%' });
+    gsap.set('.hero-media-main img', { scale: 1.12 });
+    gsap.set('#heroAccent', { opacity: 0, x: -70, y: 90, scale: .7, rotate: -8 });
+    gsap.set('.hero-copy .eyebrow, .hero-sub, .hero-ctas, .hero-facts', { opacity: 0, y: 18 });
+    var introWordEl = intro ? intro.querySelector('.intro-word') : null;
+    if (introWordEl) gsap.set(introWordEl, { y: introWordEl.offsetHeight });
+
+    // The "hole" rect starts as a small window centered on the real hero
+    // photo and grows to comfortably cover it — computed directly in
+    // viewport pixels so the frame border and clip-path always agree
+    // exactly (no transform/box-shadow interaction to go wrong).
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var holeStart = { x: vw / 2 - 85, y: vh / 2 - 59, w: 170, h: 118 };
+    var holeEnd = { x: 0, y: 0, w: vw, h: vh };
+    if (heroMedia) {
+      var r = heroMedia.getBoundingClientRect();
+      holeStart = { x: r.left + r.width / 2 - 85, y: r.top + r.height / 2 - 59, w: 170, h: 118 };
+      holeEnd = { x: r.left - r.width * .06, y: r.top - r.height * .06, w: r.width * 1.12, h: r.height * 1.12 };
+    }
+    function setHole(t){
+      var x = holeStart.x + (holeEnd.x - holeStart.x) * t;
+      var y = holeStart.y + (holeEnd.y - holeStart.y) * t;
+      var w = holeStart.w + (holeEnd.w - holeStart.w) * t;
+      var h = holeStart.h + (holeEnd.h - holeStart.h) * t;
+      if (veil) {
+        veil.style.clipPath = 'path(evenodd, "M0 0 L' + vw + ' 0 L' + vw + ' ' + vh + ' L0 ' + vh + ' Z M' +
+          x + ' ' + y + ' L' + (x + w) + ' ' + y + ' L' + (x + w) + ' ' + (y + h) + ' L' + x + ' ' + (y + h) + ' Z")';
+      }
+      if (frameBorder) {
+        frameBorder.style.left = x + 'px'; frameBorder.style.top = y + 'px';
+        frameBorder.style.width = w + 'px'; frameBorder.style.height = h + 'px';
+        frameBorder.style.opacity = Math.max(0, 1 - t * 1.2);
+      }
+    }
+    setHole(0);
+
+    if (!intro || reduced) {
+      if (intro) intro.remove();
+      gsap.set(['.split-word', '.hero-media-main img', '#heroAccent', '.hero-copy .eyebrow', '.hero-sub', '.hero-ctas', '.hero-facts'], { clearProps: 'all' });
+      return Promise.resolve();
+    }
+
+    document.body.classList.add('intro-active');
+    return new Promise(function(resolve){
+      function finish(){ intro.remove(); document.body.classList.remove('intro-active'); resolve(); }
+      var holeProxy = { t: 0 };
+      var tl = gsap.timeline({ onComplete: finish });
+
+      tl.to('#intro .intro-glow', { opacity: 1, duration: .9, ease: 'sine.out' })
+        .to('#intro .intro-mark', { opacity: 1, scale: 1, duration: .55, ease: 'back.out(2.2)' }, .1)
+        .to('#intro .intro-word', { y: 0, duration: .8, ease: 'power4.out' }, .35)
+        .to('#intro .intro-line', { opacity: 1, y: 0, duration: .5, stagger: .1, ease: 'power2.out' }, .6)
+        .addLabel('open', 1.05)
+        // The frame expands — the transformation itself, not a curtain
+        // ahead of an unrelated hero animation.
+        .to(holeProxy, { t: 1, duration: 1.3, ease: 'power3.inOut', onUpdate: function(){ setHole(holeProxy.t); } }, 'open')
+        .to('#intro .intro-content', { opacity: 0, duration: .4, ease: 'power2.in' }, 'open+=.2')
+        .to('.hero-media-main img', { scale: 1, duration: 1.4, ease: 'power3.out' }, 'open')
+        .to('.hero-copy .eyebrow', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 'open+=.35')
+        .to('.hero-copy h1 .split-word', { opacity: 1, y: '0%', duration: .8, stagger: .03, ease: 'power3.out' }, 'open+=.45')
+        // The veil dissolves once the frame has fully opened — nav, CTAs
+        // and the rest of the page arrive naturally as the dark layer clears.
+        .to('#intro', { opacity: 0, duration: .45, ease: 'power2.in' }, 'open+=1.35')
+        .to('#heroAccent', { opacity: 1, x: 0, y: 0, scale: 1, rotate: -2, duration: .95, ease: 'power3.out' }, 'open+=1.1')
+        .to('.hero-sub, .hero-ctas, .hero-facts', { opacity: 1, y: 0, duration: .7, stagger: .08, ease: 'power3.out' }, 'open+=1.0');
+    });
+  }
+
+  // --------------------------------------------- scroll choreography ----
+  function initScrollChoreography(gsap, ScrollTrigger){
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Section-head words lift in, line by line, as each section enters.
+    document.querySelectorAll('.section-head h2').forEach(function(h){
+      gsap.to(h.querySelectorAll('.split-word'), {
+        opacity: 1, y: '0%', duration: .8, stagger: .025, ease: 'power3.out',
+        scrollTrigger: { trigger: h, start: 'top 85%' }
+      });
+    });
+
+    // Generic reveal elements: fade/rise.
+    document.querySelectorAll('.reveal').forEach(function(el){
+      gsap.fromTo(el, { opacity: 0, y: 36 }, {
+        opacity: 1, y: 0, duration: .9, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      });
+    });
+
+    // Concern rows / path items stagger in as a group once the grid enters.
+    ['.concern-list .concern-row', '.path-strip .path-item'].forEach(function(sel){
+      var items = gsap.utils.toArray(sel);
+      if (!items.length) return;
+      gsap.fromTo(items, { opacity: 0, y: 24 }, {
+        opacity: 1, y: 0, duration: .7, stagger: .08, ease: 'power3.out',
+        scrollTrigger: { trigger: items[0].closest('.concern-grid, .path-strip'), start: 'top 82%' }
+      });
+    });
+
+    // Hero scroll transformation: a short, bounded pin (desktop only) where
+    // the primary photo pushes into a tighter, more immersive crop, the
+    // secondary photo actively recedes rather than sitting still, and the
+    // copy clears out of the way — a real geometry change the user feels
+    // on the very first scroll, not a flat parallax drift.
+    var mm = gsap.matchMedia();
+    mm.add('(min-width: 901px)', function(){
+      var heroST = ScrollTrigger.create({
+        trigger: '.hero', start: 'top top', end: '+=65%', pin: true, scrub: .5,
+        animation: gsap.timeline()
+          .to('.hero-media-main img', { scale: 1.24, yPercent: 4, ease: 'none' }, 0)
+          .to('#heroAccent', { xPercent: -65, yPercent: 45, scale: .55, rotate: -16, opacity: .2, ease: 'none' }, 0)
+          .to('.hero-copy', { opacity: 0, x: -40, ease: 'none' }, .1)
+      });
+      return function(){ heroST.kill(); };
+    });
+    mm.add('(max-width: 900px)', function(){
+      var heroMobTl = gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } })
+        .to('.hero-media-main img', { yPercent: 10, scale: 1.12, ease: 'none' }, 0)
+        .to('#heroAccent', { yPercent: -18, rotate: -4, ease: 'none' }, 0);
+      return function(){ heroMobTl.scrollTrigger && heroMobTl.scrollTrigger.kill(); };
+    });
+
+    // Visual panels in concerns/journey/explore: a soft scale-in as the
+    // active photo changes, read by MutationObserver on class="active" —
+    // layered on top of each section's own clip-path/slide transition.
+    function scaleInOnActivate(container){
+      if (!container) return;
+      var mo = new MutationObserver(function(muts){
+        muts.forEach(function(m){
+          var t = m.target;
+          if (t.classList && t.classList.contains('active')) {
+            gsap.fromTo(t, { scale: 1.08 }, { scale: 1, duration: .6, ease: 'power3.out' });
+          }
+        });
+      });
+      container.querySelectorAll('img, .concern-visual-img').forEach(function(img){
+        mo.observe(img, { attributes: true, attributeFilter: ['class'] });
+      });
+    }
+    scaleInOnActivate(document.getElementById('concernVisual'));
+
+    // Journey gets a more pronounced per-stage framing change (bigger scale
+    // delta) than the other sections, since it's the strongest storytelling
+    // moment after the hero.
+    var jMediaEl = document.querySelector('.journey-media');
+    if (jMediaEl) {
+      var jmo = new MutationObserver(function(muts){
+        muts.forEach(function(m){
+          var t = m.target;
+          if (t.classList && t.classList.contains('active')) {
+            gsap.fromTo(t, { scale: 1.16 }, { scale: 1, duration: .7, ease: 'power3.out' });
+          }
+        });
+      });
+      jMediaEl.querySelectorAll('img').forEach(function(img){ jmo.observe(img, { attributes: true, attributeFilter: ['class'] }); });
+    }
+
+    mm.add('(min-width: 901px)', function(){
+      initJourneyPin(gsap, ScrollTrigger);
+      return function(){ journeyST && journeyST.kill(); journeyST = null; };
+    });
+
+    // Recalculate pin distances once webfonts/images have settled, and on
+    // resize — layout shifts from either would otherwise leave a pinned
+    // section's start/end measured against stale geometry.
+    window.addEventListener('load', function(){ ScrollTrigger.refresh(); });
+    var resizeTimer;
+    window.addEventListener('resize', function(){
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function(){ ScrollTrigger.refresh(); }, 200);
+    });
+  }
+
+  (function boot(){
+    // Wait for the display webfont to be ready before measuring/animating
+    // anything percentage-based (the masked VERA reveal in particular) —
+    // a font swap mid-tween changes the element's box and corrupts a
+    // yPercent-based transform computed against the pre-swap size.
+    var fontsReady = (window.document && document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function(){}) : Promise.resolve();
+    Promise.all([
+      loadScript('/vendor/gsap/3.12.5/gsap.min.js').then(function(){
+        return reduced ? null : loadScript('/vendor/gsap/3.12.5/ScrollTrigger.min.js');
+      }),
+      fontsReady
+    ]).then(function(){
+      var gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
+      if (!gsap) { showEverythingNoAnim(); document.getElementById('intro') && document.getElementById('intro').remove(); return; }
+      playOpening(gsap).then(function(){
+        if (reduced || !ScrollTrigger) { showEverythingNoAnim(); return; }
+        initScrollChoreography(gsap, ScrollTrigger);
+      });
+    }).catch(function(){
+      showEverythingNoAnim();
+      var intro = document.getElementById('intro'); if (intro) intro.remove();
+      document.body.classList.remove('intro-active');
+    });
+  })();
+
+  // ---------------------------------------------------- B: concerns ----
+  var concerns = [
+    { id:'chair', label:'A toothache or sudden pain', sub:'Something hurts right now', service:'Emergency Care', tag:'Same-day slots',
+      points:['Reserved same-day slots for pain, breaks or swelling.','Clear guidance by phone before you even arrive.','Follow-up plan booked before you leave.'],
+      image:'images/v4/detail.jpg' },
+    { id:'mirror', label:'A brighter, more confident smile', sub:'Cosmetic consultation', service:'Cosmetic Dentistry', tag:'By consultation',
+      points:['Whitening, veneers and bonding, planned around your goals.','Options discussed during the consultation.','Transparent, itemised estimate before any work begins.'],
+      image:'images/v4/consultation.jpg' },
+    { id:'desk', label:'Due for a checkup or cleaning', sub:'Routine care', service:'General Dentistry', tag:'Most requested',
+      points:['Routine checkups, cleanings and early-decay prevention.','Findings reviewed and explained during your visit.','Gentle approach for anxious or first-time patients.'],
+      image:'images/v4/treatment.jpg' },
+    { id:'kids', label:'Bringing in my child', sub:'Family-friendly care', service:'Pediatric Care', tag:'Family-friendly',
+      points:['Shorter, playful appointments designed for younger patients.','Parents welcome in the room for every visit.','Preventive focus: sealants, fluoride and habit coaching.'],
+      image:'images/v4/hero-consultation.jpg' }
+  ];
+  var cList = document.getElementById('concernList');
+  var cPanel = document.getElementById('concernPanel');
+  var cVisual = document.getElementById('concernVisual');
+  var cDefault = document.getElementById('concernVisualDefault');
+  var apptHeading = document.getElementById('apptHeading');
+  var apptService = document.getElementById('vService');
+  var cActive = null;
+  var cImgs = {};
+
+  concerns.forEach(function(c, i){
+    var img = document.createElement('div');
+    img.className = 'concern-visual-img';
+    img.style.background = "url('" + c.image + "') center/cover";
+    cVisual.appendChild(img);
+    cImgs[c.id] = img;
+
+    var row = document.createElement('div');
+    row.className = 'concern-row';
+    row.setAttribute('role', 'listitem');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-pressed', 'false');
+    row.innerHTML = '<span class="n">0' + (i + 1) + '</span><h3>' + c.label + '</h3><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    row.addEventListener('click', function(){ selectConcern(c, row); });
+    row.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectConcern(c, row); } });
+    cList.appendChild(row);
+  });
+
+  // Delegated once: the "Request this appointment" CTA is re-created inside
+  // cPanel's innerHTML on every selection, so a single listener on the
+  // panel itself (rather than re-binding per render) stays correct even
+  // while the panel fade is still in flight.
+  cPanel.addEventListener('click', function(e){
+    var cta = e.target.closest('#concernCta');
+    if (!cta || !cActive) return;
+    var c = concerns.filter(function(x){ return x.id === cActive; })[0];
+    if (c) apptService.value = c.service;
+  });
+
+  function setConcernPanel(html){
+    if (window.gsap) {
+      gsap.to(cPanel, { opacity: 0, y: -8, duration: .2, ease: 'power1.in', onComplete: function(){
+        cPanel.innerHTML = html;
+        gsap.fromTo(cPanel, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' });
+      }});
+    } else {
+      cPanel.innerHTML = html;
+    }
+  }
+
+  function selectConcern(c, row){
+    var wasActive = cActive === c.id;
+    Array.prototype.forEach.call(cList.children, function(r){ r.setAttribute('aria-pressed', 'false'); });
+    Object.keys(cImgs).forEach(function(k){ cImgs[k].classList.remove('active'); });
+    cDefault.classList.remove('active');
+    if (wasActive) {
+      cActive = null;
+      cDefault.classList.add('active');
+      setConcernPanel('<span class="tag">Start here</span><h4>Choose what\'s on your mind</h4><p style="color:#E9E7DE;margin-top:12px;font-size:13.5px">Select any item on the left — the service, what it covers, and your next step will appear here.</p>');
+      return;
+    }
+    cActive = c.id;
+    row.setAttribute('aria-pressed', 'true');
+    cImgs[c.id].classList.add('active');
+    var html = '<span class="tag">' + c.tag + '</span><h4>' + c.service + '</h4><ul>';
+    c.points.forEach(function(p){
+      html += '<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>' + p + '</span></li>';
+    });
+    html += '</ul><div class="cta"><a class="btn light" href="#appointment" id="concernCta">Request this appointment</a></div>';
+    setConcernPanel(html);
+    apptHeading.innerHTML = 'You told us: <em>' + c.label.charAt(0).toLowerCase() + c.label.slice(1) + '.</em> Let\'s get it booked.';
+  }
+
+  // ---------------------------------------------------- D: journey ----
+  var stages = [
+    { eyebrow:'Stage 01 — Arrive', title:'A warm welcome, no paperwork pile.', body:"Check in at reception, five minutes early — a short digital form on a tablet, nothing more." },
+    { eyebrow:'Stage 02 — Consultation', title:'A real conversation first.', body:"What brought you in, what you want, and what today's visit can realistically cover — before anything clinical happens." },
+    { eyebrow:'Stage 03 — Treatment', title:'Every step explained as it happens.', body:"Nothing is a surprise mid-procedure — each step is talked through, with pacing set by you, not the clock." },
+    { eyebrow:'Stage 04 — Aftercare', title:'A written plan, not just a reminder card.', body:"You leave knowing exactly what to expect next, and when to come back — in plain language." }
+  ];
+  var jIdx = 0;
+  var journeyST = null; // set by initJourneyPin() once the pinned ScrollTrigger exists
+  var jEyebrow = document.getElementById('jEyebrow'), jTitle = document.getElementById('jTitle'), jBody = document.getElementById('jBody'), jIdxEl = document.getElementById('journeyIdx');
+  var jDots = document.getElementById('jDots'), jPrev = document.getElementById('jPrev'), jNext = document.getElementById('jNext'), jRailFill = document.getElementById('jRailFill');
+  var jImgs = [0, 1, 2, 3].map(function(i){ return document.getElementById('jImg' + i); });
+  // Alternate the wipe axis per stage (vertical, then horizontal) so the
+  // four transitions read as distinct moments rather than one repeated
+  // motion played four times.
+  jImgs.forEach(function(im, i){ if (im && i % 2 === 1) im.classList.add('wipe-h'); });
+
+  stages.forEach(function(s, i){
+    var d = document.createElement('button');
+    d.type = 'button'; d.className = 'jdot';
+    d.setAttribute('aria-label', 'Go to ' + s.eyebrow);
+    d.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+    d.addEventListener('click', function(){ gotoStage(i); });
+    jDots.appendChild(d);
+  });
+
+  function setStage(i){
+    jIdx = Math.max(0, Math.min(stages.length - 1, i));
+    var s = stages[jIdx];
+    jEyebrow.textContent = s.eyebrow; jTitle.textContent = s.title; jBody.textContent = s.body;
+    jIdxEl.textContent = String(jIdx + 1).padStart(2, '0') + ' / ' + String(stages.length).padStart(2, '0');
+    jImgs.forEach(function(im, ii){ im.classList.toggle('active', ii === jIdx); });
+    Array.prototype.forEach.call(jDots.children, function(d, di){ d.setAttribute('aria-current', di === jIdx ? 'true' : 'false'); });
+    jPrev.disabled = jIdx === 0; jNext.disabled = jIdx === stages.length - 1;
+    if (jRailFill && !journeyST) jRailFill.style.width = (jIdx / (stages.length - 1) * 100) + '%';
+  }
+
+  // When the section is pinned (desktop), stage changes are driven by
+  // scroll position via initJourneyPin()'s onUpdate — so prev/next/dots
+  // move the scroll position rather than jumping the stage directly,
+  // keeping scroll as the single source of truth. Unpinned (mobile, or
+  // reduced motion), they fall back to setting the stage immediately.
+  function gotoStage(i){
+    i = Math.max(0, Math.min(stages.length - 1, i));
+    if (journeyST) {
+      var prog = (i + .5) / stages.length;
+      var y = journeyST.start + (journeyST.end - journeyST.start) * prog;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    } else {
+      setStage(i);
+    }
+  }
+  jPrev.addEventListener('click', function(){ gotoStage(jIdx - 1); });
+  jNext.addEventListener('click', function(){ gotoStage(jIdx + 1); });
+  setStage(0);
+
+  // Desktop only: pin the journey section for a short scroll distance and
+  // scrub the stage/image/rail progression to scroll position directly —
+  // the strongest scroll-driven moment on the page. Skipped on narrow
+  // viewports and reduced-motion so mobile never gets scroll-trapped.
+  function initJourneyPin(gsap, ScrollTrigger){
+    if (reduced) return;
+    journeyST = ScrollTrigger.create({
+      trigger: '#journey .journey-grid',
+      start: 'top top+=110',
+      end: '+=160%',
+      pin: true,
+      anticipatePin: 1,
+      scrub: .4,
+      onUpdate: function(self){
+        var idx = Math.min(stages.length - 1, Math.floor(self.progress * stages.length));
+        if (idx !== jIdx) setStage(idx);
+        if (jRailFill) jRailFill.style.width = (self.progress * 100) + '%';
+      }
+    });
+  }
+
+  var journeySection = document.getElementById('journey');
+  journeySection.setAttribute('tabindex', '-1');
+  journeySection.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight') gotoStage(jIdx + 1);
+    else if (e.key === 'ArrowLeft') gotoStage(jIdx - 1);
+  });
+
+  // ------------------------------------------------- E: explore clinic --
+  var areas = [
+    { tag:'Reception', title:'Arrival & check-in', body:'Natural light, a short digital form, and a seat while your room is readied — nothing to fill out twice.' },
+    { tag:'Consultation', title:'A room built for conversation', body:'Where findings are discussed and options are laid out clearly before any treatment is agreed to.' },
+    { tag:'Treatment', title:'Clean, calm, and explained', body:'Modern equipment, a steady pace, and a dentist who talks you through every step as it happens.' }
+  ];
+  var exTabs = document.getElementById('exploreTabs');
+  var exMedia = document.getElementById('exploreMedia');
+  var exInfo = document.getElementById('exploreInfo');
+  var exImgs = Array.prototype.slice.call(exMedia.querySelectorAll('img'));
+  var exActiveIdx = 0;
+  areas.forEach(function(a, i){
+    var t = document.createElement('button');
+    t.type = 'button'; t.className = 'explore-tab'; t.setAttribute('role', 'tab');
+    t.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+    t.textContent = a.tag;
+    t.addEventListener('click', function(){ setArea(i); });
+    exTabs.appendChild(t);
+  });
+  // A spatial transition rather than a tab swap: the incoming photo slides
+  // and scales in from the direction of travel while the outgoing one
+  // recedes the opposite way, with the info panel crossfading in step —
+  // a distinct motion language from the concerns wipe and the journey pin.
+  function setArea(i){
+    if (i === exActiveIdx) return;
+    var dir = i > exActiveIdx ? 1 : -1;
+    Array.prototype.forEach.call(exTabs.children, function(t, ti){ t.setAttribute('aria-selected', ti === i ? 'true' : 'false'); });
+    var outgoing = exImgs[exActiveIdx], incoming = exImgs[i];
+    var a = areas[i];
+    if (window.gsap) {
+      gsap.set(incoming, { zIndex: 2 }); gsap.set(outgoing, { zIndex: 1 });
+      incoming.classList.add('active');
+      gsap.fromTo(incoming, { opacity: 0, xPercent: dir * 12, scale: 1.08 }, { opacity: 1, xPercent: 0, scale: 1, duration: .85, ease: 'power3.out' });
+      gsap.to(outgoing, { opacity: 0, xPercent: -dir * 8, scale: .96, duration: .6, ease: 'power2.inOut', onComplete: function(){
+        outgoing.classList.remove('active'); gsap.set(outgoing, { clearProps: 'transform' });
+      }});
+      gsap.to(exInfo, { opacity: 0, y: -8, duration: .22, ease: 'power1.in', onComplete: function(){
+        exInfo.innerHTML = '<span class="tag">' + a.tag + '</span><h3>' + a.title + '</h3><p>' + a.body + '</p>';
+        gsap.fromTo(exInfo, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .4, ease: 'power2.out' });
+      }});
+    } else {
+      exImgs.forEach(function(im, ii){ im.classList.toggle('active', ii === i); });
+      exInfo.innerHTML = '<span class="tag">' + a.tag + '</span><h3>' + a.title + '</h3><p>' + a.body + '</p>';
+    }
+    exActiveIdx = i;
+  }
+
+  // ------------------------------------------------------- appt form ----
+  var form = document.getElementById('apptForm'), status = document.getElementById('apptStatus');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('vName').value.trim();
+    var contact = document.getElementById('vContact').value.trim();
+    var service = document.getElementById('vService').value;
+    status.className = 'form-status show';
+    if (!name || !contact || !service) {
+      status.classList.add('err'); status.classList.remove('ok');
+      status.textContent = 'Please fill in your name, contact detail and a service before submitting.';
+      return;
+    }
+    status.classList.add('ok'); status.classList.remove('err');
+    status.textContent = 'Thanks, ' + name.split(' ')[0] + ' — this is a demo. No real appointment was created and no data was sent or stored.';
+    form.reset();
+  });
+})();
+</script>
+</body>
+</html>
