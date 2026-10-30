@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VERA Clinic — Before the Chair (Phase 2 proof) — ATHAR</title>
+<meta name="description" content="VERA Clinic — Phase 2 creative proof: cinematic hero, The Unseen Visit interactive 3D journey. A demonstration by ATHAR Digital Studio.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">{ "imports": {
+  "three": "/vendor/three/0.186.1/three.module.min.js",
+  "three/addons/": "/vendor/three/0.186.1/addons/"
+} }</script>
+<style>
+:root{
+  --ink:#080b14; --ink-2:#0c1120; --ink-deep:#04060c;
+  --porcelain:#f7f6f2; --porcelain-dim:#e9e7e0;
+  --blue:#7fb0ff; --blue-soft:rgba(127,176,255,.32); --blue-dim:#3f6fc2;
+  --text:#eef0f6; --text-dim:rgba(238,240,246,.64); --text-faint:rgba(238,240,246,.4);
+  --text-dark:#0b0e16; --text-dark-dim:#52564f;
+  --line:rgba(238,240,246,.13); --line-strong:rgba(238,240,246,.22);
+  --serif:'Fraunces',Georgia,serif; --sans:'Figtree',system-ui,-apple-system,sans-serif;
+  --gutter:clamp(20px,4.5vw,72px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important} }
+body{margin:0;background:var(--ink);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--serif);font-weight:500;margin:0;letter-spacing:-.01em}
+em{font-style:italic;color:var(--blue)}
+p{margin:0;line-height:1.6}
+a{color:inherit}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip-link{position:absolute;left:12px;top:-60px;background:var(--porcelain);color:var(--text-dark);padding:10px 16px;border-radius:8px;z-index:9999;font-size:13px;font-weight:600;transition:top .2s}
+.skip-link:focus{top:12px}
+
+/* ---- preserved ATHAR navigation ---- */
+.athar-strip{position:fixed;top:0;left:0;right:0;z-index:999;height:36px;background:#04060c;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
+.athar-chip{display:inline-flex;align-items:center;gap:8px;color:var(--text);font-size:12px;letter-spacing:.4px;opacity:.9;transition:opacity .2s;text-decoration:none}
+.athar-chip:hover{opacity:1}
+.athar-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--blue)}
+
+.nav{position:fixed;top:36px;left:0;right:0;z-index:998;padding:18px var(--gutter);display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(10px);background:linear-gradient(180deg,rgba(4,6,12,.72),rgba(4,6,12,0))}
+.brand{display:flex;align-items:baseline;gap:9px;text-decoration:none;color:var(--text);font-family:var(--serif);font-size:19px;letter-spacing:.02em}
+.brand .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--blue-dim));display:inline-flex;align-items:center;justify-content:center;font-family:var(--sans);font-weight:700;font-size:13px;color:var(--ink-deep)}
+.brand .tiny{font-family:var(--sans);font-size:10px;letter-spacing:.14em;color:var(--text-faint);text-transform:uppercase;margin-left:2px}
+.nav-links{display:flex;gap:28px;font-size:13.5px}
+.nav-links a{text-decoration:none;color:var(--text-dim);transition:color .2s}
+.nav-links a:hover,.nav-links a:focus-visible{color:var(--text)}
+.nav-cta{display:flex;align-items:center;gap:14px}
+@media(max-width:820px){.nav-links{display:none}}
+
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border-radius:999px;font-size:14px;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer;font-family:var(--sans);transition:transform .25s cubic-bezier(.2,.8,.2,1),background .2s,border-color .2s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--porcelain);color:var(--text-dark)}
+.btn-primary:hover,.btn-primary:focus-visible{background:#fff}
+.btn-outline{background:transparent;color:var(--text);border-color:var(--line-strong)}
+.btn-outline:hover,.btn-outline:focus-visible{border-color:var(--blue);color:var(--blue)}
+.btn:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.btn-arrow{display:inline-flex}
+
+/* ---------------------------------------------------------------- hero */
+#top,#journey,#exit,#request{scroll-margin-top:110px}
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero-canvas-wrap{position:absolute;inset:0;z-index:0}
+.hero-canvas-wrap canvas{display:block;width:100%;height:100%}
+.hero-fallback-glow{position:absolute;inset:0;z-index:0;background:
+  radial-gradient(60% 55% at 78% 42%, var(--blue-soft), transparent 70%),
+  radial-gradient(40% 40% at 82% 60%, rgba(127,176,255,.18), transparent 70%)}
+.hero-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(100deg,rgba(4,6,12,.92) 0%,rgba(4,6,12,.55) 42%,rgba(4,6,12,.1) 68%,transparent 85%)}
+.hero-in{position:relative;z-index:2;max-width:1360px;margin:0 auto;padding:140px var(--gutter) 80px;width:100%}
+.hero-copy{max-width:620px}
+.eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:18px;display:block}
+.hero-copy h1{font-size:clamp(40px,6vw,74px);line-height:1.04;color:var(--text)}
+.hero-sub{margin-top:22px;font-size:17px;line-height:1.65;color:var(--text-dim);max-width:46ch}
+.hero-ctas{display:flex;align-items:center;gap:22px;margin-top:38px;flex-wrap:wrap}
+.hero-watch{display:inline-flex;align-items:center;gap:10px;color:var(--text-dim);text-decoration:none;font-size:13.5px}
+.hero-watch .play{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);display:inline-flex;align-items:center;justify-content:center}
+.hero-facts{display:flex;gap:34px;margin-top:52px;flex-wrap:wrap}
+.hero-fact{font-size:12.5px;color:var(--text-dim);max-width:16ch;padding-left:16px;border-left:1px solid var(--line-strong)}
+.hero-skip{position:absolute;right:var(--gutter);bottom:28px;z-index:2;font-size:12px;color:var(--text-faint);text-decoration:underline;text-underline-offset:3px}
+.hero-skip:hover{color:var(--text)}
+.scroll-cue{position:absolute;left:var(--gutter);bottom:28px;z-index:2;display:flex;align-items:center;gap:10px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint)}
+.scroll-cue .line{width:1px;height:28px;background:linear-gradient(var(--blue),transparent);animation:cueMove 2.2s ease-in-out infinite}
+@keyframes cueMove{0%,100%{opacity:.3}50%{opacity:1}}
+@media (prefers-reduced-motion: reduce){ .scroll-cue .line{animation:none;opacity:.6} }
+
+/* ------------------------------------------------------- unseen visit */
+.journey{position:relative;background:var(--ink-2);border-bottom:1px solid var(--line);padding:0}
+.journey-head{max-width:1360px;margin:0 auto;padding:90px var(--gutter) 10px}
+.journey-head .eyebrow{color:var(--blue)}
+.journey-head h2{font-size:clamp(28px,3.6vw,44px);max-width:16ch}
+.journey-head p{margin-top:16px;max-width:52ch;color:var(--text-dim);font-size:15.5px}
+.journey-stage{position:relative;max-width:1360px;margin:0 auto;padding:40px var(--gutter) 110px;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;min-height:68vh}
+@media(max-width:900px){.journey-stage{grid-template-columns:1fr;min-height:0}}
+.journey-canvas-wrap{position:relative;aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:radial-gradient(60% 60% at 50% 45%,#0e1424,var(--ink-deep));border:1px solid var(--line)}
+.journey-canvas-wrap canvas{display:block;width:100%;height:100%}
+.journey-static-fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;text-align:center;padding:24px}
+.journey-static-fallback .ring{width:84px;height:84px;border-radius:50%;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:28px;color:var(--blue)}
+.stage-index{position:absolute;top:16px;left:18px;font-size:12px;letter-spacing:.12em;color:var(--text-dim);background:rgba(4,6,12,.5);padding:6px 11px;border-radius:999px;border:1px solid var(--line)}
+.journey-copy{max-width:480px}
+.stage-eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);font-weight:600}
+.journey-copy h3{font-size:clamp(24px,3vw,34px);margin-top:12px}
+.journey-copy p.stage-body{margin-top:16px;color:var(--text-dim);font-size:15.5px;line-height:1.7}
+.stage-note{margin-top:18px;font-size:12.5px;color:var(--text-faint);font-style:italic}
+.stage-controls{display:flex;align-items:center;gap:16px;margin-top:34px}
+.stage-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line-strong);background:transparent;color:var(--text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,color .2s}
+.stage-btn:hover,.stage-btn:focus-visible{border-color:var(--blue);color:var(--blue)}
+.stage-btn:disabled{opacity:.3;cursor:default}
+.stage-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.stage-dots{display:flex;gap:8px}
+.stage-dot{width:7px;height:7px;border-radius:50%;background:var(--line-strong);border:none;padding:0;cursor:pointer}
+.stage-dot[aria-current="true"]{background:var(--blue);width:20px;border-radius:4px;transition:width .25s}
+.journey-all-text{margin-top:40px}
+.journey-list{display:none}
+.journey-list.show{display:block}
+.journey-list ol{list-style:none;margin:0;padding:0;display:grid;gap:18px}
+.journey-list li{border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.journey-list .n{font-size:11px;color:var(--blue);letter-spacing:.1em}
+.journey-list h4{font-family:var(--serif);font-size:19px;margin-top:6px;font-weight:500}
+.journey-list p{margin-top:8px;color:var(--text-dim);font-size:14px}
+
+/* ------------------------------------------------------------- exit */
+.exit{background:var(--porcelain);color:var(--text-dark);padding:100px var(--gutter) 70px}
+.exit-in{max-width:1360px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px}
+@media(max-width:900px){.exit-in{grid-template-columns:1fr}}
+.exit h2{font-size:clamp(26px,3.4vw,40px);color:var(--text-dark)}
+.exit .eyebrow{color:#3f6fc2}
+.exit p{color:var(--text-dark-dim)}
+.exit-points{margin-top:26px;display:grid;gap:14px}
+.exit-point{display:flex;gap:12px;font-size:14.5px;color:#3b3f38}
+.exit-point svg{flex:none;margin-top:2px;color:#3f6fc2}
+.demo-form{background:#fff;border:1px solid rgba(11,14,22,.08);border-radius:16px;padding:30px;box-shadow:0 20px 60px -30px rgba(11,14,22,.25)}
+.demo-form .demo-flag{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#3f6fc2;background:#eef3ff;padding:5px 10px;border-radius:999px;margin-bottom:16px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:7px;color:#2c2f29}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border-radius:9px;border:1px solid rgba(11,14,22,.16);font-family:var(--sans);font-size:14px;background:#fcfcfb}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:transparent}
+.field textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.form-row{grid-template-columns:1fr}}
+.demo-form .btn-primary{width:100%;justify-content:center;background:var(--text-dark);color:#fff}
+.demo-form .btn-primary:hover{background:#000}
+.form-status{margin-top:14px;font-size:13px;padding:12px 14px;border-radius:9px;display:none}
+.form-status.show{display:block}
+.form-status.ok{background:#eaf7ee;color:#1f5c34}
+.form-status.err{background:#fdeceb;color:#8a241a}
+
+footer.site-footer{background:var(--porcelain);color:var(--text-dark-dim);padding:30px var(--gutter) 60px;border-top:1px solid rgba(11,14,22,.08);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;max-width:1360px;margin:0 auto}
+footer.site-footer a{color:#3f6fc2;text-decoration:none}
+
+/* phase-2 proof badge, not part of final production chrome */
+.proof-badge{position:fixed;bottom:16px;left:16px;z-index:1000;background:rgba(4,6,12,.85);color:var(--text);font-size:11px;letter-spacing:.06em;padding:8px 12px;border-radius:8px;border:1px solid var(--line-strong);pointer-events:none}
+
+/* no-3d fallback state */
+html.no-3d .hero-canvas-wrap{display:none}
+html.no-3d .hero-fallback-glow{display:block}
+html:not(.no-3d) .hero-fallback-glow{display:none}
+html.no-3d .journey-canvas-wrap canvas{display:none}
+html.no-3d .journey-static-fallback{display:flex}
+html.no-3d .stage-index{display:none}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#request">Skip to consultation request</a>
+
+<div class="athar-strip">
+  <a class="athar-chip" href="../../index.html#showcase"><span class="dot" aria-hidden="true"></span>A demo by ATHAR — back to showcase</a>
+</div>
+
+<nav class="nav">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true">V</span>VERA<span class="tiny">Dental Care</span></a>
+  <div class="nav-links">
+    <a href="#journey">Your Visit</a>
+    <a href="#exit">The Experience</a>
+    <a href="#request">Consultation</a>
+  </div>
+  <div class="nav-cta">
+    <a class="btn btn-outline" href="#request" style="padding:10px 20px;font-size:13px">Book a Visit</a>
+  </div>
+</nav>
+
+<main id="top">
+<section class="hero" id="hero">
+  <div class="hero-canvas-wrap"><canvas id="heroCanvas" aria-hidden="true"></canvas></div>
+  <div class="hero-fallback-glow" aria-hidden="true"></div>
+  <div class="hero-scrim" aria-hidden="true"></div>
+  <div class="hero-in">
+    <div class="hero-copy">
+      <span class="eyebrow">Before the chair</span>
+      <h1>The unknown<br>feels <em>bigger.</em></h1>
+      <p class="hero-sub">At VERA, we turn uncertainty into clarity. Explore what a visit actually involves, at your own pace, before you ever sit down.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#journey">Explore Your Visit
+          <span class="btn-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg></span>
+        </a>
+        <a class="hero-watch" href="#request">
+          <span class="play" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg></span>
+          Request a Consultation
+        </a>
+      </div>
+      <div class="hero-facts">
+        <span class="hero-fact">Clear information before you arrive</span>
+        <span class="hero-fact">A calmer, guided first visit</span>
+        <span class="hero-fact">Nothing explained twice</span>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue" aria-hidden="true"><span class="line"></span>Scroll</div>
+  <a class="hero-skip" href="#request">Skip the cinematic intro →</a>
+</section>
+
+<section class="journey" id="journey" aria-label="The Unseen Visit — an interactive guide to your consultation">
+  <div class="journey-head">
+    <span class="eyebrow">The unseen visit</span>
+    <h2>Nothing about your visit<br>is a surprise.</h2>
+    <p>Move through two real moments of a first consultation. Use the arrows, the dots, or your keyboard — the 3D view is a companion to the text, not a requirement for it.</p>
+  </div>
+
+  <div class="journey-stage">
+    <div class="journey-canvas-wrap" id="journeyCanvasWrap">
+      <canvas id="journeyCanvas" aria-hidden="true"></canvas>
+      <div class="journey-static-fallback">
+        <div class="ring" aria-hidden="true">V</div>
+        <p style="font-size:12.5px;color:var(--text-faint);max-width:22ch">Interactive 3D view is off — motion is reduced or 3D isn't available on this device. The two stages are described in full below.</p>
+      </div>
+      <span class="stage-index" id="stageIndex" aria-hidden="true">01 / 02</span>
+    </div>
+    <div class="journey-copy" aria-live="polite">
+      <span class="stage-eyebrow" id="stageEyebrow">Stage 01 — Arrival</span>
+      <h3 id="stageTitle">A warm welcome, no paperwork pile.</h3>
+      <p class="stage-body" id="stageBody">You're greeted, settled in, and asked what's actually on your mind — a short conversation before anything clinical happens.</p>
+      <p class="stage-note" id="stageNote">General description of a typical first visit. Individual appointments vary.</p>
+      <div class="stage-controls" role="group" aria-label="Visit stage navigation">
+        <button type="button" class="stage-btn" id="stagePrev" aria-label="Previous stage">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L4 8l6 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="stage-dots" id="stageDots"></div>
+        <button type="button" class="stage-btn" id="stageNext" aria-label="Next stage">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l6 5-6 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="journey-head journey-all-text">
+    <div class="journey-list" id="journeyList">
+      <ol id="journeyListItems"></ol>
+    </div>
+  </div>
+</section>
+
+<section class="exit" id="exit">
+  <div class="exit-in">
+    <div>
+      <span class="eyebrow">Clarity and trust</span>
+      <h2>A first consultation,<br>explained plainly.</h2>
+      <p style="margin-top:16px">A first visit is a conversation, not a commitment. Here's what that generally involves — and what you can expect from requesting one.</p>
+      <div class="exit-points">
+        <div class="exit-point"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/></svg>You describe what's on your mind — pain, a question, or just routine care.</div>
+        <div class="exit-point"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/></svg>We confirm a time and what the first visit will likely cover.</div>
+        <div class="exit-point"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M2 12a10 10 0 1018 6" stroke-linecap="round" stroke-linejoin="round"/></svg>Nothing is decided or billed before you've had that conversation.</div>
+      </div>
+    </div>
+    <div class="demo-form" id="request">
+      <span class="demo-flag">Demonstration only — no real appointment is created</span>
+      <h2 style="font-size:22px;margin-bottom:18px">Request a consultation</h2>
+      <form id="apptForm" novalidate>
+        <div class="form-row">
+          <div class="field"><label for="vName">Your name</label><input id="vName" name="name" type="text" required></div>
+          <div class="field"><label for="vContact">Email or phone</label><input id="vContact" name="contact" type="text" required></div>
+        </div>
+        <div class="field"><label for="vService">What brings you in</label>
+          <select id="vService" name="service" required>
+            <option value="">Select one…</option>
+            <option>A toothache or sudden pain</option>
+            <option>A brighter, more confident smile</option>
+            <option>Due for a checkup or cleaning</option>
+            <option>Bringing in my child</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field"><label for="vMsg">Anything else we should know (optional)</label><textarea id="vMsg" name="message"></textarea></div>
+        <button type="submit" class="btn btn-primary">Request this consultation</button>
+        <div class="form-status" id="apptStatus" role="status"></div>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <span>© 2026 VERA Clinic — a fictional brand built by ATHAR Digital Studio. 3D asset: "Human teeth" by Alexander Antipov, CC BY 4.0.</span>
+  <a href="../../index.html#showcase">Back to the ATHAR showcase →</a>
+</footer>
+
+<div class="proof-badge">VERA — Phase 2 creative proof (unreviewed)</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var coarse = window.matchMedia('(pointer: coarse)').matches;
+  var narrow = window.innerWidth < 760;
+
+  function supportsWebGL(){
+    if (!(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('importmap'))) return false;
+    try{
+      var c = document.createElement('canvas');
+      return !!(c.getContext('webgl2') || c.getContext('webgl'));
+    }catch(e){ return false; }
+  }
+
+  var allow3D = supportsWebGL() && !reduced && !(coarse && narrow);
+  if (!allow3D) {
+    document.documentElement.classList.add('no-3d');
+  } else {
+    import('./js/vera-scene.js').then(function(mod){ mod.init(); }).catch(function(err){
+      console.error('VERA 3D scene failed to load, falling back to static', err);
+      document.documentElement.classList.add('no-3d');
+    });
+  }
+
+  // ------------------------------------------------- stage data/UI ----
+  var stages = [
+    { eyebrow:'Stage 01 — Arrival', title:'A warm welcome, no paperwork pile.',
+      body:"You're greeted, settled in, and asked what's actually on your mind — a short conversation before anything clinical happens.",
+      note:'General description of a typical first visit. Individual appointments vary.' },
+    { eyebrow:'Stage 02 — Examination', title:'A closer look, explained as it happens.',
+      body:"Each tooth is reviewed and talked through in plain language, as it's looked at — not after the fact.",
+      note:'Examinations vary by individual; this is a general illustration, not a diagnosis.' }
+  ];
+  var idx = 0;
+  var eyebrowEl = document.getElementById('stageEyebrow');
+  var titleEl = document.getElementById('stageTitle');
+  var bodyEl = document.getElementById('stageBody');
+  var noteEl = document.getElementById('stageNote');
+  var indexEl = document.getElementById('stageIndex');
+  var dotsWrap = document.getElementById('stageDots');
+  var prevBtn = document.getElementById('stagePrev');
+  var nextBtn = document.getElementById('stageNext');
+  var listItems = document.getElementById('journeyListItems');
+
+  stages.forEach(function(s, i){
+    var dot = document.createElement('button');
+    dot.className = 'stage-dot'; dot.type = 'button';
+    dot.setAttribute('aria-label', 'Go to ' + s.eyebrow);
+    dot.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+    dot.addEventListener('click', function(){ setStage(i); });
+    dotsWrap.appendChild(dot);
+
+    var li = document.createElement('li');
+    li.innerHTML = '<span class="n">' + s.eyebrow + '</span><h4>' + s.title + '</h4><p>' + s.body + '</p>';
+    listItems.appendChild(li);
+  });
+  if (document.documentElement.classList.contains('no-3d')) {
+    document.getElementById('journeyList').classList.add('show');
+  }
+
+  function setStage(i){
+    idx = Math.max(0, Math.min(stages.length - 1, i));
+    var s = stages[idx];
+    eyebrowEl.textContent = s.eyebrow;
+    titleEl.textContent = s.title;
+    bodyEl.textContent = s.body;
+    noteEl.textContent = s.note;
+    indexEl.textContent = String(idx + 1).padStart(2,'0') + ' / ' + String(stages.length).padStart(2,'0');
+    Array.prototype.forEach.call(dotsWrap.children, function(d, di){
+      d.setAttribute('aria-current', di === idx ? 'true' : 'false');
+    });
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === stages.length - 1;
+    window.dispatchEvent(new CustomEvent('vera:stage', { detail: { index: idx } }));
+  }
+  prevBtn.addEventListener('click', function(){ setStage(idx - 1); });
+  nextBtn.addEventListener('click', function(){ setStage(idx + 1); });
+  setStage(0);
+
+  var journeySection = document.getElementById('journey');
+  journeySection.setAttribute('tabindex', '-1');
+  journeySection.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight') { setStage(idx + 1); }
+    else if (e.key === 'ArrowLeft') { setStage(idx - 1); }
+  });
+  // basic touch swipe on the canvas card
+  var swipeTarget = document.getElementById('journeyCanvasWrap');
+  var tx0 = null;
+  swipeTarget.addEventListener('touchstart', function(e){ tx0 = e.changedTouches[0].clientX; }, { passive:true });
+  swipeTarget.addEventListener('touchend', function(e){
+    if (tx0 === null) return;
+    var dx = e.changedTouches[0].clientX - tx0;
+    if (Math.abs(dx) > 40) { setStage(idx + (dx < 0 ? 1 : -1)); }
+    tx0 = null;
+  }, { passive:true });
+
+  // ---------------------------------------------- appointment form ----
+  var form = document.getElementById('apptForm');
+  var status = document.getElementById('apptStatus');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('vName').value.trim();
+    var contact = document.getElementById('vContact').value.trim();
+    var service = document.getElementById('vService').value;
+    status.className = 'form-status show';
+    if (!name || !contact || !service) {
+      status.classList.add('err'); status.classList.remove('ok');
+      status.textContent = 'Please fill in your name, contact detail and what brings you in.';
+      return;
+    }
+    status.classList.add('ok'); status.classList.remove('err');
+    status.textContent = 'Thanks, ' + name.split(' ')[0] + ' — this is a demo. No real appointment was created and no data was sent or stored.';
+    form.reset();
+  });
+})();
+</script>
+</body>
+</html>
