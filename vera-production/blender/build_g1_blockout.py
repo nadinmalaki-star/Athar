@@ -165,8 +165,11 @@ def add_camera(name, loc, target_obj, lens):
 
 EYE_H = 1.55
 cam1 = add_camera("CAM_01_THRESHOLD", (-1.3, 0.05, EYE_H), look_entry, 35)
-cam2 = add_camera("CAM_02_RECEPTION", (3.0, -1.55, EYE_H), desk, 50)
-cam3 = add_camera("CAM_03_CONSULT", (8.05, -1.6, EYE_H - 0.1), look_chair, 50)
+# v1 placed CAM_02/03 overlapping the seating cluster and the BC partition
+# wall respectively (point-blank clipped renders) - pulled back to clear,
+# unobstructed vantage points within their own zones.
+cam2 = add_camera("CAM_02_RECEPTION", (2.6, -1.9, EYE_H + 0.05), desk, 50)
+cam3 = add_camera("CAM_03_CONSULT", (10.3, -1.75, EYE_H - 0.05), look_chair, 50)
 
 cam_top_data = bpy.data.cameras.new("CAM_TOP_PLAN")
 cam_top_data.type = 'ORTHO'
