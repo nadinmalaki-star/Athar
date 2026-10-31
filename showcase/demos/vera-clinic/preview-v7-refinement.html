@@ -323,8 +323,8 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
 <section class="hero" id="hero">
   <div class="hero-media">
     <picture>
-      <source media="(max-width: 900px)" srcset="images/v4/hero-consultation-mobile.jpg">
-      <img id="heroImg" src="images/v4/hero-consultation.jpg" alt="A dentist and assistant reviewing a treatment plan on a tablet with a patient in a bright, modern clinic">
+      <source media="(max-width: 900px)" srcset="images/v7/hero-v2-mobile.jpg">
+      <img id="heroImg" src="images/v7/hero-v2.jpg" alt="A dentist warmly explaining a treatment plan to a smiling patient reclined in a bright, uncluttered consultation room">
     </picture>
   </div>
   <div class="hero-scrim" aria-hidden="true"></div>
@@ -349,7 +349,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
       <p class="manifesto-copy reveal">A clearer, calmer experience begins <strong>before</strong> treatment — not during it. That idea shapes every part of how VERA is designed to work, from your first question to the moment you leave.</p>
     </div>
     <div class="manifesto-portrait reveal" id="manifestoPortrait">
-      <img src="images/v7/manifesto-portrait.jpg" alt="A calm, attentive portrait of a dental professional">
+      <img src="images/v7/manifesto-portrait-v2.jpg" alt="A calm dental professional reviewing a tablet, a patient softly out of focus behind her">
     </div>
   </div>
 </section>
@@ -364,7 +364,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     <div class="concern-grid reveal">
       <div class="concern-list" id="concernList" role="list"></div>
       <div class="concern-visual" id="concernVisual">
-        <div class="concern-visual-img active" id="concernVisualDefault" style="background:url('images/v4/consultation.jpg') center/cover"></div>
+        <div class="concern-visual-img active" id="concernVisualDefault" style="background:url('images/v7/checkup.jpg') center/cover"></div>
         <div class="concern-visual-panel" id="concernPanel">
           <span class="tag">Start here</span>
           <h4>Choose what's on your mind</h4>
@@ -406,10 +406,10 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     <div class="journey-grid reveal">
       <div class="journey-media">
         <span class="journey-idx" id="journeyIdx">01 / 04</span>
-        <img id="jImg0" class="active" src="../vera-clinic/images/reception.jpg" alt="A calm, light-filled clinic reception area">
-        <img id="jImg1" src="images/v4/consultation.jpg" alt="A dentist consulting with a smiling patient">
-        <img id="jImg2" src="images/v4/treatment.jpg" alt="A dentist adjusting the overhead light before treatment">
-        <img id="jImg3" src="images/v4/detail.jpg" alt="A close, careful dental examination in progress">
+        <img id="jImg0" class="active" src="images/v7/arrival-reception.jpg" alt="A real clinic reception desk with staff checking a patient in">
+        <img id="jImg1" src="images/v7/consultation-room.jpg" alt="A dentist and patient reviewing an X-ray together at a desk">
+        <img id="jImg2" src="images/v7/treatment-care.jpg" alt="A dentist calmly performing a routine treatment on a patient" style="object-position:center 22%">
+        <img id="jImg3" src="images/v7/aftercare.jpg" alt="A dentist and patient shaking hands and smiling at the end of an appointment" style="object-position:center 18%">
       </div>
       <div class="journey-copy">
         <span class="stage-eyebrow" id="jEyebrow">Stage 01 — Arrive</span>
@@ -436,9 +436,9 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
     <div class="explore-tabs reveal" id="exploreTabs" role="tablist"></div>
     <div class="explore-stage reveal">
       <div class="explore-media" id="exploreMedia">
-        <img class="active" data-i="0" src="../vera-clinic/images/reception.jpg" alt="Reception area">
-        <img data-i="1" src="images/v4/consultation.jpg" alt="Consultation room">
-        <img data-i="2" src="images/v4/treatment.jpg" alt="Treatment room">
+        <img class="active" data-i="0" src="images/v7/arrival-reception.jpg" alt="Reception area">
+        <img data-i="1" src="images/v7/consultation-room.jpg" alt="Consultation room">
+        <img data-i="2" src="images/v7/treatment-care.jpg" alt="Treatment room" style="object-position:center 22%">
       </div>
       <div class="explore-info" id="exploreInfo">
         <span class="tag">Reception</span>
@@ -457,7 +457,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
       <p>A first visit is a conversation, not a commitment. Here's what that generally involves — what's discussed, what it costs to ask, and what happens next.</p>
     </div>
     <div class="trust-portrait reveal">
-      <img src="images/v4/treatment.jpg" alt="A calm, attentive moment during a dental appointment">
+      <img src="images/v7/trust-portrait.jpg" alt="A dentist and patient in a quiet, relaxed conversation, seated away from any treatment chair">
     </div>
   </div>
 </section>
@@ -720,13 +720,13 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
   var concerns = [
     { id:'chair', label:'A toothache or sudden pain', sub:'Something hurts right now', service:'Emergency Care', tag:'Same-day slots',
       points:['Reserved same-day slots for pain, breaks or swelling.','Clear guidance by phone before you even arrive.','Follow-up plan booked before you leave.'],
-      image:'images/v4/detail.jpg' },
+      image:'images/v7/exam-pain.jpg', pos:'78% 70%' },
     { id:'mirror', label:'A brighter, more confident smile', sub:'Cosmetic consultation', service:'Cosmetic Dentistry', tag:'By consultation',
       points:['Whitening, veneers and bonding, planned around your goals.','Options discussed during the consultation.','Transparent, itemised estimate before any work begins.'],
-      image:'images/v4/consultation.jpg' },
+      image:'images/v7/cosmetic-consult.jpg' },
     { id:'desk', label:'Due for a checkup or cleaning', sub:'Routine care', service:'General Dentistry', tag:'Most requested',
       points:['Routine checkups, cleanings and early-decay prevention.','Findings reviewed and explained during your visit.','Gentle approach for anxious or first-time patients.'],
-      image:'images/v4/treatment.jpg' },
+      image:'images/v7/checkup.jpg' },
     { id:'kids', label:'Bringing in my child', sub:'Family-friendly care', service:'Pediatric Care', tag:'Family-friendly',
       points:['Shorter, playful appointments designed for younger patients.','Parents welcome in the room for every visit.','Preventive focus: sealants, fluoride and habit coaching.'],
       image:'images/v7/pediatric-care.jpg' }
@@ -743,7 +743,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
   concerns.forEach(function(c, i){
     var img = document.createElement('div');
     img.className = 'concern-visual-img';
-    img.style.background = "url('" + c.image + "') center/cover";
+    img.style.background = "url('" + c.image + "') " + (c.pos || 'center') + "/cover";
     cVisual.appendChild(img);
     cImgs[c.id] = img;
 
@@ -819,9 +819,9 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
   // motion-wise distinct from the concern selector: whole-scene crossfade
   // with a slow continuing pan on the photo, rather than a directional wipe.
   var pathways = [
-    { n:'01', name:'General Dentistry', body:'Checkups, cleanings and early prevention — where most first visits begin.', image:'images/v4/treatment.jpg', alt:'A dentist preparing equipment for a routine checkup' },
-    { n:'02', name:'Cosmetic Dentistry', body:'Whitening, veneers and bonding, planned around your goals, costs shared upfront.', image:'images/v4/consultation.jpg', alt:'A dentist discussing cosmetic options with a smiling patient' },
-    { n:'03', name:'Emergency Care', body:'Same-day slots for pain, breaks or swelling, with guidance before you arrive.', image:'images/v4/detail.jpg', alt:'A close, careful dental examination in progress' },
+    { n:'01', name:'General Dentistry', body:'Checkups, cleanings and early prevention — where most first visits begin.', image:'images/v7/checkup.jpg', alt:'A dentist performing a routine cleaning and checkup' },
+    { n:'02', name:'Cosmetic Dentistry', body:'Whitening, veneers and bonding, planned around your goals, costs shared upfront.', image:'images/v7/cosmetic-consult.jpg', alt:'A dentist holding a shade guide during a cosmetic consultation' },
+    { n:'03', name:'Emergency Care', body:'Same-day slots for pain, breaks or swelling, with guidance before you arrive.', image:'images/v7/exam-pain.jpg', alt:'A dentist examining a patient for pain or sudden discomfort', pos:'78% 70%' },
     { n:'04', name:'Pediatric Care', body:'Shorter, playful appointments, paced for younger patients, parents in the room.', image:'images/v7/pediatric-care.jpg', alt:'A father and daughter reviewing a dental X-ray with a pediatric dentist' }
   ];
   var pTabs = document.getElementById('pathTabs');
@@ -832,6 +832,7 @@ footer{padding:56px var(--gutter) 40px;border-top:1px solid var(--line);backgrou
   pathways.forEach(function(p, i){
     var img = document.createElement('img');
     img.src = p.image; img.alt = p.alt;
+    if (p.pos) img.style.objectPosition = p.pos;
     if (i === 0) img.classList.add('active');
     pMedia.appendChild(img);
     pImgs.push(img);
