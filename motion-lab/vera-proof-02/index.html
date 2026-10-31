@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VERA Motion Lab — Proof 02</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --graphite:#1B1B20; --graphite-soft:#2B2B32; --ivory:#F5F1EB; --copper:#BD786B;
+    --copper-dark:#A3645A; --stone:#D9D0C8; --ink:#1B1B20; --ink-soft:#55555B;
+    --display:'Fraunces',Georgia,serif; --body:'Figtree',Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--graphite); color:var(--ivory); font-family:var(--body);
+    line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  img{display:block; max-width:100%}
+  button{font-family:inherit}
+  .skip-note{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:60; font-size:11px; letter-spacing:.06em;
+    text-transform:uppercase; color:rgba(245,241,235,.8); font-family:var(--body);
+    background:rgba(27,27,32,.6); padding:8px 16px; border-radius:999px; backdrop-filter:blur(6px);
+    pointer-events:none; transition:opacity .4s ease;
+  }
+
+  /* ===================================================== Stage 1 + 2 pin */
+  .cine-stage{position:relative; height:100vh; overflow:hidden; background:var(--graphite)}
+  .cine-inner{position:absolute; inset:0}
+
+  /* ---- Stage 1: photo layer is ALWAYS full-bleed. the ivory panel sits
+     above it and is masked away via clip-path, so revealing more of the
+     photo never requires resizing the photo's own box — this removes an
+     entire bug class Proof 01 hit on mobile (a box that had to grow to
+     fill space freed by a shrinking sibling, and briefly didn't). */
+  .s1-photo{position:absolute; inset:0; z-index:1; overflow:hidden}
+  .s1-photo img{
+    position:absolute; top:0; left:0; width:150%; height:100%; object-fit:cover;
+    object-position:78% 42%;
+  }
+  .s1-scrim{position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,0) 45%); z-index:2}
+  .s1-photo-copy{position:absolute; inset:0; z-index:3}
+  .s1-headline-r{
+    position:absolute; right:clamp(28px,5vw,64px); top:50%; transform:translateY(-50%);
+    font-family:var(--display); font-style:italic; font-weight:500; font-size:clamp(38px,5.8vw,86px);
+    line-height:1.02; letter-spacing:-.01em; color:var(--ivory); text-align:right; max-width:11ch;
+  }
+  .s1-caption-r{position:absolute; right:clamp(28px,5vw,64px); bottom:36px; font-size:13px; color:rgba(245,241,235,.82); max-width:24ch; text-align:right}
+
+  .s1-ivory{
+    position:absolute; inset:0; z-index:4; background:var(--ivory); color:var(--ink);
+    clip-path:polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%);
+  }
+  .s1-nav{position:absolute; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:28px clamp(20px,4vw,48px)}
+  .s1-nav .mark{font-family:var(--display); font-size:19px; color:var(--ink); display:flex; align-items:center; gap:8px; white-space:nowrap}
+  .s1-nav .mark span{width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg,var(--graphite-soft),var(--copper)); display:flex; align-items:center; justify-content:center; color:var(--ivory); font-size:14px; font-weight:600}
+  .s1-nav .tag{color:var(--ink-soft); font-size:11px; text-transform:uppercase; letter-spacing:.14em; white-space:nowrap}
+  .s1-headline-l{
+    position:absolute; left:clamp(28px,5vw,64px); top:50%; transform:translateY(-50%);
+    font-family:var(--display); font-weight:500; font-size:clamp(38px,5.8vw,86px);
+    line-height:1.02; letter-spacing:-.01em; color:var(--ink); max-width:10ch;
+  }
+  .s1-caption-l{position:absolute; left:clamp(28px,5vw,64px); bottom:36px; font-size:13px; color:var(--ink-soft); max-width:26ch}
+
+  /* ---- Stage 2: graphite curtain, rises from the bottom while Stage 1 is
+     still resolving — genuine overlap, not a handoff. */
+  .s2-layer{
+    position:absolute; inset:0; z-index:5; background:var(--graphite);
+    clip-path:inset(100% 0 0 0); overflow:hidden;
+  }
+  .s2-media{position:absolute; inset:0}
+  .s2-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0}
+  .s2-img.active{opacity:1}
+  #s2ImgA{object-position:42% 30%}
+  #s2ImgB{object-position:50% 22%; clip-path:inset(0 0 0 100%)}
+  .s2-scrim{position:absolute; inset:0; background:linear-gradient(100deg,rgba(10,10,12,.92) 0%,rgba(10,10,12,.55) 38%,rgba(10,10,12,.2) 62%,rgba(10,10,12,.05) 100%)}
+  .s2-copy{position:absolute; left:0; top:0; height:100%; width:min(640px,56vw); display:flex; flex-direction:column; justify-content:center; padding:0 clamp(28px,6vw,80px)}
+  .s2-copy .eyebrow{font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--copper); font-weight:600; margin-bottom:18px; opacity:0; transform:translateY(16px)}
+  .s2-copy h2{font-family:var(--display); font-weight:500; font-size:clamp(30px,4.6vw,58px); line-height:1.08; letter-spacing:-.01em; color:var(--ivory); margin:0 0 20px 0}
+  .s2-copy h2 .ln{display:block; overflow:hidden}
+  .s2-copy h2 .ln span{display:inline-block; transform:translateY(110%)}
+  .s2-copy p{font-size:15.5px; line-height:1.7; color:rgba(245,241,235,.78); max-width:42ch; margin:0; opacity:0; transform:translateY(16px)}
+
+  /* =================================================== Stage 3: arrival */
+  .arrival{background:var(--ivory); color:var(--ink); padding:120px clamp(24px,6vw,80px) 110px}
+  .arrival .inner{max-width:900px; margin:0 auto}
+  .arrival .eyebrow{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--copper-dark); font-weight:600; display:block; margin-bottom:16px}
+  .arrival h2{font-family:var(--display); font-weight:500; font-size:clamp(34px,5vw,58px); line-height:1.08; margin:0 0 16px 0}
+  .arrival > .inner > p{font-size:16px; color:var(--ink-soft); max-width:52ch; margin:0 0 48px 0}
+  .choice-group{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px}
+  .choice{
+    text-align:left; background:#fff; border:1.5px solid var(--stone); border-radius:14px; padding:24px 22px;
+    cursor:pointer; transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  }
+  .choice:hover{border-color:var(--copper)}
+  .choice:focus-visible{outline:3px solid var(--copper); outline-offset:2px}
+  .choice[aria-checked="true"]{border-color:var(--copper-dark); box-shadow:0 14px 34px -18px rgba(27,27,32,.3); transform:translateY(-2px)}
+  .choice .n{font-family:var(--display); font-size:13px; color:var(--copper-dark); display:block; margin-bottom:10px}
+  .choice .label{font-family:var(--display); font-weight:500; font-size:19px; line-height:1.25; color:var(--ink); display:block}
+  .choice-panel{
+    background:var(--graphite); color:var(--ivory); border-radius:16px; padding:30px clamp(22px,4vw,40px);
+    min-height:108px; display:flex; align-items:center;
+  }
+  .choice-panel .empty{color:var(--stone); font-size:14.5px}
+  .choice-panel .tag{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--copper); font-weight:600; display:block; margin-bottom:10px}
+  .choice-panel h4{font-family:var(--display); font-weight:500; font-size:22px; margin:0 0 8px 0}
+  .choice-panel p{font-size:14px; color:rgba(245,241,235,.78); margin:0; max-width:56ch}
+  .choice-panel .demo-note{display:inline-block; margin-top:12px; font-size:11.5px; color:var(--copper); letter-spacing:.02em}
+
+  @media (max-width:900px){ .choice-group{grid-template-columns:1fr} }
+
+  .next-section{min-height:60vh; background:var(--graphite); display:flex; align-items:center; padding:80px clamp(24px,6vw,80px)}
+  .next-section .inner{max-width:620px}
+  .next-section .eyebrow{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--copper); font-weight:600; display:block; margin-bottom:16px}
+  .next-section h3{font-family:var(--display); font-weight:500; font-size:clamp(24px,3.2vw,38px); margin:0 0 16px 0}
+  .next-section p{font-size:15px; line-height:1.7; color:rgba(245,241,235,.72); margin:0}
+
+  /* ===================================================================== mobile */
+  @media (max-width:900px){
+    .s1-nav{padding:18px 20px}
+    .s1-headline-l{position:static; transform:none; padding:100px 22px 0 22px; max-width:none; font-size:clamp(30px,8.6vw,46px)}
+    .s1-caption-l{position:static; margin:18px 22px 0 22px; max-width:none}
+    .s1-ivory{clip-path:polygon(0% 0%, 100% 0%, 100% 58%, 0% 58%)}
+    .s1-headline-r{display:none}
+    .s1-caption-r{right:20px; bottom:26px; max-width:70vw}
+    .s1-photo img{width:118%; object-position:68% 38%}
+
+    .s2-copy{width:100%; padding:0 22px; justify-content:flex-end; padding-bottom:64px}
+    .s2-scrim{background:linear-gradient(0deg,rgba(10,10,12,.94) 0%,rgba(10,10,12,.72) 38%,rgba(10,10,12,.4) 68%,rgba(10,10,12,.22) 100%)}
+    #s2ImgA{object-position:58% 68%}
+    #s2ImgB{object-position:50% 30%}
+
+    .arrival{padding:90px 20px 80px}
+  }
+
+  /* ========================================================= reduced motion */
+  .reduced .cine-stage{height:auto; min-height:100vh}
+  .reduced .s1-photo{position:relative; height:62vh}
+  .reduced .s1-photo img{width:100%; object-position:68% 38%}
+  .reduced .s1-ivory{position:relative; clip-path:none; width:100%; height:auto; padding:120px 0 60px}
+  .reduced .s1-headline-l{position:static; transform:none; padding:0 clamp(28px,5vw,64px); max-width:14ch}
+  .reduced .s1-caption-l{position:static; margin-top:22px; padding:0 clamp(28px,5vw,64px); max-width:30ch}
+  .reduced .s1-headline-r,.reduced .s1-caption-r{display:none}
+  .reduced .s2-layer{position:relative; clip-path:none; min-height:72vh}
+  .reduced .s2-img{opacity:0}
+  .reduced .s2-img.active{opacity:1}
+  .reduced #s2ImgB{clip-path:none}
+  .reduced .s2-copy .eyebrow,.reduced .s2-copy p{opacity:1; transform:none}
+  .reduced .s2-copy h2 .ln span{transform:none}
+  .reduced .skip-note{display:none}
+</style>
+</head>
+<body>
+
+<div class="skip-note" id="skipNote">Scroll to begin</div>
+
+<section class="cine-stage" id="cineStage">
+  <div class="cine-inner">
+
+    <div class="s1-photo" id="s1Photo">
+      <img id="s1Img" src="images/stage1-photo.jpg" alt="A dentist warmly explaining a treatment plan to a smiling patient in a calm, uncluttered consultation room">
+      <div class="s1-scrim" aria-hidden="true"></div>
+      <div class="s1-photo-copy">
+        <h2 class="s1-headline-r" id="s1HeadlineR">we plan<br>for.</h2>
+        <p class="s1-caption-r">Every reaction, anticipated.</p>
+      </div>
+    </div>
+
+    <div class="s1-ivory" id="s1Ivory">
+      <div class="s1-nav">
+        <span class="mark"><span>V</span>VERA — Motion Lab</span>
+        <span class="tag">Proof 02</span>
+      </div>
+      <h1 class="s1-headline-l" id="s1HeadlineL">What you<br>feel,</h1>
+      <p class="s1-caption-l">A more ambitious scroll-driven motion study for the VERA experience — an isolated prototype, not the production site.</p>
+    </div>
+
+    <div class="s2-layer" id="s2Layer">
+      <div class="s2-media">
+        <img class="s2-img active" id="s2ImgA" src="images/stage2-photo-a.jpg" alt="A dentist and patient reviewing an X-ray together at a desk">
+        <img class="s2-img" id="s2ImgB" src="images/stage2-photo-b.jpg" alt="A dentist and patient in a quiet, relaxed conversation, away from any treatment chair">
+      </div>
+      <div class="s2-scrim" aria-hidden="true"></div>
+      <div class="s2-copy">
+        <span class="eyebrow" id="s2Eyebrow">The visit, reconsidered</span>
+        <h2 id="s2Headline">
+          <span class="ln"><span>Every step, talked through —</span></span>
+          <span class="ln"><span>before it happens, not during it.</span></span>
+        </h2>
+        <p id="s2Body">Nothing about your visit should feel like a procedure that's simply happening to you. We walk through it first — out loud, in plain language.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="arrival" id="arrival">
+  <div class="inner">
+    <span class="eyebrow">Before you sit down</span>
+    <h2>What brings you in?</h2>
+    <p>Three quick examples of how VERA adapts to what you tell it — select one to see how. This is a working demonstration: nothing you select is recorded or sent anywhere.</p>
+
+    <div class="choice-group" id="choiceGroup" role="radiogroup" aria-label="What brings you in?"></div>
+    <div class="choice-panel" id="choicePanel" aria-live="polite">
+      <span class="empty">Select an option above to see a demonstration response.</span>
+    </div>
+  </div>
+</section>
+
+<section class="next-section">
+  <div class="inner">
+    <span class="eyebrow">Proof continues</span>
+    <h3>The composition settles here — scroll resumes normally.</h3>
+    <p>This section exists only to prove the prototype doesn't end in a dead frame. Scroll back up through all three stages to watch the whole transformation reverse.</p>
+  </div>
+</section>
+
+<script>
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) document.body.classList.add('reduced');
+
+  // ---------------------------------------------------- Stage 3: choices
+  // Built from data so the same markup, interaction model (click + Enter/
+  // Space + roving tabindex) and keyboard behaviour work identically with
+  // or without GSAP/reduced-motion.
+  var choices = [
+    {
+      label: 'A new patient, nervous about the first visit',
+      tag: 'First visit', title: 'A slower first fifteen minutes.',
+      body: 'No tools, no chair — just a short conversation about what worries you, what today actually involves, and what it doesn’t.'
+    },
+    {
+      label: 'A routine check-up, just want it quick',
+      tag: 'Routine care', title: 'In, checked, out — nothing drawn out.',
+      body: 'A standard cleaning and exam, booked back-to-back with your schedule in mind, with findings explained in the same visit.'
+    },
+    {
+      label: 'Something urgent — tooth pain today',
+      tag: 'Same-day', title: 'Same-day triage, before you arrive.',
+      body: 'A short call first, so we know what to expect before you walk in — then a reserved same-day slot, not a waiting-room gamble.'
+    }
+  ];
+  var group = document.getElementById('choiceGroup');
+  var panel = document.getElementById('choicePanel');
+  var buttons = [];
+  choices.forEach(function(c, i){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'choice'; b.setAttribute('role', 'radio');
+    b.setAttribute('aria-checked', 'false');
+    b.setAttribute('tabindex', i === 0 ? '0' : '-1');
+    b.innerHTML = '<span class="n">0' + (i + 1) + '</span><span class="label">' + c.label + '</span>';
+    b.addEventListener('click', function(){ selectChoice(i); });
+    group.appendChild(b);
+    buttons.push(b);
+  });
+  group.addEventListener('keydown', function(e){
+    var i = buttons.indexOf(document.activeElement);
+    if (i === -1) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault(); focusChoice((i + 1) % buttons.length);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault(); focusChoice((i - 1 + buttons.length) % buttons.length);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault(); selectChoice(i);
+    }
+  });
+  function focusChoice(i){
+    buttons.forEach(function(b, bi){ b.setAttribute('tabindex', bi === i ? '0' : '-1'); });
+    buttons[i].focus();
+  }
+  function selectChoice(i){
+    buttons.forEach(function(b, bi){ b.setAttribute('aria-checked', bi === i ? 'true' : 'false'); });
+    var c = choices[i];
+    panel.innerHTML = '<div><span class="tag">' + c.tag + '</span><h4>' + c.title + '</h4><p>' + c.body + '</p><span class="demo-note">Demonstration only — no data is collected or sent.</span></div>';
+  }
+
+  // --------------------------------------------------------- GSAP motion
+  function loadScript(src){
+    return new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = src; s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  if (!reduced) {
+    loadScript('vendor/gsap/gsap.min.js')
+      .then(function(){ return loadScript('vendor/gsap/ScrollTrigger.min.js'); })
+      .then(init)
+      .catch(function(){ document.body.classList.add('reduced'); });
+  }
+
+  function splitLines(){
+    // The Stage 2 headline's two lines are pre-wrapped in markup (.ln > span)
+    // rather than measured/split at runtime, so there is nothing to
+    // recompute on resize and no risk of a reflow-timing bug.
+  }
+
+  function init(){
+    var gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
+    if (!gsap || !ScrollTrigger) { document.body.classList.add('reduced'); return; }
+    gsap.registerPlugin(ScrollTrigger);
+    splitLines();
+
+    var mm = gsap.matchMedia();
+
+    ScrollTrigger.create({
+      trigger: '#cineStage', start: 'top top', end: '+=10%', scrub: true,
+      onUpdate: function(self){
+        var note = document.getElementById('skipNote');
+        if (note) note.style.opacity = self.progress > 0.25 ? 0 : 1;
+      }
+    });
+
+    // -------------------------------------------------------- Desktop
+    mm.add('(min-width: 901px)', function(){
+      var tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#cineStage', start: 'top top', end: '+=260%',
+          scrub: 0.7, pin: true, pinSpacing: true, anticipatePin: 1
+        }
+      });
+
+      // ---- labelled stages, laid out on one shared, scrubbed timeline
+      tl.addLabel('s1-exit', 0)
+        // Stage 1: the ivory panel is wiped away at an angle — a
+        // coordinated clip-path morph + slight translate/rotate, not a
+        // box resize — while its headline/caption move with the same
+        // motion rather than simply fading in place.
+        .to('#s1Ivory', {
+          clipPath: 'polygon(0% 0%, 6% 0%, -10% 100%, 0% 100%)',
+          x: -30, rotateZ: -0.6, duration: 1, ease: 'power2.inOut'
+        }, 's1-exit')
+        .to(['#s1HeadlineL', '.s1-caption-l', '.s1-nav'], {
+          opacity: 0, x: -50, duration: .55, ease: 'power2.in'
+        }, 's1-exit+=0.02')
+        // the photo reframes — scale and focal point both shift, so the
+        // *framing* changes rather than a flat zoom
+        .to('#s1Img', { width: '112%', objectPosition: '38% 30%', duration: 1, ease: 'power2.inOut' }, 's1-exit')
+        .to('.s1-scrim', { opacity: .7, duration: 1 }, 's1-exit')
+        .to(['#s1HeadlineR', '.s1-caption-r'], {
+          scale: .55, x: -70, y: 26, opacity: 0, duration: .5, ease: 'power2.inOut', transformOrigin: '100% 50%'
+        }, 's1-exit+=0.1')
+
+        // ---- Stage 2 begins rising while Stage 1 is still resolving —
+        // the overlap is the point: label sits inside Stage 1's own span.
+        .addLabel('s2-emerge', 's1-exit+=0.32')
+        .to('#s2Layer', { clipPath: 'inset(0% 0 0 0)', duration: .85, ease: 'power3.inOut' }, 's2-emerge')
+        .to('#s2Eyebrow', { opacity: 1, y: 0, duration: .5, ease: 'power2.out' }, 's2-emerge+=0.4')
+        .to('#s2Headline .ln span', { y: '0%', duration: .6, stagger: .08, ease: 'power3.out' }, 's2-emerge+=0.46')
+
+        // ---- within Stage 2: a genuinely second image composition,
+        // revealed with its own mask wipe — not a crossfade.
+        .addLabel('s2-swap', 's2-emerge+=0.55')
+        .to('#s2ImgB', { clipPath: 'inset(0 0 0 0%)', duration: .7, ease: 'power2.inOut' }, 's2-swap')
+        .set('#s2ImgA', { opacity: 0 }, 's2-swap+=0.68')
+        .set('#s2ImgB', { opacity: 1 }, 's2-swap+=0.68')
+        .to('#s2Body', { opacity: 1, y: 0, duration: .5, ease: 'power2.out' }, 's2-swap+=0.1')
+
+        .addLabel('s2-settle', 's2-swap+=0.9');
+
+      return function(){ tl.scrollTrigger && tl.scrollTrigger.kill(); tl.kill(); };
+    });
+
+    // --------------------------------------------------------- Mobile
+    mm.add('(max-width: 900px)', function(){
+      var tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#cineStage', start: 'top top', end: '+=220%',
+          scrub: 0.7, pin: true, pinSpacing: true, anticipatePin: 1
+        }
+      });
+
+      tl.addLabel('s1-exit', 0)
+        .to('#s1Ivory', {
+          clipPath: 'polygon(0% 0%, 100% 0%, 100% 4%, 0% -8%)',
+          y: -20, duration: 1, ease: 'power2.inOut'
+        }, 's1-exit')
+        .to(['#s1HeadlineL', '.s1-caption-l', '.s1-nav'], { opacity: 0, y: -24, duration: .5, ease: 'power2.in' }, 's1-exit+=0.02')
+        .to('#s1Img', { width: '100%', objectPosition: '58% 30%', duration: 1, ease: 'power2.inOut' }, 's1-exit')
+        .to('.s1-scrim', { opacity: .75, duration: 1 }, 's1-exit')
+        .to('.s1-caption-r', { opacity: 0, y: 14, duration: .4, ease: 'power2.in' }, 's1-exit+=0.1')
+
+        .addLabel('s2-emerge', 's1-exit+=0.3')
+        .to('#s2Layer', { clipPath: 'inset(0% 0 0 0)', duration: .85, ease: 'power3.inOut' }, 's2-emerge')
+        .to('#s2Eyebrow', { opacity: 1, y: 0, duration: .5, ease: 'power2.out' }, 's2-emerge+=0.4')
+        .to('#s2Headline .ln span', { y: '0%', duration: .6, stagger: .08, ease: 'power3.out' }, 's2-emerge+=0.46')
+
+        .addLabel('s2-swap', 's2-emerge+=0.55')
+        .to('#s2ImgB', { clipPath: 'inset(0 0 0 0%)', duration: .7, ease: 'power2.inOut' }, 's2-swap')
+        .set('#s2ImgA', { opacity: 0 }, 's2-swap+=0.68')
+        .set('#s2ImgB', { opacity: 1 }, 's2-swap+=0.68')
+        .to('#s2Body', { opacity: 1, y: 0, duration: .5, ease: 'power2.out' }, 's2-swap+=0.1')
+
+        .addLabel('s2-settle', 's2-swap+=0.9');
+
+      return function(){ tl.scrollTrigger && tl.scrollTrigger.kill(); tl.kill(); };
+    });
+  }
+</script>
+</body>
+</html>
