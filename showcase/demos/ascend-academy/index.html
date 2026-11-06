@@ -66,7 +66,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .back-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--lime)}
 
 /* ---------- nav ---------- */
-.nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px var(--gutter);background:linear-gradient(180deg,rgba(10,10,12,.92),rgba(10,10,12,.7) 70%,transparent);backdrop-filter:blur(6px)}
+.nav{position:sticky;top:0;z-index:100;padding:20px var(--gutter) 0;background:linear-gradient(180deg,rgba(10,10,12,.92),rgba(10,10,12,.7) 70%,transparent);backdrop-filter:blur(6px)}
+.nav-row{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px}
 .wordmark{font-family:var(--display);font-size:19px;letter-spacing:.01em}
 .wordmark span{color:var(--lime)}
 .nav-links{display:flex;gap:34px;list-style:none;margin:0;padding:0}
@@ -76,6 +77,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 .nav-cta:hover{background:var(--lime);color:var(--ink)}
 .menu-btn{display:none;background:none;border:1px solid var(--line);color:var(--white);width:40px;height:40px;border-radius:2px}
 @media (max-width:860px){.nav-links{display:none}.nav-cta{display:none}.menu-btn{display:block}}
+.mobile-menu{display:none;background:var(--void);border-top:1px solid var(--line);margin:0 calc(-1 * var(--gutter));padding:8px var(--gutter) 22px}
+.mobile-menu[hidden]{display:none!important}
+@media (max-width:860px){.mobile-menu:not([hidden]){display:block}}
+.mobile-menu-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.mobile-menu-links li{border-bottom:1px solid var(--line-soft)}
+.mobile-menu-links a{display:block;padding:16px 2px;font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--white-dim)}
+.mobile-menu-links a:hover,.mobile-menu-links a:focus-visible{color:var(--lime)}
+.mobile-menu-cta{margin-top:18px;width:100%;justify-content:center}
 
 .btn{display:inline-flex;align-items:center;gap:12px;padding:15px 24px;border:1px solid var(--lime);color:var(--lime);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;transition:background .2s,color .2s,border-color .2s;background:transparent}
 .btn:hover{background:var(--lime);color:var(--ink)}
@@ -259,15 +268,26 @@ footer a:hover{color:var(--lime)}
 <a class="back-chip" href="../../index.html#showcase" data-dest="athar"><span class="dot" aria-hidden="true"></span>← Back to Athar</a>
 
 <header class="nav">
-  <div class="wordmark">ASCEND<span>.</span></div>
-  <ul class="nav-links">
-    <li><a href="#programs">Programs</a></li>
-    <li><a href="#curriculum">Curriculum</a></li>
-    <li><a href="#pathway">Pathway</a></li>
-    <li><a href="#enroll">Apply</a></li>
-  </ul>
-  <a class="nav-cta" href="#enroll">Enroll now</a>
-  <button class="menu-btn" aria-label="Menu">☰</button>
+  <div class="nav-row">
+    <div class="wordmark">ASCEND<span>.</span></div>
+    <ul class="nav-links">
+      <li><a href="#programs">Programs</a></li>
+      <li><a href="#curriculum">Curriculum</a></li>
+      <li><a href="#pathway">Pathway</a></li>
+      <li><a href="#enroll">Apply</a></li>
+    </ul>
+    <a class="nav-cta" href="#enroll">Request info</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+  </div>
+  <nav class="mobile-menu" id="mobileMenu" hidden aria-label="Mobile">
+    <ul class="mobile-menu-links">
+      <li><a href="#programs">Programs</a></li>
+      <li><a href="#curriculum">Curriculum</a></li>
+      <li><a href="#pathway">Pathway</a></li>
+      <li><a href="#enroll">Apply</a></li>
+    </ul>
+    <a class="btn solid mobile-menu-cta" href="#enroll">Request info</a>
+  </nav>
 </header>
 
 <main id="main">
@@ -523,6 +543,36 @@ footer a:hover{color:var(--lime)}
   if (hasGSAP) gsap.registerPlugin(ScrollTrigger);
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- mobile menu ----------
+  (function mobileMenu(){
+    var btn = document.getElementById('menuBtn');
+    var menu = document.getElementById('mobileMenu');
+    if (!btn || !menu) return;
+
+    function open(){
+      menu.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      btn.textContent = '✕';
+    }
+    function close(){
+      menu.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+      btn.textContent = '☰';
+    }
+    btn.addEventListener('click', function(){
+      if (menu.hidden) open(); else close();
+    });
+    menu.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', close);
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && !menu.hidden) close();
+    });
+    window.addEventListener('resize', function(){
+      if (window.innerWidth > 860 && !menu.hidden) close();
+    });
+  })();
 
   // ---------- reveal on scroll ----------
   var revealEls = document.querySelectorAll('.reveal');
