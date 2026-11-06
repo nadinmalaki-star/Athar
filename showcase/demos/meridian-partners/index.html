@@ -44,7 +44,8 @@ button{font:inherit;cursor:pointer}
 .back-chip svg{width:14px;height:14px}
 
 /* nav */
-.nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px var(--gutter);background:rgba(12,20,32,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{position:sticky;top:0;z-index:20;padding:16px var(--gutter);background:rgba(12,20,32,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-row{display:flex;align-items:center;justify-content:space-between;gap:18px}
 .nav-left{display:flex;align-items:center;gap:22px;min-width:0}
 .nav .wordmark{font-family:var(--display);font-size:20px;letter-spacing:.5px;color:var(--paper);white-space:nowrap}
 .nav .wordmark b{color:var(--bronze);font-weight:500}
@@ -53,7 +54,14 @@ button{font:inherit;cursor:pointer}
 .nav-links a:hover{opacity:1}
 .nav-cta{padding:10px 20px;border:1px solid var(--bronze);border-radius:2px;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--bronze-hot);transition:background .2s,color .2s}
 .nav-cta:hover{background:var(--bronze);color:var(--navy)}
-.nav-toggle{display:none;background:none;border:0;color:var(--paper)}
+.nav-toggle{display:none;background:none;border:1px solid var(--line);color:var(--paper);width:38px;height:38px;border-radius:2px;font-size:16px;flex:none}
+.mobile-nav{display:none;margin:0 calc(-1 * var(--gutter));padding:6px var(--gutter) 18px;border-top:1px solid var(--line)}
+.mobile-nav[hidden]{display:none!important}
+.mobile-nav-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.mobile-nav-links li{border-bottom:1px solid var(--line)}
+.mobile-nav-links a{display:block;padding:15px 2px;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--paper);opacity:.8}
+.mobile-nav-links a:hover,.mobile-nav-links a:focus-visible{opacity:1;color:var(--bronze-hot)}
+.mobile-nav-cta{margin-top:16px;width:100%}
 
 /* ---------- hero : asymmetric editorial grid ---------- */
 .hero{position:relative;background:
@@ -232,7 +240,8 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
   .nav-links{display:none}
   .nav-toggle{display:block}
   .nav{padding:14px 16px}
-  .nav-cta{padding:9px 14px;font-size:10px}
+  .nav-cta{display:none}
+  .mobile-nav:not([hidden]){display:block}
 }
 @media(max-width:560px){
   .nav-left{gap:10px}
@@ -248,19 +257,30 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
 <body>
 
 <header class="nav">
-  <div class="nav-left">
-    <a class="back-chip" href="../../index.html#showcase">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-      <span>Back to Athar</span>
-    </a>
-    <a class="wordmark" href="#top">MERIDIAN <b>Partners</b></a>
+  <div class="nav-row">
+    <div class="nav-left">
+      <a class="back-chip" href="../../index.html#showcase">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        <span>Back to Athar</span>
+      </a>
+      <a class="wordmark" href="#top">MERIDIAN <b>Partners</b></a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#narrative">The Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#inquiry">Inquiry</a></li>
+    </ul>
+    <a class="nav-cta" href="#inquiry">Request a Diagnostic</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="mobileNav">☰</button>
   </div>
-  <ul class="nav-links">
-    <li><a href="#narrative">The Work</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="#inquiry">Inquiry</a></li>
-  </ul>
-  <a class="nav-cta" href="#inquiry">Request a Quotation</a>
+  <nav class="mobile-nav" id="mobileNav" hidden aria-label="Mobile">
+    <ul class="mobile-nav-links">
+      <li><a href="#narrative">The Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#inquiry">Inquiry</a></li>
+    </ul>
+    <a class="btn mobile-nav-cta" href="#inquiry">Request a Diagnostic</a>
+  </nav>
 </header>
 
 <section class="hero" id="top">
@@ -292,9 +312,9 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
     <div class="hero-side reveal">
       <div class="stat"><strong>04</strong><span>Advisory Lines</span></div>
       <div class="stat"><strong>01</strong><span>Engagement, Fully Scoped</span></div>
-      <div class="stat"><strong>100%</strong><span>Qualified Inquiries Reviewed</span></div>
+      <div class="stat"><strong>Every</strong><span>Qualified Inquiry Reviewed</span></div>
       <div class="side-actions">
-        <a class="btn" href="#inquiry">Request a Quotation</a>
+        <a class="btn" href="#inquiry">Request a Diagnostic</a>
         <a class="btn ghost" href="#narrative">See How We Work</a>
       </div>
     </div>
@@ -536,6 +556,19 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isMobile = window.matchMedia('(max-width: 900px)').matches;
 
+  // ---------- mobile nav ----------
+  (function mobileNav(){
+    var btn = document.getElementById('navToggle');
+    var menu = document.getElementById('mobileNav');
+    if(!btn || !menu) return;
+    function open(){ menu.hidden = false; btn.setAttribute('aria-expanded','true'); btn.textContent = '✕'; }
+    function close(){ menu.hidden = true; btn.setAttribute('aria-expanded','false'); btn.textContent = '☰'; }
+    btn.addEventListener('click', function(){ if(menu.hidden) open(); else close(); });
+    menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', close); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !menu.hidden) close(); });
+    window.addEventListener('resize', function(){ if(window.innerWidth > 860 && !menu.hidden) close(); });
+  })();
+
   // ---------- index-grid accordion (services) ----------
   document.querySelectorAll('.index-card-head').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -743,9 +776,12 @@ footer .f-word{font-family:var(--display);color:var(--paper);font-size:16px}
       if(!el.value || !el.value.trim()){ ok = false; el.style.borderColor = '#b4452f'; }
       else { el.style.borderColor = ''; }
     });
+    var emailEl = document.getElementById('mEmail');
+    var emailOk = /.+@.+\..+/.test(emailEl.value.trim());
+    if(!emailOk){ ok = false; emailEl.style.borderColor = '#b4452f'; }
     if(!ok){
       status.className = 'q-status';
-      status.textContent = 'Please fill in all required fields.';
+      status.textContent = emailEl.value.trim() && !emailOk ? 'Please enter a valid email address.' : 'Please fill in all required fields.';
       return;
     }
     submitBtn.disabled = true;
