@@ -65,7 +65,7 @@ button{font:inherit;cursor:pointer}
 
 /* ---------- hero : asymmetric editorial grid ---------- */
 .hero{position:relative;background:
-  linear-gradient(100deg, var(--navy) 0%, var(--navy) 46%, rgba(12,19,34,.86) 70%, rgba(12,19,34,.6) 100%),
+  linear-gradient(100deg, var(--navy) 0%, var(--navy) 24%, rgba(12,19,34,.88) 36%, rgba(12,19,34,.72) 48%, rgba(12,19,34,.56) 60%, rgba(12,19,34,.42) 72%, rgba(12,19,34,.32) 85%, rgba(12,19,34,.26) 100%),
   url('images/hero.jpg') center/cover no-repeat;
   color:var(--paper);overflow:hidden}
 .hero-grid{position:absolute;inset:0;opacity:.5;pointer-events:none}
@@ -78,19 +78,23 @@ button{font:inherit;cursor:pointer}
 .hero-main .cite{display:flex;align-items:center;gap:14px;margin-top:8px}
 .hero-main .cite .rule{width:38px;height:1px;background:var(--bronze)}
 .hero-main .cite span{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#aab1ba}
-.hero-side{border-left:1px solid var(--line);padding:132px 0 64px 44px;display:flex;flex-direction:column;gap:0}
+.hero-side{border-left:1px solid var(--line);padding:132px 0 64px 44px;display:flex;flex-direction:column;gap:0;background:linear-gradient(100deg, rgba(12,19,34,.06) 0%, rgba(12,19,34,.4) 100%)}
 .hero-side .stat{padding:24px 0;border-bottom:1px solid var(--line)}
 .hero-side .stat:first-child{padding-top:0}
-.hero-side .stat strong{display:block;font-family:var(--display);font-size:34px;color:var(--bronze-hot);font-weight:400}
-.hero-side .stat span{display:block;margin-top:6px;font-size:11px;letter-spacing:1.2px;color:#9aa3ad;text-transform:uppercase}
+.hero-side .stat strong{display:block;font-family:var(--display);font-size:34px;color:var(--bronze-hot);font-weight:400;text-shadow:0 1px 10px rgba(12,19,34,.65)}
+.hero-side .stat span{display:block;margin-top:6px;font-size:11px;letter-spacing:1.2px;color:#9aa3ad;text-transform:uppercase;text-shadow:0 1px 8px rgba(12,19,34,.7)}
 .hero-side .side-actions{margin-top:auto;padding-top:30px;display:flex;flex-direction:column;gap:12px}
+.hero-side .btn{background:rgba(12,19,34,.38)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:15px 24px;font-size:11.5px;letter-spacing:1.6px;text-transform:uppercase;border:1px solid var(--bronze);border-radius:2px;color:var(--bronze-hot);transition:background .25s,color .25s}
 .btn:hover{background:var(--bronze);color:var(--navy)}
 .btn.ghost{border-color:rgba(244,242,236,.3);color:var(--paper)}
 .btn.ghost:hover{background:rgba(244,242,236,.08);color:var(--paper)}
 @media(max-width:900px){
+  .hero{background:
+    linear-gradient(155deg, var(--navy) 0%, var(--navy) 40%, rgba(12,19,34,.86) 52%, rgba(12,19,34,.68) 64%, rgba(12,19,34,.56) 76%, rgba(12,19,34,.46) 88%, rgba(12,19,34,.4) 100%),
+    url('images/hero.jpg') center/cover no-repeat}
   .hero-inner{grid-template-columns:1fr;min-height:0;padding-top:108px}
-  .hero-side{border-left:0;border-top:1px solid var(--line);padding:32px 0 48px;flex-direction:row;flex-wrap:wrap;gap:0 36px}
+  .hero-side{border-left:0;border-top:1px solid var(--line);padding:32px 0 48px;flex-direction:row;flex-wrap:wrap;gap:0 36px;background:none}
   .hero-side .stat{border-bottom:0;flex:1 1 auto;min-width:120px}
   .hero-side .side-actions{width:100%;flex-direction:row;flex-wrap:wrap;margin-top:18px}
   .hero-side .side-actions .btn{flex:1 1 180px}
