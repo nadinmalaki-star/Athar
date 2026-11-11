@@ -115,60 +115,69 @@ section{padding:110px var(--gutter)}
 .dark h2,.dark h3{color:var(--ivory)}
 
 /* ---------------------------------------------------------------- hero */
-/* One full-bleed photograph fills the entire initial viewport; typography
-   sits directly on it inside a photographed-in negative-space region, with
-   a directional scrim for legibility only where the text actually sits —
-   never a solid panel, never a split column. */
-/* Split editorial hero, benchmarked against the reference's split
-   ivory/photo composition: one sentence crossing both fields, upright
-   serif on the ivory ground, italic on the photograph. The photo layer
-   is always full-bleed — the ivory panel is revealed/hidden purely via a
-   clip-path mask, never a box resize, which is what keeps this robust at
-   every breakpoint (the technique proven in the VERA Motion Lab proofs). */
+/* Calm editorial cinematic hero (V2). Three independent layers, never
+   conflated, so text can never be clipped by or collide with a moving
+   mask: (1) the photographic image layer — zoom/pan/reveal only, carries
+   no text or CTAs; (2) the ivory backdrop — a pure clip-path wipe,
+   decorative only, carries no text either; (3) the editorial typography
+   layer — eyebrow, the complete headline ("The unknown feels bigger."),
+   deck line, supporting paragraph and both CTAs, all living together on
+   solid ivory as ONE block. The photograph is a pure photographic
+   counterpart to the headline, not a surface typography sits on top of —
+   no scrim is needed because nothing is ever overlaid on it. */
 .hero{position:relative;height:100svh;padding:0;overflow:hidden}
 .hero-media{position:absolute;inset:0;z-index:1}
 .hero-media img{width:100%;height:100%;object-fit:cover;object-position:60% 38%;transform-origin:50% 40%}
-.hero-photo-copy{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;justify-content:flex-end;padding:0 var(--gutter) 90px;max-width:680px;margin-left:auto}
-.hero-h1-r{font-size:clamp(52px,8.6vw,136px);line-height:.86;letter-spacing:-.03em;color:var(--ivory);margin-bottom:22px;transform-origin:0% 100%}
-.hero-h1-r em{font-style:italic;color:var(--copper)}
-.hero-ivory{
-  position:absolute;inset:0;z-index:4;background:var(--ivory);color:var(--ink);
-  display:flex;flex-direction:column;justify-content:center;padding:0 var(--gutter);
+.hero-ivory-bg{
+  position:absolute;inset:0;z-index:2;background:var(--ivory);
   clip-path:polygon(0% 0%,46% 0%,46% 100%,0% 100%);
 }
-.hero-h1-l{font-size:clamp(44px,7vw,112px);line-height:.88;letter-spacing:-.03em;color:var(--ink);transform-origin:0% 50%}
-.hero-h1-sub{display:block;font-family:var(--body);font-style:normal;font-weight:500;font-size:17px;letter-spacing:0;margin-top:20px;color:var(--ink-soft);max-width:26ch}
-.hero-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:
-    linear-gradient(100deg, rgba(27,27,32,.8) 0%, rgba(27,27,32,.54) 30%, rgba(27,27,32,.1) 54%, rgba(27,27,32,0) 68%),
-    linear-gradient(0deg, rgba(27,27,32,.5) 0%, rgba(27,27,32,0) 34%);
+.hero-editorial{
+  position:absolute;inset:0;z-index:3;color:var(--ink);
+  display:flex;flex-direction:column;justify-content:center;
+  width:46%;padding:0 var(--gutter);
 }
-.hero-sub{font-size:17px;max-width:46ch;line-height:1.65;color:rgba(245,241,235,.82);margin-bottom:26px}
-.hero-ctas{display:flex;gap:18px;flex-wrap:wrap}
-.hero-ctas .btn.outline{border-color:rgba(245,241,235,.75);color:var(--ivory)}
-.hero-ctas .btn.outline:hover{background:var(--ivory);color:var(--ink);border-color:var(--ivory)}
+.hero-h1{font-size:clamp(38px,4.3vw,72px);line-height:1.02;letter-spacing:-.02em;color:var(--ink);margin:18px 0 0}
+.hero-h1 .h1-row{display:block}
+.hero-h1 .h1-accent{font-style:italic;color:var(--copper-dark)}
+.hero-h1-sub{display:block;font-family:var(--body);font-style:normal;font-weight:500;font-size:17px;letter-spacing:0;margin-top:22px;color:var(--ink-soft);max-width:30ch}
+.hero-sub{font-size:15.5px;max-width:36ch;line-height:1.65;color:var(--ink-soft);margin:18px 0 30px}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap}
+.hero-scroll-hint{display:none}
 @media(max-width:900px){
-  .hero{height:100svh}
-  .hero-media img{object-position:68% 38%}
-  .hero-scrim{background:linear-gradient(0deg, rgba(27,27,32,.92) 0%, rgba(27,27,32,.7) 32%, rgba(27,27,32,.22) 58%, rgba(27,27,32,0) 72%)}
-  /* Mobile reuses the Motion Lab proof's architecture, not a shrunk
-     desktop split: the photo stays always full-bleed (absolute,
-     z-index:1), and the ivory panel becomes a bottom-anchored card,
-     sized to its own content (not a fixed fraction of the viewport —
-     see the `top:auto` note on scroll choreography below), that wipes
-     away VERTICALLY on scroll rather than sideways. The photo-side
-     headline/copy/CTAs sit above it as their own absolute layer. */
-  .hero-ivory{position:absolute;top:auto;left:0;right:0;bottom:0;clip-path:none;
-    background:var(--ivory);display:flex;flex-direction:column;justify-content:flex-end;
-    padding:36px 22px 32px}
-  .hero-h1-l{font-size:clamp(34px,10vw,50px);color:var(--ink)}
-  .hero-h1-sub{font-size:14.5px;color:var(--ink-soft);margin-top:12px}
-  .hero-photo-copy{justify-content:flex-end;max-width:none;margin-left:0;padding:0 22px 300px}
-  .hero-h1-r{font-size:clamp(36px,11vw,58px);margin-bottom:16px}
-  .hero-sub{font-size:14.5px;max-width:none;line-height:1.55;margin-bottom:16px}
-  .hero-ctas{gap:10px;margin-top:2px}
-  .hero-ctas .btn{padding:13px 22px;font-size:13.5px}
+  /* Mobile V3: one seamless composition, not image-then-block — a
+     full-bleed photo with dark editorial type resting directly on its
+     own naturally calm lower floor area. No separate ivory panel, no
+     scrim: because the type here is dark-on-light (not light-on-dark),
+     the photo's own plain lower region already carries full contrast
+     without darkening the image. The eyebrow grows a thin trailing
+     rule and a subtle scroll hint appears beneath the CTAs — both
+     pure CSS additions, invisible above this breakpoint. */
+  .hero{height:100svh;overflow:hidden}
+  .hero-media{position:absolute;inset:0;z-index:1}
+  .hero-media img{object-position:50% 18%}
+  .hero-ivory-bg{display:none}
+  .hero-editorial{
+    position:absolute;inset:auto 0 0 0;z-index:3;width:auto;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:0 22px 30px;color:var(--ink);
+  }
+  .hero-editorial .eyebrow{display:flex;align-items:center;gap:12px}
+  .hero-editorial .eyebrow::after{content:'';flex:1 1 auto;height:1px;background:currentColor;opacity:.28}
+  .hero-h1{font-size:clamp(32px,9.5vw,46px);margin-top:14px}
+  .hero-h1-sub{font-size:15px;color:var(--ink-soft);margin-top:14px}
+  .hero-sub{display:none}
+  .hero-ctas{flex-direction:column;align-items:stretch;gap:12px;margin-top:24px}
+  .hero-ctas .btn{justify-content:center;padding:16px 22px;font-size:15px}
+  .hero-scroll-hint{display:flex;align-items:center;gap:10px;margin-top:22px;color:var(--ink-soft);
+    font-size:12.5px;letter-spacing:.04em}
+  .hero-scroll-hint-ring{width:30px;height:30px;border-radius:50%;border:1px solid currentColor;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .hero-scroll-hint-ring svg{width:13px;height:13px;animation:scrollHintBob 1.8s ease-in-out infinite}
 }
+@keyframes scrollHintBob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+/* The file-wide reduced-motion rule near the top (*{animation:none!important})
+   already disables this keyframe; no separate override needed here. */
 
 /* ------------------------------------------------- B: what brings you */
 .concerns{background:var(--paper)}
@@ -428,26 +437,32 @@ footer .foot-in>div:first-child p{color:rgba(245,241,235,.62)}
 
 <main id="top">
 <section class="hero" id="hero">
-  <div class="hero-ivory" id="heroIvory">
-    <span class="eyebrow">Before the chair</span>
-    <h1 class="hero-h1-l" id="heroH1L">The unknown<br>feels</h1>
-    <p class="hero-h1-sub">Until you know what to expect.</p>
-  </div>
   <div class="hero-media" id="heroMedia">
     <picture>
       <source media="(max-width: 900px)" srcset="images/v7/hero-v2-mobile.jpg">
-      <img id="heroImg" src="images/v7/hero-v2.jpg" alt="A dentist warmly explaining a treatment plan to a smiling patient reclined in a bright, uncluttered consultation room">
+      <img id="heroImg" src="images/v7/hero-v2.jpg" alt="VERA Clinic's reception — a warm, light-filled space with the clinic's reception desk and signage">
     </picture>
   </div>
-  <div class="hero-scrim" aria-hidden="true"></div>
-  <div class="hero-photo-copy">
-    <h1 class="hero-h1-r" id="heroH1R"><em>bigger.</em></h1>
+  <div class="hero-ivory-bg" id="heroIvoryBg" aria-hidden="true"></div>
+  <div class="hero-editorial" id="heroEditorial">
+    <span class="eyebrow">Before the chair</span>
+    <h1 class="hero-h1" id="heroH1">
+      <span class="h1-row">The unknown</span>
+      <span class="h1-row">feels <em class="h1-accent">bigger.</em></span>
+    </h1>
+    <p class="hero-h1-sub">Until you know what to expect.</p>
     <p class="hero-sub">At VERA, we turn uncertainty into clarity — showing you exactly what a visit involves, at your own pace, before you ever sit down.</p>
     <div class="hero-ctas">
-      <a class="btn light" href="#concerns">Explore Your Visit
+      <a class="btn" href="#concerns">Explore Your Visit
         <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
       <a class="btn outline" href="#appointment">Request a Consultation</a>
+    </div>
+    <div class="hero-scroll-hint" aria-hidden="true">
+      <span class="hero-scroll-hint-ring">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg>
+      </span>
+      Scroll to explore
     </div>
   </div>
 </section>
@@ -741,29 +756,25 @@ footer .foot-in>div:first-child p{color:rgba(245,241,235,.62)}
   // so the two read as one continuous sequence.
   function playOpening(gsap){
     var intro = document.getElementById('intro');
-    // The ivory panel now masks in on BOTH breakpoints (ported from the
-    // Motion Lab proof): desktop opens sideways into its split, mobile
-    // opens upward as a card rising over the photo. Only the clip-path
-    // shape differs per breakpoint — the entrance/exit mechanics are the
-    // same masking language either way.
+    // The ivory backdrop masks in on desktop only (a pure clip-path
+    // reveal, carrying no text of its own). On mobile it is a normal
+    // stacked block with no overlay mechanic, so there is nothing to
+    // mask in — only the editorial text needs an entrance there.
     var isSplitDesktop = window.matchMedia('(min-width: 901px)').matches;
-    var ivoryClosed = isSplitDesktop ? 'polygon(0% 0%,0% 0%,0% 100%,0% 100%)' : 'inset(100% 0 0 0)';
-    var ivoryOpen = isSplitDesktop ? 'polygon(0% 0%,46% 0%,46% 100%,0% 100%)' : 'inset(0% 0 0 0)';
+    var ivoryClosed = 'polygon(0% 0%,0% 0%,0% 100%,0% 100%)';
+    var ivoryOpen = 'polygon(0% 0%,46% 0%,46% 100%,0% 100%)';
 
-    document.querySelectorAll('.hero-h1-l, .hero-h1-r, .section-head h2, .manifesto-statement').forEach(splitWords);
+    document.querySelectorAll('.hero-h1, .section-head h2, .manifesto-statement').forEach(splitWords);
     gsap.set('.split-word', { opacity: 0, y: '100%' });
     gsap.set('#heroImg', { scale: 1.14, xPercent: 1.4, yPercent: -1 });
-    gsap.set('.hero-ivory .eyebrow, .hero-h1-sub, .hero-sub, .hero-ctas', { opacity: 0, y: 18 });
-    // The ivory panel is revealed from nothing (fully collapsed clip-path)
-    // rather than simply faded in, so its very first appearance is the
-    // same masking language the scroll-driven wipe later reuses.
-    gsap.set('#heroIvory', { clipPath: ivoryClosed });
+    gsap.set('.hero-editorial .eyebrow, .hero-h1-sub, .hero-sub, .hero-ctas, .hero-scroll-hint', { opacity: 0, y: 18 });
+    if (isSplitDesktop) gsap.set('#heroIvoryBg', { clipPath: ivoryClosed });
     var introWordEl = intro ? intro.querySelector('.intro-word') : null;
     if (introWordEl) gsap.set(introWordEl, { y: introWordEl.offsetHeight });
 
     if (!intro || reduced) {
       if (intro) intro.remove();
-      gsap.set(['.split-word', '#heroImg', '#heroIvory', '.hero-ivory .eyebrow', '.hero-h1-sub', '.hero-sub', '.hero-ctas'], { clearProps: 'all' });
+      gsap.set(['.split-word', '#heroImg', '#heroIvoryBg', '.hero-editorial .eyebrow', '.hero-h1-sub', '.hero-sub', '.hero-ctas', '.hero-scroll-hint'], { clearProps: 'all' });
       return Promise.resolve();
     }
 
@@ -781,15 +792,17 @@ footer .foot-in>div:first-child p{color:rgba(245,241,235,.62)}
         // arrives, overlapped — one continuous sequence, not a handoff.
         .to('#intro .intro-logo, #intro .intro-lines', { opacity: 0, scale: 1.04, duration: .55, ease: 'power2.in' }, 'open')
         .to('#intro', { opacity: 0, duration: .8, ease: 'power2.inOut' }, 'open+=.1')
-        .to('#heroImg', { scale: 1, xPercent: 0, yPercent: 0, duration: 1.6, ease: 'power3.out' }, 'open')
-        // The ivory panel wipes in to its resting state — a mask reveal,
-        // not a fade — immediately followed by its own headline.
-        .to('#heroIvory', { clipPath: ivoryOpen, duration: 1, ease: 'power3.inOut' }, 'open+=.1')
-        .to('.hero-ivory .eyebrow', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 'open+=.35')
-        .to('.hero-h1-l .split-word', { opacity: 1, y: '0%', duration: .8, stagger: .025, ease: 'power3.out' }, 'open+=.45')
+        .to('#heroImg', { scale: 1, xPercent: 0, yPercent: 0, duration: 1.6, ease: 'power3.out' }, 'open');
+      if (isSplitDesktop) {
+        // The ivory backdrop wipes in to its resting state — a mask
+        // reveal, not a fade — immediately followed by the editorial text.
+        tl.to('#heroIvoryBg', { clipPath: ivoryOpen, duration: 1, ease: 'power3.inOut' }, 'open+=.1');
+      }
+      tl.to('.hero-editorial .eyebrow', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 'open+=.35')
+        .to('.hero-h1 .split-word', { opacity: 1, y: '0%', duration: .8, stagger: .025, ease: 'power3.out' }, 'open+=.45')
         .to('.hero-h1-sub', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 'open+=.8')
-        .to('.hero-h1-r .split-word', { opacity: 1, y: '0%', duration: .8, stagger: .025, ease: 'power3.out' }, 'open+=.5')
-        .to('.hero-sub, .hero-ctas', { opacity: 1, y: 0, duration: .7, stagger: .1, ease: 'power3.out' }, 'open+=.9');
+        .to('.hero-sub, .hero-ctas', { opacity: 1, y: 0, duration: .7, stagger: .1, ease: 'power3.out' }, 'open+=.95')
+        .to('.hero-scroll-hint', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 'open+=1.2');
     });
   }
 
@@ -823,16 +836,19 @@ footer .foot-in>div:first-child p{color:rgba(245,241,235,.62)}
       });
     })();
 
-    // Hero exit: a single PINNED, scrubbed timeline on both breakpoints —
-    // the hero holds in place for a runway of extra scroll while the
-    // photo, the ivory panel's mask, and BOTH headlines move together as
-    // one choreographed event. Ported and extended from the Motion Lab
-    // proof: the receding ivory text doesn't just fade and slide — it
-    // SCALES down (to 84%) as it recedes, and the photo-side "bigger."
-    // headline scales UP (to ~1.1) as the photo reaches its full-bleed
-    // state, so the word's own motion enacts its meaning rather than
-    // sitting static while everything else moves around it. Every tween
-    // uses fromTo() with explicit start values, not to() — a plain to()
+    // Hero exit: a single PINNED, scrubbed timeline on both breakpoints,
+    // with three independently-targeted layers that never conflate image
+    // and text: (1) the photo zooms/pans on its own; (2) on desktop, the
+    // ivory backdrop — a plain decorative clip-path layer with no text
+    // inside it — wipes away to reveal the full photograph; (3) the
+    // editorial text block (headline, deck, paragraph, CTAs — one DOM
+    // node, one tween) fades/scales out as a single unit, finishing at
+    // 35% of the runway, well before the backdrop finishes its own wipe.
+    // Because the text is never a child of the clipped backdrop, it can
+    // never be cut by the moving mask edge — the two layers are
+    // sequenced by TIME (text exits first, image continues alone), never
+    // overlapped by actually sharing a clip boundary. Every tween uses
+    // fromTo() with explicit start values, not to() — a plain to()
     // captures its "from" state whenever ScrollTrigger first renders the
     // timeline, which can race the separate, async entrance sequence
     // above and lock in a stale pre-entrance value, breaking the hero's
@@ -844,30 +860,25 @@ footer .foot-in>div:first-child p{color:rgba(245,241,235,.62)}
     var isSplitDesktop = window.matchMedia('(min-width: 901px)').matches;
     var heroWipeTl = gsap.timeline({
       scrollTrigger: {
-        trigger: '.hero', start: 'top top', end: isSplitDesktop ? '+=100%' : '+=85%',
+        trigger: '.hero', start: 'top top', end: isSplitDesktop ? '+=100%' : '+=70%',
         scrub: .6, pin: true, pinSpacing: true, anticipatePin: 1
       }
     });
     if (isSplitDesktop) {
       heroWipeTl
         .fromTo('#heroImg', { yPercent: 0, scale: 1 }, { yPercent: 8, scale: 1.06, ease: 'none', duration: 1 }, 0)
-        .fromTo('#heroIvory',
+        .fromTo('#heroIvoryBg',
           { clipPath: 'polygon(0% 0%,46% 0%,46% 100%,0% 100%)' },
           { clipPath: 'polygon(0% 0%,4% 0%,-18% 100%,0% 100%)', ease: 'none', duration: 1 }, 0)
-        .fromTo('.hero-ivory .eyebrow, #heroH1L, .hero-h1-sub',
+        .fromTo('#heroEditorial',
           { opacity: 1, x: 0, scale: 1 },
-          { opacity: 0, x: -36, scale: .84, ease: 'none', duration: .4 }, 0)
-        .fromTo('#heroH1R', { scale: 1 }, { scale: 1.1, ease: 'none', duration: 1 }, 0);
+          { opacity: 0, x: -28, scale: .96, ease: 'none', duration: .35 }, 0);
     } else {
       heroWipeTl
-        .fromTo('#heroImg', { scale: 1 }, { scale: 1.1, ease: 'none', duration: 1 }, 0)
-        .fromTo('#heroIvory',
-          { clipPath: 'inset(0% 0 0 0)' },
-          { clipPath: 'inset(100% 0 0 0)', ease: 'none', duration: 1 }, 0)
-        .fromTo('.hero-ivory .eyebrow, #heroH1L, .hero-h1-sub',
+        .fromTo('#heroImg', { scale: 1 }, { scale: 1.08, ease: 'none', duration: 1 }, 0)
+        .fromTo('#heroEditorial',
           { opacity: 1, y: 0, scale: 1 },
-          { opacity: 0, y: -22, scale: .88, ease: 'none', duration: .4 }, 0)
-        .fromTo('#heroH1R', { scale: 1 }, { scale: 1.08, ease: 'none', duration: 1 }, 0);
+          { opacity: 0, y: -18, scale: .97, ease: 'none', duration: .35 }, 0);
     }
 
     // Manifesto: its own motion language — the oversized statement reveals
