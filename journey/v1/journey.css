@@ -1,0 +1,156 @@
+/* ISOLATED PROTOTYPE (revision 2) — Section 03 cinematic journey. Uses the site's own tokens (--char, --paper, --ember,
+   --display, --body, --mono, .label, .h2). Every rule is scoped to .journey; nothing else on the page is restyled. */
+
+main > section.journey{ content-visibility:visible; contain:none; }   /* the long pinned journey must never be size-estimated */
+.journey{ position:relative; background:var(--char); border-top:1px solid var(--line);
+  height:calc(var(--jr-travel, 750) * 1svh + 100svh); }
+.jr-sticky{ position:sticky; top:0; height:100svh; overflow:hidden; }
+
+/* ---------- Stage B: the cinematic, as a FRAMED stage (JS sets its box); edges dissolve into the page colour ---------- */
+.jr-cine{ position:absolute; left:0; top:0; width:100%; height:100%; opacity:0; transform-origin:50% 50%; will-change:transform, opacity;
+  -webkit-mask-image:linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 10%, #000 88%, transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 10%, #000 88%, transparent 100%);
+  mask-composite:intersect; }
+.journey[data-view="full"] .jr-cine{                                  /* A/B: the revision-1 full-bleed presentation */
+  -webkit-mask-image:radial-gradient(ellipse 72% 78% at 50% 50%, #000 62%, transparent 100%); -webkit-mask-composite:source-over;
+  mask-image:radial-gradient(ellipse 72% 78% at 50% 50%, #000 62%, transparent 100%); mask-composite:add; }
+.jr-canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.jr-shade{ position:absolute; inset:0; background:var(--char); opacity:0; pointer-events:none; }
+
+/* ---------- Stage A: head + directions scene ---------- */
+.jr-head{ position:absolute; z-index:3; inset-inline-start:var(--gutter); top:50%; transform:translateY(-50%);
+  width:min(40vw, 600px); will-change:transform, opacity; }
+.jr-head .h2{ margin-top:28px; font-size:clamp(34px, 4.2vw, 62px); line-height:1.05; max-width:12ch; }
+html[lang="ar"] .jr-head .h2{ line-height:1.3; }
+
+.jr-arch{ position:absolute; z-index:2; inset-inline-end:3vw; top:10svh; width:50vw; height:80svh; will-change:opacity, transform; }
+.jr-arch-stage{ position:absolute; inset:0; perspective:1600px; }
+.jr-plane{ position:absolute; inset:0; transform-style:preserve-3d; }
+.jr-links{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.jr-links line{ stroke:rgba(244,241,234,0.34); stroke-width:1.1; fill:none; }
+.jr-halo{ position:absolute; left:50%; top:50%; width:340px; height:340px; margin:-170px 0 0 -170px; border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(255,90,54,.26), rgba(255,90,54,.09) 45%, rgba(255,90,54,0) 100%); opacity:0; }
+.jr-core{ position:absolute; left:50%; top:50%; width:11px; height:11px; margin:-5.5px 0 0 -5.5px; background:#ff5a36; transform:rotate(45deg);
+  box-shadow:0 0 10px rgba(255,90,54,.85), 0 0 28px rgba(255,90,54,.45); }
+.jr-node{ position:absolute; display:flex; align-items:flex-start; gap:.7rem; width:13.5rem; padding:.78rem .95rem .85rem;
+  border:1px solid rgba(244,241,234,.2); background:rgba(9,9,10,.82); text-align:start; transform:translate(-50%, -50%);
+  will-change:transform, opacity; transition:border-color .45s ease; }
+.jr-node.is-linked{ border-color:rgba(255,90,54,.5); }
+.jr-idx{ font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; color:#7d7c79; padding-top:4px; transition:color .45s ease; }
+.jr-node.is-linked .jr-idx{ color:var(--ember); }
+.jr-txt{ display:flex; flex-direction:column; gap:3px; }
+.jr-name{ font-family:var(--display); font-weight:700; font-size:17px; line-height:1.25; color:var(--paper); }
+.jr-sub{ font-size:12px; line-height:1.4; color:var(--paper-mute); }
+html[lang="ar"] .jr-name{ line-height:1.45; }
+html[lang="ar"] .jr-sub{ font-size:12.5px; }
+
+/* ---------- Bridge: the Ember point becomes the box's seam ---------- */
+.jr-bridge{ position:absolute; z-index:4; left:0; top:0; width:11px; height:11px; background:#ff5a36; opacity:0; pointer-events:none;
+  box-shadow:0 0 10px rgba(255,90,54,.65), 0 0 28px rgba(255,90,54,.3); will-change:transform, opacity, width, height; }
+
+/* ---------- Narrative beats: JS places them against the frame and clamps them inside the safe viewport ---------- */
+.jr-beats{ position:absolute; z-index:3; left:0; top:0; width:30vw; height:0; pointer-events:none; }
+.jr-beat{ position:absolute; left:0; bottom:0; width:max-content; max-width:100%; opacity:0; font-family:var(--display); font-weight:800;
+  font-size:clamp(26px, 2.5vw, 40px); line-height:1.15; color:var(--paper); text-align:start;
+  text-shadow:0 1px 10px rgba(5,5,5,.9), 0 0 30px rgba(5,5,5,.8); will-change:transform, opacity; }
+html[lang="ar"] .jr-beat{ line-height:1.45; }
+
+/* ---------- Service layer: compact index -> active title -> subtitle -> two questions ---------- */
+.jr-svc{ position:absolute; z-index:5; inset-inline-start:var(--gutter); top:50%; width:min(600px, 42vw);
+  transform:translateY(-50%); opacity:0; visibility:hidden; will-change:transform, opacity; }
+.jr-svc.is-on{ visibility:visible; }
+.jr-svc-top{ margin-bottom:16px; }
+.jr-dirs{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3, max-content); gap:6px 28px; }
+.jr-dir{ display:flex; align-items:baseline; gap:8px; padding:5px 0 6px; background:none; border:0; border-bottom:1px solid transparent;
+  color:var(--paper); text-align:start; cursor:pointer; opacity:.42; font:inherit; transition:opacity .35s ease, border-color .35s ease; }
+.jr-dir:hover, .jr-dir:focus-visible{ opacity:.8; outline:none; }
+.jr-dir.is-current{ opacity:1; border-bottom-color:var(--ember); }
+.jr-dir-i{ font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--paper-mute); }
+.jr-dir.is-current .jr-dir-i{ color:var(--ember); }
+.jr-dir-n{ font-family:var(--body); font-weight:600; font-size:14px; line-height:1.3; }
+html[lang="ar"] .jr-dir-n{ font-size:15px; }
+.jr-detail{ position:relative; margin-top:38px; min-height:300px; }
+.jr-det{ position:absolute; inset:0 0 auto 0; opacity:0; transform:translateY(10px); transition:opacity .45s ease, transform .45s ease; pointer-events:none; }
+.jr-det.is-current{ opacity:1; transform:none; }
+.jr-det-n{ font-family:var(--display); font-weight:800; font-size:clamp(42px, 4vw, 60px); line-height:1.02; letter-spacing:-.015em; color:var(--paper); }
+html[lang="ar"] .jr-det-n{ line-height:1.3; letter-spacing:0; }
+.jr-ex{ margin-top:12px; font-size:clamp(17px, 1.35vw, 20px); line-height:1.45; font-weight:500; color:var(--paper-dim); }
+.jr-qa{ margin-top:28px; padding-inline-start:18px; border-inline-start:2px solid rgba(255,90,54,.55); }
+.jr-qa + .jr-qa{ margin-top:22px; }
+.jr-k{ font-family:var(--mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--ember); }
+html[lang="ar"] .jr-k{ font-family:var(--body); font-weight:600; letter-spacing:0; text-transform:none; font-size:15px; }
+.jr-v{ margin-top:7px; font-size:18px; line-height:1.65; color:rgba(245,243,237,.88); max-width:44ch; }
+html[lang="ar"] .jr-v{ font-size:18.5px; line-height:1.8; }
+.jr-exit{ margin-top:30px; padding-top:18px; border-top:1px solid var(--line); font-family:var(--display); font-weight:700;
+  font-size:clamp(16px, 1.25vw, 19px); line-height:1.6; color:var(--paper-dim); opacity:0; transition:opacity .5s ease; }
+.jr-exit.is-on{ opacity:1; }
+
+/* ---------- Sound ---------- */
+.jr-sound{ position:absolute; z-index:6; inset-inline-end:var(--gutter); bottom:5svh; display:inline-flex; align-items:center; gap:.55rem;
+  padding:.5rem .85rem; border:1px solid rgba(244,241,234,.42); background:rgba(5,5,5,.3); color:rgba(244,241,234,.9);
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; opacity:0; visibility:hidden;
+  transition:border-color .18s ease, color .18s ease, opacity .4s ease; }
+html[lang="ar"] .jr-sound{ font-family:var(--body); letter-spacing:0; font-size:12px; }
+.jr-sound.is-on{ opacity:1; visibility:visible; }
+.jr-sound:hover, .jr-sound:focus-visible{ border-color:#ff5a36; color:#ff5a36; outline:none; }
+.jr-sound-dot{ width:7px; height:7px; border-radius:50%; background:#7d7c79; }
+.jr-sound[aria-pressed="true"] .jr-sound-dot{ background:#ff5a36; box-shadow:0 0 10px rgba(255,90,54,.6); }
+
+.jr-still{ display:none; }
+
+/* ---------- Phones ---------- */
+@media (max-width: 768px){
+  .jr-head{ top:calc(62px + 3svh); transform:none; inset-inline:7vw; width:auto; }
+  .jr-head .h2{ margin-top:16px; font-size:clamp(30px, 8.6vw, 40px); }
+  .jr-arch{ inset-inline:5vw; width:auto; top:29svh; height:68svh; }
+  .jr-node{ width:min(78vw, 300px); padding:.62rem .8rem .68rem; gap:.6rem; }
+  .jr-name{ font-size:15px; }
+  .jr-sub{ font-size:11.5px; }
+  .jr-halo{ width:240px; height:240px; margin:-120px 0 0 -120px; }
+  .jr-beats{ width:86vw; }
+  .jr-beat{ font-size:clamp(22px, 6.6vw, 28px); }
+  .jr-svc{ top:auto; bottom:calc(3svh + 26px); transform:none; inset-inline:6vw; width:auto; }
+  .jr-svc-top{ margin-bottom:8px; }
+  .jr-dirs{ grid-template-columns:repeat(3, max-content); gap:2px 14px; }
+  .jr-dir{ padding:3px 0 4px; gap:6px; }
+  .jr-dir-n{ font-size:12.5px; }
+  html[lang="ar"] .jr-dir-n{ font-size:13px; }
+  .jr-detail{ margin-top:16px; min-height:220px; }
+  .jr-det-n{ font-size:30px; }
+  .jr-ex{ margin-top:6px; font-size:15px; }
+  .jr-qa{ margin-top:14px; padding-inline-start:12px; }
+  .jr-qa + .jr-qa{ margin-top:12px; }
+  .jr-k{ font-size:10px; }
+  html[lang="ar"] .jr-k{ font-size:13px; }
+  .jr-v{ margin-top:4px; font-size:14.5px; line-height:1.55; }
+  html[lang="ar"] .jr-v{ font-size:14.5px; line-height:1.7; }
+  .jr-exit{ font-size:14px; margin-top:14px; padding-top:10px; }
+  .jr-sound{ bottom:auto; top:calc(62px + 1.5svh); }
+  .jr-badge{ font-size:8.5px; padding:3px 6px; left:8px; bottom:8px; white-space:nowrap; max-width:calc(100vw - 16px); overflow:hidden; text-overflow:ellipsis; }
+}
+
+/* ---------- Reduced motion: no pinning; reading order head -> scene -> still -> every direction explained ---------- */
+.journey.jr-static{ height:auto; }
+.jr-static .jr-sticky{ position:relative; height:auto; overflow:visible; padding:clamp(90px, 10vw, 150px) var(--gutter) 90px; display:grid; gap:48px; }
+.jr-static .jr-head, .jr-static .jr-arch, .jr-static .jr-svc{ position:relative; inset:auto; top:auto; transform:none; width:auto; }
+.jr-static .jr-head{ order:1; } .jr-static .jr-arch{ order:2; height:64svh; } .jr-static .jr-still{ order:3; display:block; } .jr-static .jr-svc{ order:4; }
+.jr-static .jr-halo{ opacity:1; }
+.jr-static .jr-cine, .jr-static .jr-bridge, .jr-static .jr-beats, .jr-static .jr-sound, .jr-static .jr-dirs{ display:none; }
+.jr-static .jr-still img{ width:100%; height:auto; display:block; }
+.jr-static .jr-svc{ opacity:1; visibility:visible; max-width:680px; }
+.jr-static .jr-detail{ min-height:0; margin-top:0; }
+.jr-static .jr-det{ position:relative; opacity:1; transform:none; padding:28px 0 8px; }
+.jr-static .jr-exit{ opacity:1; }
+
+/* ---------- prototype-only chrome ---------- */
+.jr-badge{ position:fixed; left:12px; bottom:12px; z-index:9999; font:11px/1.4 ui-monospace, Consolas, monospace; color:#a5a49f;
+  background:rgba(5,5,5,.86); border:1px solid rgba(245,243,237,.14); padding:6px 9px; pointer-events:none; direction:ltr; }
+.jr-ab{ position:fixed; right:12px; bottom:12px; z-index:9999; display:flex; align-items:center; gap:6px; direction:ltr;
+  font:10.5px/1 ui-monospace, Consolas, monospace; color:#a5a49f; background:rgba(5,5,5,.9); border:1px solid rgba(245,243,237,.16); padding:6px 8px; }
+.jr-ab b{ font-weight:400; color:#7d7c79; margin:0 2px 0 6px; letter-spacing:.08em; }
+.jr-ab button{ font:inherit; color:#d8d6cf; background:none; border:1px solid rgba(245,243,237,.18); padding:4px 7px; cursor:pointer; }
+.jr-ab button[aria-pressed="true"]{ border-color:#ff5a36; color:#ff5a36; }
+.jr-debug{ position:fixed; right:12px; bottom:52px; z-index:9999; font:11px/1.5 ui-monospace, Consolas, monospace; color:#d8d6cf;
+  background:rgba(5,5,5,.9); border:1px solid rgba(255,90,54,.4); padding:8px 10px; pointer-events:none; direction:ltr; white-space:pre; }
+@media (max-width: 768px){ .jr-ab{ right:8px; bottom:30px; font-size:9px; padding:4px 6px; } .jr-ab b{ display:none; } }
