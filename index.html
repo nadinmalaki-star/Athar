@@ -1024,6 +1024,126 @@ html:not([lang="ar"]) .bb-ar, html:not([lang="ar"]) .bbm-ar{ display:none !impor
 .bbm-ar .bbm-dash, .bbm-ar .bbm-item, .bbm-ar .bbm-cover, .bbm-ar .bbm-rev{ margin-left:0; margin-right:auto; }
 .bbm-ar .bbm-obs{ margin-left:4%; margin-right:auto; }
 </style>
+<style id="built-by-athar-mahki-v1">
+/* =====================================================================
+   BUILT BY ATHAR — 03 / 03 MAHKI (prototype; replaces the Digital Clue part in all four blocks).
+   Real MAHKI captures only (status strip cropped, nothing else changed). Hierarchy: the MAHKI identity
+   (Home) → Draft Review, the functional hero → three supporting proofs in one depth stack.
+   Same section language as KHZNTI / Solution Indicator: graphite surface, hard edge from bone,
+   one Ember thread in negative space only, connectors draw once, list hover, reduced motion static.
+   ===================================================================== */
+
+/* ---------- desktop (bb-) ---------- */
+.bb-mahki{ background:var(--graphite); color:var(--paper); padding:96px 0 136px; --dim:#8a8781; }   /* exits with How Athar Thinks' own hairline */
+.bb-mahki .bb-index{ color:var(--dim); }
+.bb-mahki .bb-name small{ font-size:22px; color:var(--paper-mute); margin-top:8px; font-weight:700; }
+.bb-mahki .bb-desc{ color:var(--paper-dim); margin-top:18px; }
+.bb-mahki .mk-soon{ margin-top:12px; font-size:14px; color:var(--paper-mute); }
+.bb-mahki .bb-legend{ margin-top:34px; border-top:1px solid var(--line); }
+.bb-mahki .bb-legend li{ padding:14px 0; border-bottom:1px solid var(--line); color:var(--paper-dim); }
+.bb-mahki .bb-legend li i{ color:var(--paper-mute); }
+.bb-mahki .mk-micro{ font-size:11px; }
+/* desktop: the text on both sides of the phones (intro + CTA on the reading side, the four points on the other), so the
+   whole MAHKI row fits one screen; the phones sit a little lower than the text. Arabic mirrors with the page direction. */
+.bb-mahki .bb-row{ grid-template-columns:250px minmax(0,1fr) 210px; gap:28px; }
+.bb-mahki .bb-stage{ margin-top:56px; }
+.bb-mahki .mk-side{ align-self:center; padding-top:56px; }
+.bb-mahki .mk-side .bb-legend{ margin-top:0; }
+.bb-mahki .bb-legend li b{ color:var(--paper); font-size:14px; }
+.bb-mahki .bb-legend li[data-k]:hover b{ color:#fff; }
+.bb-mahki .bb-link{ color:var(--paper); border-color:rgba(245,243,237,0.25); }
+.mk-micro{ margin-top:12px; font-family:var(--mono); font-size:10.5px; letter-spacing:1.4px; color:var(--dim); text-transform:uppercase; }
+
+.bb-mahki .bb-stage{ --h:800; }
+.bb-mahki .bb-sc{ perspective:2200px; perspective-origin:48% 42%; }
+/* a restrained navy field from the product's own identity, centred on the cluster */
+.bb-mahki .bb-sc::before{ content:''; position:absolute; left:6%; top:-4%; width:86%; height:100%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(46,78,206,0.16), rgba(46,78,206,0.05) 55%, rgba(46,78,206,0) 78%); }
+.bb-mahki .bb-sc::after{ content:''; position:absolute; left:6%; right:6%; bottom:70px; height:140px; pointer-events:none;
+  background:radial-gradient(55% 50% at 50% 50%, rgba(46,78,206,0.06), rgba(0,0,0,0) 70%); }
+
+/* phones: one neutral bezel (no maker's details), the screen fills it exactly */
+.bb-mahki .bb-dev{ border-radius:34px; padding:7px; background:linear-gradient(150deg, #24262c 0%, #111216 42%, #08090b 100%);
+  box-shadow:0 0 0 1px rgba(0,0,0,0.65), inset 0 1px 0 rgba(245,243,237,0.17), inset 0 -1px 0 rgba(0,0,0,0.8),
+    0 44px 80px -36px rgba(0,0,0,0.9), 0 90px 150px -70px rgba(0,0,0,0.85);
+  transform:translateZ(var(--z, 0px)) rotateY(var(--ry, 0deg)) rotateX(var(--rx, 0deg));
+  transition:transform .55s cubic-bezier(.2,.7,.2,1), filter .35s ease; }
+.bb-mahki .bb-dev::before{ background:linear-gradient(135deg, rgba(245,243,237,0.09), rgba(245,243,237,0) 30%); }
+.bb-mahki .bb-scr{ border-radius:27px; background:#050816; }
+.bb-mahki .bb-scr > img{ display:block; width:100%; height:auto; max-width:none; }
+.bb-mahki .bb-scr::after{ background:none; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.05); }   /* the real screens stay exactly as captured */
+
+/* geometry, local 958px space (screen aspect 1080 × 2330): the first approved spacing (Home · Draft Review hero ·
+   a stack of three proofs). Sizing and centring come from the layout script (the cluster's own box). */
+.bb-mahki .mk-home{ left:0;     top:100px; width:236px; height:493px; --z:-70px;  --ry:11deg; z-index:2; }
+.bb-mahki .mk-hero{ left:262px; top:0;     width:326px; height:687px; --z:30px;   --ry:-5deg; --rx:1.5deg; z-index:4; }
+.bb-mahki .mk-st  { width:190px; height:394px; --ry:-13deg; }
+.bb-mahki .mk-s1  { left:624px; top:18px;  --z:-150px; z-index:1; }
+.bb-mahki .mk-s2  { left:700px; top:170px; --z:-90px;  z-index:2; }
+.bb-mahki .mk-s3  { left:776px; top:322px; --z:-30px;  z-index:3; }
+/* list hover: the matching proof comes forward out of the stack; nothing is dimmed or re-lit (screens unchanged) */
+.bb-mahki .bb-stage .bb-dev[data-k].is-dim{ opacity:1; filter:none; }
+.bb-mahki .bb-stage:has(.is-dim) .mk-st:not(.is-dim){ z-index:6; --z:40px; }
+.bb-mahki .bb-cap{ color:var(--dim); font-size:max(10px, calc(10px / var(--k, 1))); }
+.bb-mahki .bb-cap b{ color:var(--paper); margin-right:6px; }
+.bb-mahki .bb-cap.brand b{ color:var(--paper); }
+
+/* Arabic: the same first spacing, mirrored so it reads from the text column outwards (Home next to the text) */
+.bb-ar .bb-mahki .mk-home{ left:722px; --ry:-11deg; }
+.bb-ar .bb-mahki .mk-hero{ left:370px; --ry:5deg; }
+.bb-ar .bb-mahki .mk-st  { --ry:13deg; }
+.bb-ar .bb-mahki .mk-s1  { left:144px; }
+.bb-ar .bb-mahki .mk-s2  { left:68px; }
+.bb-ar .bb-mahki .mk-s3  { left:-8px; }
+.bb-ar .bb-mahki .bb-sc{ perspective-origin:52% 42%; }
+.bb-ar .bb-mahki .bb-cap{ font-size:max(12px, calc(13px / var(--k, 1))); }   /* ≈13px on screen at any stage scale, in balance with the English mono captions */
+.bb-ar .bb-mahki .bb-cap b{ margin-right:0; margin-left:6px; }
+.bb-ar .mk-micro, .bbm-ar .mk-micro{ font-family:var(--body); letter-spacing:0; text-transform:none; font-size:12.5px; }
+
+/* ---------- mobile (bbm-) ---------- */
+.bbm-mahki{ background:var(--graphite); color:var(--paper); padding-top:88px; padding-bottom:110px; --dim:#8a8781; }
+.bbm-mahki .bbm-text{ margin-top:0; }
+.bbm-mahki .bbm-idx{ color:var(--dim); }
+.bbm-mahki .bbm-name small{ color:var(--paper-mute); }
+.bbm-mahki .bbm-desc{ color:#b9b6af; }
+.bbm-mahki .mk-soon{ margin-top:10px; font-size:14px; color:var(--paper-mute); }
+.bbm-mahki .bbm-link{ color:var(--paper); border-color:rgba(245,243,237,0.25); }
+.bbm-mahki .mk-micro{ margin-top:10px; }
+.bbm-mahki .bbm-stage{ margin-top:52px; }
+.bbm-mahki .bbm-stage::before{ content:''; position:absolute; left:-10%; right:-10%; top:8%; height:62%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(46,78,206,0.16), rgba(46,78,206,0) 75%); }
+.bbm-mahki .bbm-dev{ border-radius:30px; padding:6px; background:linear-gradient(150deg, #24262c 0%, #111216 42%, #08090b 100%);
+  box-shadow:0 0 0 1px rgba(0,0,0,0.65), inset 0 1px 0 rgba(245,243,237,0.17), 0 30px 60px -30px rgba(0,0,0,0.9); }
+.bbm-mahki .bbm-scr{ border-radius:24px; background:#050816; }
+.bbm-mahki .bbm-cap{ color:var(--dim); white-space:normal; }
+.bbm-mahki .bbm-cap b{ color:var(--paper); }
+.bbm-mahki .bbm-cap.brand b{ color:var(--paper); margin-right:6px; }
+.mk-m-home{ width:64%; }
+.mk-m-hero{ width:80%; margin-left:auto; }
+.mk-m-home .bbm-cap{ margin-top:14px; }
+.mk-m-herohead{ width:80%; margin-left:auto; margin-top:44px; }
+.mk-m-herohead .mk-sub{ font-size:13.5px; color:var(--paper-dim); margin-top:4px; line-height:1.55; }
+.mk-m-hero{ margin-top:14px; }
+.mk-m-row{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:52px; }
+.mk-m-row .bbm-dev{ border-radius:18px; padding:4px; }
+.mk-m-row .bbm-scr{ border-radius:14px; }
+.mk-m-row .bbm-cap{ margin-top:10px; font-size:10px; letter-spacing:1.1px; line-height:1.45; }
+.mk-m-row .bbm-cap b{ display:block; margin:0 0 2px; }
+/* Arabic mobile: mirrored (Home on the reading side) */
+.bbm-ar .mk-m-home{ margin-left:auto; }
+.bbm-ar .mk-m-hero, .bbm-ar .mk-m-herohead{ margin-left:0; margin-right:auto; }
+.bbm-ar .mk-m-row .bbm-cap{ font-size:12px; letter-spacing:0; }
+.bbm-ar .mk-m-row .bbm-cap b{ margin:0 0 2px; }
+html:not([lang="ar"]) .bbm-mahki .bbm-cap{ text-transform:uppercase; }
+/* the headline keeps its two halves on their own lines; the Arabic name in captions stays in the Arabic face */
+.bb-mahki .bb-headline b, .bbm-mahki .bbm-headline b{ display:block; }
+.bb-ar .bb-mahki .bb-cap.brand b, .bbm-ar .bbm-mahki .bbm-cap.brand b{ font-family:var(--body); font-weight:700; }
+.bbm-ar .bbm-mahki .bbm-cap.brand b{ margin-right:0; margin-left:6px; }
+
+@media (prefers-reduced-motion:reduce){
+  .bb-mahki .bb-dev{ transition:none; }
+}
+</style>
 <style id="thinks-v2">
 /* =====================================================================
    HOW ATHAR THINKS — V2 (approved visual checkpoint prototypes/thinks-v2). Rendered objects, no WebGL.
@@ -1613,43 +1733,43 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
         </div>
       </div>
 
-      <!-- 03 · Digital Clue, on graphite -->
-      <div class="bb-part bb-dc">
+      <!-- 03 · MAHKI, on graphite: the identity (Home) → Draft Review, the functional hero → three supporting proofs -->
+      <div class="bb-part bb-mahki">
         <div class="shell">
           <article class="bb-row">
             <div class="bb-text">
               <div class="bb-index">03 / 03</div>
-              <h3 class="bb-name">Digital Clue<small>ATHAR CLUE ENGINE</small></h3>
-              <p class="bb-desc">An interactive concept experience built around a specific business observation — designed to make one digital opportunity tangible enough to explore.</p>
-              <ul class="bb-legend">
-                <li data-k="hid"><i>01</i><div><b>Something overlooked</b><span>Two lines on the same page</span></div></li>
-                <li data-k="obs"><i>02</i><div><b>An observation</b><span>What we’re exploring, step by step</span></div></li>
-                <li class="on" data-k="rev"><i>03</i><div><b>The clue, revealed</b><span>Shown: a clue about Athar’s own website</span></div></li>
-              </ul>
+              <h3 class="bb-name">MAHKI<small lang="ar">محكي</small></h3>
+              <p class="bb-headline">From customer requests <b>to structured orders.</b></p>
+              <p class="bb-desc">A paid app for shop owners to organize orders, review later changes, and export them to Excel.</p>
+              <p class="mk-soon">Coming soon to iPhone and Android.</p>
+              <a class="bb-link" href="#contact">Request early access to MAHKI ↗</a>
+              <p class="mk-micro">Invitation-only limited trial</p>
             </div>
-            <div class="bb-stage" data-stage="dc">
+            <div class="bb-stage" data-stage="mk">
               <div class="bb-sc">
                 <div class="bb-world">
-                  <div class="bb-dev bb-cover" data-el="cover" data-k="hid"><div class="bb-scr"><div class="bb-art">
-                    <img src="images/built/dc-cover-en.webp" width="480" height="528" loading="lazy" decoding="async" alt="Digital Clue cover: two lines from Athar's own website">
-                    <i class="bb-anchor" data-el="a0" style="left:83.4%; top:42.6%"></i>
-                  </div></div></div>
-                  <div class="bb-dev bb-quest" data-el="quest" data-k="obs"><div class="bb-scr"><div class="bb-art">
-                    <img src="images/built/dc-observation-en.webp" width="960" height="609" loading="lazy" decoding="async" alt="Digital Clue step 01, with the What we're exploring panel">
-                    <div class="bb-spot"><i></i><i></i><i></i><i></i></div>
-                    <i class="bb-anchor" data-el="a1" style="left:4.3%; top:81.2%"></i>
-                  </div></div></div>
-                  <div class="bb-dev bb-reveal" data-el="reveal" data-k="rev"><div class="bb-scr"><div class="bb-art">
-                    <img src="images/built/dc-reveal-en.webp" width="1150" height="793" loading="lazy" decoding="async" alt="Digital Clue: The Reveal">
-                    <i class="bb-anchor" data-el="a2" style="left:4.3%; top:43%"></i>
-                  </div></div></div>
-                  <div class="bb-dev bb-phone" data-k="rev"><div class="bb-scr"><div class="bb-art"><img src="images/built/dc-reveal-mobile-en.webp" width="220" height="754" loading="lazy" decoding="async" alt="The Reveal on mobile"></div></div></div>
+                  <div class="bb-dev mk-home" data-el="home"><div class="bb-scr"><img src="images/built/mk/mk-01-home-v1.webp" width="720" height="1553" loading="lazy" decoding="async" alt="MAHKI home screen: the MAHKI logo and “From the customer’s words to an organized order”"></div></div>
+                  <div class="bb-dev mk-hero" data-el="hero" data-k="draft"><div class="bb-scr"><img src="images/built/mk/mk-02-draft-review-v1.webp" width="860" height="1855" loading="lazy" decoding="async" alt="MAHKI Draft Review: the customer’s message, with the items and quantities MAHKI drafted from it"></div></div>
+                  <div class="bb-dev mk-st mk-s1" data-k="src"><div class="bb-scr"><img src="images/built/mk/mk-03-voice-photo-v1.webp" width="480" height="1036" loading="lazy" decoding="async" alt="MAHKI: start an order from a voice message, an audio file, or a photo of the order sheet"></div></div>
+                  <div class="bb-dev mk-st mk-s2" data-k="chg"><div class="bb-scr"><img src="images/built/mk/mk-04-approve-changes-v1.webp" width="480" height="1036" loading="lazy" decoding="async" alt="MAHKI Approve Changes: each later change shown before and after, to accept or reject"></div></div>
+                  <div class="bb-dev mk-st mk-s3" data-k="mng"><div class="bb-scr"><img src="images/built/mk/mk-05-saved-orders-PLACEHOLDER.webp" width="480" height="1036" loading="lazy" decoding="async" alt="MAHKI Saved Orders: search, date filters, and export of the results to Excel"></div></div>
                 </div>
                 <svg class="bb-conn" aria-hidden="true"></svg>
-                <div class="bb-cap" data-cap="0" data-k="hid"><b>01</b>HIDDEN · ON THE PAGE</div>
-                <div class="bb-cap" data-cap="1" data-k="obs"><b>02</b>OBSERVATION · WHAT WE’RE EXPLORING</div>
-                <div class="bb-cap on" data-cap="2" data-k="rev"><b>03</b>CLUE · THE REVEAL</div>
+                <div class="bb-cap brand" data-cap="home"><b>MAHKI</b>· HOME</div>
+                <div class="bb-cap" data-cap="draft" data-k="draft"><b>02</b>DRAFT REVIEW</div>
+                <div class="bb-cap" data-cap="src" data-k="src"><b>01</b>VOICE OR PHOTO</div>
+                <div class="bb-cap" data-cap="chg" data-k="chg"><b>03</b>APPROVE CHANGES</div>
+                <div class="bb-cap" data-cap="mng" data-k="mng"><b>04</b>SAVED ORDERS · EXCEL</div>
               </div>
+            </div>
+            <div class="bb-text mk-side">
+                <ul class="bb-legend">
+                  <li data-k="src"><i>01</i><div><b>Order sources</b><span>Voice, photo, or direct entry.</span></div></li>
+                  <li data-k="draft"><i>02</i><div><b>Draft review</b><span>Check items and quantities before saving.</span></div></li>
+                  <li data-k="chg"><i>03</i><div><b>Approve changes</b><span>See what a later change does, then approve it.</span></div></li>
+                  <li data-k="mng"><i>04</i><div><b>Manage and export</b><span>Search, filter, and export results to Excel.</span></div></li>
+                </ul>
             </div>
           </article>
         </div>
@@ -1733,35 +1853,40 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
         </div>
       </div></div>
 
-      <!-- 03 · Digital Clue, on graphite -->
-      <div class="bbm-part bbm-dc"><div class="bbm-in">
+      <!-- 03 · MAHKI, on graphite -->
+      <div class="bbm-part bbm-mahki"><div class="bbm-in">
         <div class="bbm-text">
           <div class="bbm-idx">03 / 03</div>
-          <h3 class="bbm-name">Digital Clue<small>ATHAR CLUE ENGINE</small></h3>
-          <p class="bbm-desc">An interactive concept experience built around a specific business observation — designed to make one digital opportunity tangible enough to explore.</p>
+          <h3 class="bbm-name">MAHKI<small lang="ar">محكي</small></h3>
+          <p class="bbm-headline">From customer requests <b>to structured orders.</b></p>
+          <p class="bbm-desc">A paid app for shop owners to organize orders, review later changes, and export them to Excel.</p>
+          <p class="mk-soon">Coming soon to iPhone and Android.</p>
+          <a class="bbm-link" href="#contact">Request early access to MAHKI ↗</a>
+          <p class="mk-micro">Invitation-only limited trial</p>
         </div>
-        <div class="bbm-stage" data-bbm="dc">
-          <div class="bbm-step">
-            <div class="bbm-cap"><b>01</b>HIDDEN · ON THE PAGE</div>
-            <div class="bbm-dev bbm-cover" data-el="cover"><div class="bbm-scr"><div class="bbm-art">
-              <img src="images/built/m/dc-cover.webp" width="760" height="835" loading="lazy" decoding="async" alt="Digital Clue cover: two lines from Athar's own website">
-              <i class="bbm-anchor" data-el="a0" style="left:83.4%; top:42.6%"></i>
-            </div></div></div>
+        <div class="bbm-stage" data-bbm="mk">
+          <div class="mk-m-home">
+            <div class="bbm-dev"><div class="bbm-scr"><img src="images/built/mk/mk-01-home-v1.webp" width="720" height="1553" loading="lazy" decoding="async" alt="MAHKI home screen: the MAHKI logo and “From the customer’s words to an organized order”"></div></div>
+            <div class="bbm-cap brand" data-el="homecap"><b>MAHKI</b>· HOME</div>
           </div>
-          <div class="bbm-step">
-            <div class="bbm-cap" data-el="cap1"><b>02</b>OBSERVATION · WHAT WE’RE EXPLORING</div>
-            <div class="bbm-dev bbm-obs"><div class="bbm-scr"><div class="bbm-art">
-              <img src="images/built/m/dc-observation.webp" width="930" height="1695" loading="lazy" decoding="async" alt="Digital Clue step 01 on mobile, with the What we're exploring panel">
-              <div class="bbm-spot"><i></i><i></i><i></i><i></i></div>
-              <i class="bbm-anchor" data-el="a1" style="left:8.97%; top:83.97%"></i>
-            </div></div></div>
+          <div class="mk-m-herohead" data-el="herohead">
+            <div class="bbm-cap"><b>02</b>Draft review</div>
+            <div class="mk-sub">Check items and quantities before saving.</div>
           </div>
-          <div class="bbm-step">
-            <div class="bbm-cap on"><b>03</b>CLUE · THE REVEAL</div>
-            <div class="bbm-dev bbm-rev"><div class="bbm-scr"><div class="bbm-art">
-              <img src="images/built/m/dc-reveal.webp" width="990" height="1155" loading="lazy" decoding="async" alt="Digital Clue: The Reveal on mobile">
-              <i class="bbm-anchor" data-el="a2" style="left:8.72%; top:63.3%"></i>
-            </div></div></div>
+          <div class="bbm-dev mk-m-hero"><div class="bbm-scr"><img src="images/built/mk/mk-02-draft-review-v1.webp" width="860" height="1855" loading="lazy" decoding="async" alt="MAHKI Draft Review: the customer’s message, with the items and quantities MAHKI drafted from it"></div></div>
+          <div class="mk-m-row" data-el="row">
+            <div class="mk-m-item">
+              <div class="bbm-dev"><div class="bbm-scr"><img src="images/built/mk/mk-03-voice-photo-v1.webp" width="480" height="1036" loading="lazy" decoding="async" alt="MAHKI: start an order from a voice message, an audio file, or a photo of the order sheet"></div></div>
+              <div class="bbm-cap"><b>01</b>Order sources</div>
+            </div>
+            <div class="mk-m-item">
+              <div class="bbm-dev"><div class="bbm-scr"><img src="images/built/mk/mk-04-approve-changes-v1.webp" width="480" height="1036" loading="lazy" decoding="async" alt="MAHKI Approve Changes: each later change shown before and after, to accept or reject"></div></div>
+              <div class="bbm-cap"><b>03</b>Approve changes</div>
+            </div>
+            <div class="mk-m-item">
+              <div class="bbm-dev"><div class="bbm-scr"><img src="images/built/mk/mk-05-saved-orders-PLACEHOLDER.webp" width="480" height="1036" loading="lazy" decoding="async" alt="MAHKI Saved Orders: search, date filters, and export of the results to Excel"></div></div>
+              <div class="bbm-cap"><b>04</b>Manage and export</div>
+            </div>
           </div>
           <svg class="bbm-conn" aria-hidden="true"></svg>
         </div>
@@ -1874,43 +1999,43 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
         </div>
       </div>
 
-      <!-- 03 · Digital Clue, on graphite -->
-      <div class="bb-part bb-dc">
+      <!-- 03 · MAHKI, on graphite: the identity (Home) → Draft Review, the functional hero → three supporting proofs -->
+      <div class="bb-part bb-mahki">
         <div class="shell">
           <article class="bb-row">
             <div class="bb-text">
               <div class="bb-index"><bdi dir="ltr">03 / 03</bdi></div>
-              <h3 class="bb-name" lang="en">Digital Clue<small>ATHAR CLUE ENGINE</small></h3>
-              <p class="bb-desc">تجربة تفاعلية تُبنى حول ملاحظة محددة في البزنس، وتحول فرصة رقمية واحدة إلى فكرة ملموسة يمكن استكشافها.</p>
-              <ul class="bb-legend">
-                <li data-k="hid"><i>01</i><div><b>شي ما حدا انتبهله</b><span>سطرين على نفس الصفحة</span></div></li>
-                <li data-k="obs"><i>02</i><div><b>ملاحظة</b><span>شو عم نستكشف، خطوة بخطوة</span></div></li>
-                <li class="on" data-k="rev"><i>03</i><div><b>الخلاصة بتبان</b><span>المعروض هون مبني على موقع أثر نفسه</span></div></li>
-              </ul>
+              <h3 class="bb-name">محكي<small lang="en" dir="ltr">MAHKI</small></h3>
+              <p class="bb-headline">من كلام العميل <b>إلى طلب منظّم.</b></p>
+              <p class="bb-desc">تطبيق مدفوع لأصحاب المحلات لتنظيم الطلبات ومراجعة تعديلاتها وتصديرها إلى Excel.</p>
+              <p class="mk-soon">قريبًا على آيفون وأندرويد.</p>
+              <a class="bb-link" href="#contact">سجّل اهتمامك بتجربة محكي ↗</a>
+              <p class="mk-micro">طلب دعوة للتجربة المحدودة</p>
             </div>
-            <div class="bb-stage" data-stage="dc">
+            <div class="bb-stage" data-stage="mk">
               <div class="bb-sc">
                 <div class="bb-world">
-                  <div class="bb-dev bb-cover" data-el="cover" data-k="hid"><div class="bb-scr"><div class="bb-art">
-                    <img src="images/built/dc-cover-en.webp" width="480" height="528" loading="lazy" decoding="async" alt="Digital Clue — الغلاف: سطرين من موقع أثر نفسه">
-                    <i class="bb-anchor" data-el="a0" style="left:83.4%; top:42.6%"></i>
-                  </div></div></div>
-                  <div class="bb-dev bb-quest" data-el="quest" data-k="obs"><div class="bb-scr"><div class="bb-art">
-                    <img src="images/built/dc-observation-en.webp" width="960" height="609" loading="lazy" decoding="async" alt="Digital Clue — الخطوة 01 مع لوحة «شو عم نستكشف»">
-                    <div class="bb-spot"><i></i><i></i><i></i><i></i></div>
-                    <i class="bb-anchor" data-el="a1" style="left:4.3%; top:81.2%"></i>
-                  </div></div></div>
-                  <div class="bb-dev bb-reveal" data-el="reveal" data-k="rev"><div class="bb-scr"><div class="bb-art">
-                    <img src="images/built/dc-reveal-en.webp" width="1150" height="793" loading="lazy" decoding="async" alt="Digital Clue — الخلاصة">
-                    <i class="bb-anchor" data-el="a2" style="left:4.3%; top:43%"></i>
-                  </div></div></div>
-                  <div class="bb-dev bb-phone" data-k="rev"><div class="bb-scr"><div class="bb-art"><img src="images/built/dc-reveal-mobile-en.webp" width="220" height="754" loading="lazy" decoding="async" alt="الخلاصة على الموبايل"></div></div></div>
+                  <div class="bb-dev mk-home" data-el="home"><div class="bb-scr"><img src="images/built/mk/mk-01-home-v1.webp" width="720" height="1553" loading="lazy" decoding="async" alt="الشاشة الرئيسية لمحكي: شعار محكي و«من كلام العميل إلى طلب منظّم»"></div></div>
+                  <div class="bb-dev mk-hero" data-el="hero" data-k="draft"><div class="bb-scr"><img src="images/built/mk/mk-02-draft-review-v1.webp" width="860" height="1855" loading="lazy" decoding="async" alt="مراجعة المسودة في محكي: رسالة العميل والأصناف والكميات المستخرجة منها"></div></div>
+                  <div class="bb-dev mk-st mk-s1" data-k="src"><div class="bb-scr"><img src="images/built/mk/mk-03-voice-photo-v1.webp" width="480" height="1036" loading="lazy" decoding="async" alt="محكي: طلب من رسالة صوتية أو ملف صوتي أو صورة ورقة الطلب"></div></div>
+                  <div class="bb-dev mk-st mk-s2" data-k="chg"><div class="bb-scr"><img src="images/built/mk/mk-04-approve-changes-v1.webp" width="480" height="1036" loading="lazy" decoding="async" alt="اعتماد التغييرات في محكي: كل تعديل قبل وبعد، مع قبول أو رفض"></div></div>
+                  <div class="bb-dev mk-st mk-s3" data-k="mng"><div class="bb-scr"><img src="images/built/mk/mk-05-saved-orders-PLACEHOLDER.webp" width="480" height="1036" loading="lazy" decoding="async" alt="الطلبات المحفوظة في محكي: بحث وفلاتر وتصدير النتائج إلى Excel"></div></div>
                 </div>
                 <svg class="bb-conn" aria-hidden="true"></svg>
-                <div class="bb-cap" data-cap="0" data-k="hid"><b>01</b>مخفي · على الصفحة</div>
-                <div class="bb-cap" data-cap="1" data-k="obs"><b>02</b>ملاحظة · شو عم نستكشف</div>
-                <div class="bb-cap on" data-cap="2" data-k="rev"><b>03</b>الخلاصة</div>
+                <div class="bb-cap brand" data-cap="home"><b>محكي</b>· الرئيسية</div>
+                <div class="bb-cap" data-cap="draft" data-k="draft"><b>02</b>مراجعة المسودة</div>
+                <div class="bb-cap" data-cap="src" data-k="src"><b>01</b>طلب من صوت أو صورة</div>
+                <div class="bb-cap" data-cap="chg" data-k="chg"><b>03</b>اعتماد التغييرات</div>
+                <div class="bb-cap" data-cap="mng" data-k="mng"><b>04</b>الطلبات المحفوظة · Excel</div>
               </div>
+            </div>
+            <div class="bb-text mk-side">
+                <ul class="bb-legend">
+                  <li data-k="src"><i>01</i><div><b>مصادر الطلب</b><span>صوت، صورة، أو إدخال مباشر.</span></div></li>
+                  <li data-k="draft"><i>02</i><div><b>مراجعة المسودة</b><span>راجع الأصناف والكميات قبل الحفظ.</span></div></li>
+                  <li data-k="chg"><i>03</i><div><b>اعتماد التغييرات</b><span>راجع أثر التعديلات اللاحقة واعتمدها.</span></div></li>
+                  <li data-k="mng"><i>04</i><div><b>إدارة وتصدير الطلبات</b><span>ابحث، صفِّ الطلبات، وصدّر النتائج إلى Excel.</span></div></li>
+                </ul>
             </div>
           </article>
         </div>
@@ -1994,35 +2119,40 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
         </div>
       </div></div>
 
-      <!-- 03 · Digital Clue, on graphite -->
-      <div class="bbm-part bbm-dc"><div class="bbm-in">
+      <!-- 03 · MAHKI, on graphite -->
+      <div class="bbm-part bbm-mahki"><div class="bbm-in">
         <div class="bbm-text">
           <div class="bbm-idx"><bdi dir="ltr">03 / 03</bdi></div>
-          <h3 class="bbm-name" lang="en">Digital Clue<small>ATHAR CLUE ENGINE</small></h3>
-          <p class="bbm-desc">تجربة تفاعلية تُبنى حول ملاحظة محددة في البزنس، وتحول فرصة رقمية واحدة إلى فكرة ملموسة يمكن استكشافها.</p>
+          <h3 class="bbm-name">محكي<small lang="en" dir="ltr">MAHKI</small></h3>
+          <p class="bbm-headline">من كلام العميل <b>إلى طلب منظّم.</b></p>
+          <p class="bbm-desc">تطبيق مدفوع لأصحاب المحلات لتنظيم الطلبات ومراجعة تعديلاتها وتصديرها إلى Excel.</p>
+          <p class="mk-soon">قريبًا على آيفون وأندرويد.</p>
+          <a class="bbm-link" href="#contact">سجّل اهتمامك بتجربة محكي ↗</a>
+          <p class="mk-micro">طلب دعوة للتجربة المحدودة</p>
         </div>
-        <div class="bbm-stage" data-bbm="dc">
-          <div class="bbm-step">
-            <div class="bbm-cap"><b>01</b>مخفي · على الصفحة</div>
-            <div class="bbm-dev bbm-cover" data-el="cover"><div class="bbm-scr"><div class="bbm-art">
-              <img src="images/built/m/dc-cover.webp" width="760" height="835" loading="lazy" decoding="async" alt="Digital Clue — الغلاف: سطرين من موقع أثر نفسه">
-              <i class="bbm-anchor" data-el="a0" style="left:83.4%; top:42.6%"></i>
-            </div></div></div>
+        <div class="bbm-stage" data-bbm="mk">
+          <div class="mk-m-home">
+            <div class="bbm-dev"><div class="bbm-scr"><img src="images/built/mk/mk-01-home-v1.webp" width="720" height="1553" loading="lazy" decoding="async" alt="الشاشة الرئيسية لمحكي: شعار محكي و«من كلام العميل إلى طلب منظّم»"></div></div>
+            <div class="bbm-cap brand" data-el="homecap"><b>محكي</b>· الرئيسية</div>
           </div>
-          <div class="bbm-step">
-            <div class="bbm-cap" data-el="cap1"><b>02</b>ملاحظة · شو عم نستكشف</div>
-            <div class="bbm-dev bbm-obs"><div class="bbm-scr"><div class="bbm-art">
-              <img src="images/built/m/dc-observation.webp" width="930" height="1695" loading="lazy" decoding="async" alt="Digital Clue — الخطوة 01 على الموبايل مع لوحة «شو عم نستكشف»">
-              <div class="bbm-spot"><i></i><i></i><i></i><i></i></div>
-              <i class="bbm-anchor" data-el="a1" style="left:8.97%; top:83.97%"></i>
-            </div></div></div>
+          <div class="mk-m-herohead" data-el="herohead">
+            <div class="bbm-cap"><b>02</b>مراجعة المسودة</div>
+            <div class="mk-sub">راجع الأصناف والكميات قبل الحفظ.</div>
           </div>
-          <div class="bbm-step">
-            <div class="bbm-cap on"><b>03</b>الخلاصة</div>
-            <div class="bbm-dev bbm-rev"><div class="bbm-scr"><div class="bbm-art">
-              <img src="images/built/m/dc-reveal.webp" width="990" height="1155" loading="lazy" decoding="async" alt="Digital Clue — الخلاصة على الموبايل">
-              <i class="bbm-anchor" data-el="a2" style="left:8.72%; top:63.3%"></i>
-            </div></div></div>
+          <div class="bbm-dev mk-m-hero"><div class="bbm-scr"><img src="images/built/mk/mk-02-draft-review-v1.webp" width="860" height="1855" loading="lazy" decoding="async" alt="مراجعة المسودة في محكي: رسالة العميل والأصناف والكميات المستخرجة منها"></div></div>
+          <div class="mk-m-row" data-el="row">
+            <div class="mk-m-item">
+              <div class="bbm-dev"><div class="bbm-scr"><img src="images/built/mk/mk-03-voice-photo-v1.webp" width="480" height="1036" loading="lazy" decoding="async" alt="محكي: طلب من رسالة صوتية أو ملف صوتي أو صورة ورقة الطلب"></div></div>
+              <div class="bbm-cap"><b>01</b>مصادر الطلب</div>
+            </div>
+            <div class="mk-m-item">
+              <div class="bbm-dev"><div class="bbm-scr"><img src="images/built/mk/mk-04-approve-changes-v1.webp" width="480" height="1036" loading="lazy" decoding="async" alt="اعتماد التغييرات في محكي: كل تعديل قبل وبعد، مع قبول أو رفض"></div></div>
+              <div class="bbm-cap"><b>03</b>اعتماد التغييرات</div>
+            </div>
+            <div class="mk-m-item">
+              <div class="bbm-dev"><div class="bbm-scr"><img src="images/built/mk/mk-05-saved-orders-PLACEHOLDER.webp" width="480" height="1036" loading="lazy" decoding="async" alt="الطلبات المحفوظة في محكي: بحث وفلاتر وتصدير النتائج إلى Excel"></div></div>
+              <div class="bbm-cap"><b>04</b>إدارة وتصدير الطلبات</div>
+            </div>
           </div>
           <svg class="bbm-conn" aria-hidden="true"></svg>
         </div>
@@ -2898,6 +3028,30 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
       dEl.style.top = (y - 8) + 'px';
       place(q(st, '[data-cap="q"]'), m.l, m.b + 16);
     },
+    mk: function(st){
+      // MAHKI: one quiet thread in MAHKI's own blue (#4370FF, sampled from its screens), in the negative space under
+      // the cluster only: a short drop from Home, the hero and the front proof, joined by one baseline just below
+      // them. It never crosses a screen; the captions hang under it. Arabic runs right → left.
+      var R = measurer(st), svg = q(st, '.bb-conn'), BLUE = '#4370FF'; svg.textContent = '';
+      var devs = [].slice.call(st.querySelectorAll('.bb-dev')).map(R);
+      var base = Math.max.apply(null, devs.map(function(d){ return d.b; })) + 22, capY = base + 12;
+      var h = R(q(st, '[data-el="home"]')), m = R(q(st, '[data-el="hero"]')), s = R(q(st, '.mk-s3'));
+      var xh = h.cx, xm = m.cx, xs = rtl ? s.r - 34 : s.l + 34;
+      var gid = cfg[0] + '-mk-thr', defs = el('defs', {}), g = el('linearGradient', { id:gid, gradientUnits:'userSpaceOnUse', x1:xh, y1:base, x2:xs, y2:base });
+      g.appendChild(el('stop', { offset:'0', 'stop-color':BLUE, 'stop-opacity':'0.38' })); g.appendChild(el('stop', { offset:'1', 'stop-color':BLUE, 'stop-opacity':'0.78' }));
+      defs.appendChild(g); svg.appendChild(defs);
+      var att = { stroke:'url(#' + gid + ')', 'stroke-width':'1.25', 'stroke-linejoin':'round' };
+      line(svg, 'M' + xh + ' ' + (h.b + 12) + ' L ' + xh + ' ' + base + ' L ' + xs + ' ' + base + ' L ' + xs + ' ' + (s.b + 12), att, '', 0);
+      line(svg, 'M' + xm + ' ' + (m.b + 10) + ' L ' + xm + ' ' + base, att, '', 0.5);
+      [[xh, 0.3, 0.5], [xm, 0.75, 0.65], [xs, 1.2, 0.85]].forEach(function(p){
+        mark(svg, 'rect', { x:p[0] - 2.5, y:base - 2.5, width:5, height:5, fill:BLUE, 'fill-opacity':String(p[2]) }, '', p[1]); });
+      var cap = function(sel, x, y){ var c = q(st, sel); place(c, x, y); c.style.transform = rtl ? 'translateX(-100%)' : ''; };
+      var off = rtl ? 3 : -3;
+      cap('[data-cap="home"]', xh + off, capY);
+      cap('[data-cap="draft"]', xm + off, capY);
+      var c0 = R(q(st, '[data-cap="src"]')), lh = Math.max(18, c0.b - c0.t + 3);   // stacked lines follow the caption's real height
+      ['src', 'chg', 'mng'].forEach(function(k, i){ cap('[data-cap="' + k + '"]', xs + off, capY + i * lh); });   // back → front
+    },
     dc: function(st){
       var R = measurer(st), svg = q(st, '.bb-conn'); svg.textContent = '';
       var p0 = R(q(st, '[data-el="a0"]')), p1 = R(q(st, '[data-el="a1"]')), p2 = R(q(st, '[data-el="a2"]'));
@@ -2929,6 +3083,21 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
   function layout(st){
     var w = st.clientWidth; if (!w) return false;
     var key = st.getAttribute('data-stage');
+    if (key === 'mk') {
+      // MAHKI, sized like KHZNTI: the cluster's own box (screens + thread + captions, measured in local units after a
+      // first draw) is scaled to fill the screen height under the nav (MK_CLEAR above and below) or the column width,
+      // whichever is smaller, and centred in the column. The stage height follows the box (whole pixels).
+      st.style.setProperty('--k', (w / W).toFixed(5)); st.style.setProperty('--x', '0'); draw.mk(st);
+      var Rm = measurer(st), bx = { l:Infinity, r:-Infinity, t:Infinity, b:-Infinity };
+      [].forEach.call(st.querySelectorAll('.bb-dev, .bb-cap'), function(e){ var r = Rm(e); if (r.r <= r.l) return;
+        bx.l = Math.min(bx.l, r.l); bx.r = Math.max(bx.r, r.r); bx.t = Math.min(bx.t, r.t); bx.b = Math.max(bx.b, r.b); });
+      var MK_CLEAR = 44, nv = document.querySelector('nav'), navH = nv ? nv.offsetHeight : 76, Hm = Math.ceil(bx.b + 6);
+      var km = Math.max(KMIN, Math.min(0.96 * w / (bx.r - bx.l), (innerHeight - navH - 2 * MK_CLEAR) / (bx.b - Math.min(0, bx.t))));
+      km = Math.floor(Hm * km) / Hm;
+      var xm = (w - (bx.r - bx.l) * km) / 2 - bx.l * km;
+      st.style.setProperty('--h', Hm); st.style.setProperty('--k', km.toFixed(6)); st.style.setProperty('--x', xm.toFixed(1));
+      draw.mk(st); return true;
+    }
     if (key !== 'kh') { st.style.setProperty('--k', (w / W).toFixed(5)); st.style.removeProperty('--x'); draw[key](st); if (rtl) rtlClear(st, w, w / W, 0); return true; }
     var L = KH_BOX.l, Rt = KH_BOX.r, T = KH_BOX.t, B = KH_BOX.b;
     var nav = document.querySelector('nav'), navH = nav ? nav.offsetHeight : 76;
@@ -3073,6 +3242,23 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
       var so = R(q(ph, '[data-el="selOut"]')), dr = R(q(st, '[data-el="dir"]')), kk = R(q(st, '[data-el="dir"] .k')), x = st.clientWidth + 8;
       line(svg, ortho([[so.l, so.cy], [x, so.cy], [x, kk.cy], [dr.r - 30, kk.cy]], 8), { stroke:'#FF5A36', 'stroke-width':'1.6' }, 1.1);
       mark(svg, 'rect', { x:dr.r - 36, y:kk.cy - 3, width:6, height:6, fill:'#FF5A36' }, 1.9);
+    },
+    mk: function(st){
+      // MAHKI on mobile: one quiet thread in MAHKI's own blue (#4370FF) in the free lane beside the hero (left in
+      // English, right in Arabic), from the identity caption → the Draft Review caption → the row of proofs.
+      // It never crosses a screen.
+      var R = rel(st), svg = q(st, '.bbm-conn'), W = st.clientWidth, rtl = id === 'bbm-ar', BLUE = '#4370FF'; svg.textContent = '';
+      var hc = R(q(st, '[data-el="homecap"]')), dk = R(q(st, '[data-el="herohead"] .bbm-cap')), row = R(q(st, '[data-el="row"]'));
+      var lane = rtl ? W - 6 : 6, y0 = hc.b + 14, yEnd = row.t - 22, gid = id + '-mk-thr';
+      var defs = el('defs', {}), g = el('linearGradient', { id:gid, gradientUnits:'userSpaceOnUse', x1:0, y1:y0, x2:0, y2:yEnd });
+      g.appendChild(el('stop', { offset:'0', 'stop-color':BLUE, 'stop-opacity':'0.38' })); g.appendChild(el('stop', { offset:'1', 'stop-color':BLUE, 'stop-opacity':'0.8' }));
+      defs.appendChild(g); svg.appendChild(defs);
+      var xk = rtl ? dk.r + 10 : dk.l - 10, att = { stroke:'url(#' + gid + ')', 'stroke-width':'1.3' };
+      line(svg, ortho([[lane, y0], [lane, dk.cy], [xk, dk.cy]], 8), att, 0);
+      line(svg, ortho([[lane, dk.cy], [lane, yEnd]], 8), att, 0.8);
+      mark(svg, 'rect', { x:lane - 2.5, y:y0 - 2.5, width:5, height:5, fill:BLUE, 'fill-opacity':'0.5' }, 0);
+      mark(svg, 'rect', { x:xk - (rtl ? -1 : 5), y:dk.cy - 2.5, width:5, height:5, fill:BLUE, 'fill-opacity':'0.75' }, 0.7);
+      mark(svg, 'rect', { x:lane - 2.5, y:yEnd - 2.5, width:5, height:5, fill:BLUE, 'fill-opacity':'0.85' }, 1.6);
     },
     dc: function(st){
       var R = rel(st), svg = q(st, '.bbm-conn'), W = st.clientWidth; svg.textContent = '';
