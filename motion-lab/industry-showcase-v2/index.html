@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ATHAR Industry Showcase — v2 · Four Chapters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Instrument+Serif:ital@0;1&family=Archivo+Black&family=Fraunces:ital@0;1&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Space+Mono&display=swap">
+<style>
+:root{
+  --void:#050505; --char:#0b0b0c; --graphite:#111113;
+  --paper:#F5F3ED; --bone:#E9E6DD; --ink:#141210;
+  --paper-dim:#9a9995; --paper-mute:#7d7c78;
+  --ember:#FF5A36; --ember-hot:#FFB199;
+  --line:rgba(245,243,237,.1); --line-strong:rgba(245,243,237,.18);
+  --gutter:clamp(20px,4.5vw,64px);
+  --display:'Almarai','Almarai Fallback',sans-serif;
+  --editorial:'Instrument Serif','Times New Roman',serif;
+  --ascend-display:'Archivo Black','Arial Black',sans-serif;
+  --meridian-display:'Fraunces',Georgia,serif;
+  --body:'IBM Plex Sans Arabic','Plex Fallback',sans-serif;
+  --mono:'Space Mono','Mono Fallback',ui-monospace,monospace;
+
+  --lime:#D6FF3F;
+  --bronze:#b08968; --bronze-hot:#d4a876; --bronze-deep:#4a2f1c;
+
+  --c-accent: var(--ember);
+  --c-text: var(--paper);
+  --c-text-dim: var(--paper-dim);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--void);height:100%}
+body{color:var(--c-text);font-family:var(--body);-webkit-font-smoothing:antialiased;overflow:hidden}
+img{display:block}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+a{color:inherit;text-decoration:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+
+.stage{position:relative;width:100vw;height:100svh;overflow:hidden;isolation:isolate}
+
+/* ---------- persistent ATHAR identity ---------- */
+.athar-nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+  padding:22px var(--gutter);pointer-events:none}
+.athar-nav *{pointer-events:auto}
+.athar-id{display:flex;align-items:center;gap:12px;color:var(--paper);padding:9px 14px 9px 10px;border-radius:999px;
+  background:rgba(10,8,6,.34);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.athar-id .mark{width:28px;height:28px;border:1px solid currentColor;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:800;font-size:12px;color:var(--ember);border-color:var(--ember)}
+.athar-id .word{font-family:var(--mono);font-size:10.5px;letter-spacing:3px;text-transform:uppercase;opacity:.9}
+.proto-tag{font-family:var(--mono);font-size:10px;letter-spacing:2.2px;text-transform:uppercase;color:var(--paper);
+  border:1px solid rgba(245,243,237,.3);border-radius:999px;padding:7px 13px;opacity:.9;background:rgba(10,8,6,.34);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.proto-tag .concept{opacity:.62}
+
+/* Shared "breath" scrim — a brief, shared dip in exposure right at the
+   wipe crossing, so the hard cut between FORMA's dark interior and
+   VERA's bright reception reads as a considered exposure change between
+   two worlds rather than an abrupt flash. Sits above both chapter
+   layers, below the nav. */
+#transitionScrim{position:fixed;inset:0;z-index:40;background:var(--void);opacity:0;pointer-events:none}
+
+/* ---------- chapter layers ----------
+   z-index is managed dynamically in JS (see goTo()), not hardcoded per
+   chapter: the layer being transitioned IN is always elevated above
+   whichever one is currently showing, right before its clip-path grows
+   from a hidden sliver to full. This is what makes the wipe work
+   correctly in both directions, and for a jump between any two chapters
+   (not just adjacent ones) — a fixed z-index-by-sequence-position (as
+   Prototype 02 used) only wipes correctly going forward; reversing
+   relies on the outgoing layer's clip-path shrinking back down, which
+   never happened, so the chapter underneath never actually appeared (a
+   bug confirmed here via diagnostic: body.dataset.chapter flipped
+   correctly, but the photo stayed on the outgoing chapter). */
+.chapter-layer{position:absolute;inset:0;z-index:1}
+#formaLayer{z-index:2}
+.chapter-bg{position:absolute;inset:0;overflow:hidden}
+.chapter-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06)}
+.chapter-wash{position:absolute;inset:0}
+
+#veraLayer .chapter-bg img,#ascendLayer .chapter-bg img,#meridianLayer .chapter-bg img{transform:scale(1.12)}
+
+/* FORMA atmosphere */
+#formaLayer .chapter-wash{background:linear-gradient(100deg,rgba(10,7,4,.78) 0%,rgba(10,7,4,.5) 32%,rgba(10,7,4,.12) 58%,rgba(10,7,4,0) 78%)}
+
+/* VERA atmosphere — the photo stays dominant; only a faint bottom-edge
+   vignette (insurance alongside the text-shadow below), never a panel. */
+#veraLayer .chapter-wash{background:linear-gradient(0deg,rgba(20,18,16,.16) 0%,rgba(20,18,16,0) 30%)}
+
+/* ASCEND atmosphere — art-direction pass: measured the actual photo
+   (ImageMagick texture/luminance sampling) rather than guessing. Every
+   candidate zone near the old bottom-left position sat in a 125-166
+   luminance band with high local texture (std 26-67) — a genuine
+   contrast dead zone, which is why no amount of font-weight or shadow
+   tuning ever fully fixed it. The one standout: the far bottom-right
+   floor corner near the lime ottomans, std≈14.7 vs 26-32 everywhere
+   else nearby — the single genuinely calm patch in the frame. Dark ink
+   reads crisply there with zero added wash, so the gradient this
+   chapter used to need is gone; legibility now comes from position and
+   color choice alone, not an effect laid over the photo. */
+#ascendLayer .chapter-wash{background:none}
+
+/* MERIDIAN atmosphere — positioning and dark ink alone weren't quite
+   enough once shifted fully clear of the tree (the sky/window boundary
+   here still varies more than ASCEND's floor corner did), so this is the
+   one spot in the Showcase keeping a gradient — a small, local, light-
+   toned wash anchored right where the text sits, not a full-frame
+   darkening effect. Tried positioning-and-cropping alone first per the
+   brief; this is the minimum needed on top of that, not a replacement
+   for it. */
+#meridianLayer .chapter-wash{background:radial-gradient(ellipse 560px 460px at 100% 20%, rgba(245,243,237,.3) 0%, rgba(245,243,237,0) 68%)}
+
+/* ---------- chapter content ---------- */
+.chapter-content{position:relative;z-index:2;height:100%;display:flex;align-items:center;padding:0 var(--gutter)}
+/* VERA: no panel — the full-bleed reception photo stays dominant. Text
+   sits bottom-right, directly on the photo's own calm counter/floor area,
+   dark-on-light like VERA's own approved Hero, with a soft light text-shadow
+   instead of any background fill. Shifted further right than the shared
+   default (40px gutter pad instead of 120px) because the index/category
+   lines land in the flower vase at this chapter's own framing; measured
+   clear of the vase (x 947-1003) and the old chapter rail position. The
+   editorial type scale below is deliberately compact, so the whole block
+   (bottom-anchored) now sits lower and smaller than Prototype 02 — more
+   room between it and the vase/signage above, less duplication of the
+   clinic's own sign with a second large wordmark. */
+#veraLayer .chapter-content{justify-content:flex-end;align-items:flex-end;padding-right:calc(var(--gutter) + 40px);padding-bottom:132px}
+
+/* ASCEND: bottom-RIGHT now (moved from bottom-left) — the measured
+   calm floor corner (see chapter-wash comment above) sits at the far
+   right of this photo, not the left, so the text block follows the
+   actual negative space rather than a fixed per-chapter slot. */
+#ascendLayer .chapter-content{justify-content:flex-end;align-items:flex-end;padding-bottom:110px}
+
+/* MERIDIAN: top-right, shifted further into the open sky past the olive
+   tree and window mullions — every sampled point in this photo's window
+   band came back busy (std 52-64, recurring mullions + tree + skyline);
+   the clearest available patch is the open sky once shifted clear of the
+   tree, which is why the crop now differs between desktop and mobile
+   (see object-position overrides below) rather than relying on one fixed
+   crop to keep working at every width. */
+#meridianLayer .chapter-content{justify-content:flex-end;align-items:flex-start;padding-top:115px}
+
+.ch-panel{max-width:560px}
+#meridianLayer .ch-panel{max-width:400px}
+
+.ch-index{display:block;font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--c-accent);margin-bottom:16px}
+.mask{display:block;overflow:hidden}
+.mask-in{display:block;will-change:transform}
+.ch-cat .mask-in{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--c-text-dim)}
+.ch-cat{margin-bottom:14px}
+.ch-title{font-family:var(--display);font-weight:800;font-size:clamp(38px,5vw,74px);line-height:.98;letter-spacing:-.01em;margin:0 0 22px;color:var(--c-text)}
+.ch-value{font-size:clamp(14.5px,1.1vw,17px);line-height:1.75;color:var(--c-text-dim);max-width:46ch;margin:0 0 30px;
+  opacity:0;transform:translateY(16px)}
+.ch-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px;opacity:0;transform:translateY(16px)}
+.btn-demo{display:inline-flex;align-items:center;gap:10px;padding:15px 24px;background:var(--c-text);color:var(--void);
+  font-family:var(--mono);font-size:11px;letter-spacing:1.6px;text-transform:uppercase;border-radius:2px;transition:background .25s,color .25s,transform .25s}
+.btn-demo:hover{background:var(--c-accent);color:var(--void);transform:translateY(-1px)}
+#veraLayer .btn-demo{background:var(--ink);color:var(--paper)}
+#veraLayer .btn-demo:hover{background:var(--c-accent);color:var(--ink)}
+
+/* VERA dark-on-light overrides — same principle proven on VERA's own
+   approved Hero: no panel, just dark/coral text directly on the photo
+   with a soft light shadow for insurance, never a background fill. */
+#veraLayer .ch-index{color:#C96A4E;text-shadow:0 1px 14px rgba(245,243,237,.65)}
+#veraLayer .ch-cat .mask-in{color:rgba(20,18,16,.62);text-shadow:0 1px 14px rgba(245,243,237,.6)}
+
+/* Editorial type treatment — deliberately smaller and quieter than FORMA's
+   bold hero headline. The real VERA Clinic signage is already the
+   wordmark in frame; a second shouting duplicate of "VERA" competed with
+   it. A compact serif caption (same Instrument Serif family used on
+   VERA's own approved site) reads as an art-directed case-study label
+   instead of a second logo. */
+#veraLayer .ch-title{font-family:var(--editorial);font-weight:400;font-size:clamp(28px,3vw,44px);line-height:1.04;
+  letter-spacing:0;margin:0 0 14px;color:var(--ink);text-shadow:0 2px 20px rgba(245,243,237,.55)}
+#veraLayer .ch-value{font-size:12.5px;line-height:1.7;max-width:32ch;margin:0 0 16px;color:rgba(20,18,16,.68);
+  text-shadow:0 1px 14px rgba(245,243,237,.6)}
+
+/* Secondary note — a concise, visibly secondary line naming the actual
+   digital experience, distinct from the atmospheric copy above. */
+#veraLayer .ch-note{font-family:var(--mono);font-size:10.5px;letter-spacing:.2px;line-height:1.6;max-width:44ch;
+  margin:0 0 16px;color:rgba(20,18,16,.52);text-shadow:0 1px 12px rgba(245,243,237,.55);opacity:0;transform:translateY(16px)}
+
+/* ASCEND — Archivo Black (the real standalone demo's own display font),
+   loud and heavy, the opposite move from VERA's "quieten it down"
+   treatment: ASCEND's own brand voice already is loud and systemized, so
+   underplaying it here would be the same mismatch VERA had in reverse.
+   One-Chapter-One-Message pass: index/kicker are deliberately quiet —
+   wayfinding, not content — so the headline, one value sentence and the
+   CTA are the only things competing for attention. The 4-track list and
+   the per-chapter concept-work note are gone; that detail belongs in the
+   real program explorer, and the disclosure now lives once, globally, in
+   the persistent top tag. */
+/* Title stays light (paper/lime) — it sits over the darker curved wall
+   and shelving above the floor corner, where light text already reads
+   cleanly. Supporting copy below it (category, value, CTA) now sits
+   directly on the calm floor patch itself, which is light and even, so
+   those three switch to dark ink — chosen from the actual local
+   background tone, not carried over from elsewhere in the Showcase. */
+#ascendLayer .ch-index{margin-bottom:10px;color:var(--lime);opacity:.85;text-shadow:0 1px 10px rgba(5,8,4,.5)}
+#ascendLayer .ch-cat{margin-bottom:10px}
+#ascendLayer .ch-cat .mask-in{font-weight:400;color:rgba(20,18,16,.55);text-shadow:0 1px 10px rgba(245,243,237,.5)}
+#ascendLayer .ch-title{font-family:var(--ascend-display);font-weight:400;text-transform:uppercase;
+  font-size:clamp(32px,4vw,58px);line-height:.96;letter-spacing:-.01em;margin:0 0 16px;color:var(--paper);
+  text-shadow:0 2px 16px rgba(5,8,4,.5)}
+#ascendLayer .ch-value{font-weight:500;font-size:15px;line-height:1.5;max-width:30ch;margin:0 0 20px;
+  color:rgba(20,18,16,.82);text-shadow:0 1px 3px rgba(245,243,237,.85),0 2px 14px rgba(245,243,237,.55)}
+
+#ascendLayer .btn-demo.is-outline .btn-demo-text{font-size:12px}
+#ascendLayer .btn-demo.is-outline .btn-demo-icon{width:34px;height:34px}
+
+/* MERIDIAN — Fraunces (the real standalone demo's own serif), warmer and
+   more decorative than VERA's Instrument Serif, so the showcase's two
+   "quiet serif" chapters still read as different voices. Dark ink + a
+   light halo (same pattern as VERA), now shifted further right into the
+   open sky past the olive tree and window mullions (see chapter-content
+   and chapter-wash above) rather than the original top-right crop, which
+   measured busy (std 52-64) at every sampled point. */
+#meridianLayer .ch-cat .mask-in{font-weight:400;color:rgba(20,18,16,.6);text-shadow:0 1px 14px rgba(245,243,237,.68)}
+#meridianLayer .ch-title{font-family:var(--meridian-display);font-weight:400;font-size:clamp(30px,3.2vw,48px);
+  line-height:1.06;letter-spacing:0;margin:0 0 16px;color:var(--ink);text-shadow:0 2px 20px rgba(245,243,237,.65)}
+#meridianLayer .ch-value{font-weight:500;font-size:15px;line-height:1.5;max-width:28ch;margin:0 0 20px;
+  color:rgba(20,18,16,.8);text-shadow:0 1px 14px rgba(245,243,237,.65)}
+
+/* MERIDIAN's index — a subtle nod to the real demo's own numbered
+   narrative device (01/08 + progress bar), without literally showing
+   "01/08" here, which would wrongly imply the Showcase itself has eight
+   navigable stages. The number stays truthful ("04 / 04", this Showcase's
+   real chapter count); only the thin progress underline is borrowed, and
+   it reuses the same visual device already built for the chapter-nav
+   ticks below rather than inventing a new one. */
+#meridianLayer .ch-index{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;color:var(--bronze-deep);
+  opacity:.85;text-shadow:0 1px 12px rgba(245,243,237,.65)}
+#meridianLayer .ch-index .idx-bar{width:46px;height:1px;background:var(--bronze-deep);opacity:.65}
+
+#meridianLayer .btn-demo.is-outline .btn-demo-text{font-size:12px}
+#meridianLayer .btn-demo.is-outline .btn-demo-icon{width:34px;height:34px}
+
+/* Elegant CTA — reads as an intentional button (a bordered icon circle,
+   same visual language as the chapter-nav arrows below) paired with an
+   underlined label, rather than a plain text link or a solid block that
+   would compete with the photo. Shared by every chapter except FORMA
+   (which keeps its own original solid-block button) — each chapter just
+   supplies its own ink/border/accent via CSS custom properties, so the
+   structure, spacing and hover motion stay identical everywhere. */
+.btn-demo.is-outline{display:inline-flex;align-items:center;gap:13px;background:none;color:var(--cta-ink);padding:0;border-radius:0}
+.btn-demo.is-outline .btn-demo-text{font-size:11px;letter-spacing:1.8px;border-bottom:1px solid var(--cta-border);
+  padding-bottom:5px;text-shadow:var(--cta-shadow);transition:color .25s ease,border-color .25s ease}
+.btn-demo.is-outline .btn-demo-icon{width:32px;height:32px;border-radius:50%;border:1px solid var(--cta-border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:border-color .25s ease,background .25s ease,transform .25s ease}
+.btn-demo.is-outline .btn-demo-icon svg{width:14px;height:14px;filter:drop-shadow(var(--cta-icon-shadow))}
+.btn-demo.is-outline:hover .btn-demo-text{color:var(--cta-accent);border-color:var(--cta-accent)}
+.btn-demo.is-outline:hover .btn-demo-icon{border-color:var(--cta-accent);background:var(--cta-accent-wash);transform:translateX(3px)}
+
+#veraLayer{--cta-ink:var(--ink);--cta-border:rgba(20,18,16,.38);--cta-shadow:0 1px 12px rgba(245,243,237,.6);
+  --cta-icon-shadow:0 1px 12px rgba(245,243,237,.6);--cta-accent:#C96A4E;--cta-accent-wash:rgba(201,106,78,.14)}
+#ascendLayer{--cta-ink:var(--ink);--cta-border:rgba(20,18,16,.4);--cta-shadow:0 1px 10px rgba(245,243,237,.6);
+  --cta-icon-shadow:0 1px 10px rgba(245,243,237,.6);--cta-accent:var(--lime);--cta-accent-wash:rgba(214,255,63,.16)}
+#meridianLayer{--cta-ink:var(--ink);--cta-border:rgba(20,18,16,.45);
+  --cta-shadow:0 1px 3px rgba(245,243,237,.9),0 2px 16px rgba(245,243,237,.65);
+  --cta-icon-shadow:0 1px 10px rgba(245,243,237,.75);
+  --cta-accent:var(--bronze-deep);--cta-accent-wash:rgba(122,86,54,.16)}
+
+/* ---------- chapter navigation — lighter, premium ----------
+   A single consolidated bottom bar instead of the old discrete dark
+   pill blobs: prev arrow / chapter index / next arrow, no background
+   chips. Icons and ticks sit directly on the photo (text-shadow for
+   insurance) over a single faint shared scrim at the very bottom edge,
+   so the controls read as a quiet, consistent strip rather than
+   competing UI elements. Always light (paper) — the shared scrim keeps
+   contrast safe on both FORMA's dark interior and VERA's bright
+   reception without needing per-chapter color flips. */
+.ch-nav{position:fixed;left:0;right:0;bottom:0;z-index:55;display:flex;align-items:center;justify-content:center;
+  gap:26px;padding:20px var(--gutter) 26px;pointer-events:none}
+.ch-nav::before{content:'';position:absolute;left:0;right:0;bottom:0;height:140px;z-index:-1;
+  background:linear-gradient(0deg,rgba(5,5,5,.42) 0%,rgba(5,5,5,0) 100%)}
+.ch-nav *{pointer-events:auto}
+
+.ch-nav-arrow{width:38px;height:38px;border-radius:50%;border:1px solid rgba(245,243,237,.4);display:flex;
+  align-items:center;justify-content:center;color:var(--paper);flex-shrink:0;
+  transition:border-color .25s ease,transform .25s ease,opacity .25s ease}
+.ch-nav-arrow svg{width:16px;height:16px;filter:drop-shadow(0 1px 6px rgba(0,0,0,.35))}
+.ch-nav-arrow:hover{border-color:var(--c-accent);transform:scale(1.08)}
+.ch-nav-arrow:disabled{opacity:.25;pointer-events:none}
+
+.ch-nav-index{display:flex;align-items:center;gap:15px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--paper)}
+.ch-nav-tick{position:relative;padding:10px 1px 12px;color:rgba(245,243,237,.5);text-shadow:0 1px 6px rgba(0,0,0,.4);
+  transition:color .3s ease}
+.ch-nav-tick::after{content:'';position:absolute;left:0;right:0;bottom:3px;height:1px;background:currentColor;
+  opacity:.3;transform:scaleX(.45);transform-origin:center;transition:transform .3s ease,opacity .3s ease,background .3s ease}
+.ch-nav-tick.is-current{color:var(--paper)}
+.ch-nav-tick.is-current::after{opacity:1;transform:scaleX(1);background:var(--c-accent)}
+
+@media (prefers-reduced-motion: reduce){
+  .ch-nav-arrow,.ch-nav-tick,.ch-nav-tick::after{transition:none!important}
+}
+
+/* ============================================================
+   mobile — intentional full-screen chapter experience
+   ============================================================ */
+@media (max-width:860px){
+  .athar-nav{padding:16px 18px}
+  .chapter-content{align-items:flex-end;padding:0 18px 156px}
+  #veraLayer .chapter-content{justify-content:flex-start;padding-right:18px;padding-bottom:156px}
+  .ch-panel{max-width:none;width:100%}
+  .ch-title{font-size:clamp(32px,10vw,44px)}
+  #formaLayer .chapter-wash{background:linear-gradient(0deg,rgba(10,7,4,.85) 0%,rgba(10,7,4,.55) 35%,rgba(10,7,4,.1) 65%,rgba(10,7,4,0) 85%)}
+
+  /* ASCEND's calm floor-corner crop (desktop) is far to the right of the
+     photo; object-fit:cover on a narrow portrait viewport shows only a
+     ~26% vertical slice of the image, centered by default — which cuts
+     the calm corner out of frame entirely and puts the text back over
+     the busier wall-display/staircase area. Shifting object-position
+     toward the right edge keeps the same calm corner in view. */
+  #ascendLayer .chapter-bg img{object-position:96% center}
+
+  /* MERIDIAN: same issue, opposite fix — shift toward the olive tree's
+     side of the window just enough to keep it fully out of the narrow
+     portrait crop, confirmed by rendering (not assumed from desktop
+     geometry: the mobile aspect crops a materially different slice). */
+  #meridianLayer .chapter-bg img{object-position:78% 25%}
+  #meridianLayer .chapter-content{padding-top:72px}
+  #meridianLayer .ch-panel{max-width:260px}
+  #meridianLayer .ch-index{margin-bottom:6px}
+  #meridianLayer .ch-cat{margin-bottom:6px}
+  #meridianLayer .ch-title{margin-bottom:10px;line-height:1.0}
+  #meridianLayer .ch-value{margin-bottom:14px;font-size:13px;line-height:1.36}
+
+  /* VERA's mobile crop (vera-reception-mobile.jpg) is a different, taller
+     source frame than desktop's; centered object-fit:cover crops the
+     "VERA Clinic" wall sign right at its edge on common phone widths
+     (measured: ~390px wide crops to within 10px of the sign's right
+     edge). Re-centering the crop on the sign itself, rather than the
+     image's own geometric center, keeps the full sign in frame without
+     touching the approved source image. */
+  #veraLayer .chapter-bg img{object-position:58% 46%}
+
+  /* Mobile type hierarchy — a clearly dominant title against smaller,
+     more clearly secondary supporting copy (vs. Prototype 02's flatter
+     scale, where title/value/note sat closer together in size). */
+  #veraLayer .ch-title{font-size:clamp(30px,9.5vw,40px);margin-bottom:12px}
+  #veraLayer .ch-value{font-size:13.5px;line-height:1.65;max-width:34ch}
+
+  .ch-nav{gap:14px;padding:16px 14px 20px}
+  .ch-nav::before{height:120px}
+  .ch-nav-arrow{width:40px;height:40px}
+  .ch-nav-index{gap:9px;font-size:10px}
+  .ch-nav-tick{padding:10px 0 12px}
+}
+
+@media (max-width:340px){
+  .ch-nav{gap:10px;padding:14px 10px 18px}
+  .ch-nav-arrow{width:36px;height:36px}
+  .ch-nav-index{gap:7px}
+}
+
+/* Short viewports (e.g. 320x568) — the mobile VERA crop puts the vase and
+   signage higher in frame relative to viewport height, so the same text
+   block that clears them at 390px+ tall screens starts climbing back into
+   the sign. Shrink and tighten it so it fits below, measured empirically
+   against the actual rendered crop rather than assumed. */
+@media (max-width:860px) and (max-height:650px){
+  #veraLayer .chapter-content{padding-bottom:84px}
+  #veraLayer .ch-index{margin-bottom:8px}
+  #veraLayer .ch-cat{margin-bottom:8px}
+  #veraLayer .ch-title{font-size:clamp(22px,8vw,30px);margin-bottom:8px}
+  #veraLayer .ch-value{font-size:11.5px;line-height:1.5;margin-bottom:8px;max-width:30ch}
+  #veraLayer .ch-note{display:none}
+
+  /* ASCEND's panel is much shorter now (index + kicker + title + one
+     value sentence + CTA, no track list or note) — this short-viewport
+     rule is kept as a defensive tightening pass rather than removed
+     outright, re-verified empirically at 320x568 after the content cut. */
+  #ascendLayer .chapter-content{padding-bottom:84px}
+  #ascendLayer .chapter-bg img{object-position:100% center}
+  #ascendLayer .ch-index{margin-bottom:8px}
+  #ascendLayer .ch-cat{margin-bottom:8px}
+  #ascendLayer .ch-title{font-size:clamp(24px,8vw,32px);margin-bottom:12px}
+  #ascendLayer .ch-value{font-size:13px;line-height:1.5;margin-bottom:14px;max-width:26ch}
+
+  /* MERIDIAN at the shortest tested viewport (320x568): the 390px crop's
+     object-position no longer clears the tree once the viewport's own
+     aspect ratio changes how much of the image width is visible — this
+     needed its own value, confirmed by rendering both widths side by
+     side rather than assuming one crop scales to the other. */
+  #meridianLayer .chapter-content{padding-top:50px}
+  #meridianLayer .chapter-bg img{object-position:100% 18%}
+  #meridianLayer .ch-panel{max-width:200px}
+  #meridianLayer .ch-title{font-size:clamp(22px,7vw,26px);margin-bottom:8px}
+  #meridianLayer .ch-value{font-size:11.5px;line-height:1.3;margin-bottom:10px}
+}
+</style>
+</head>
+<body data-chapter="forma">
+
+<nav class="athar-nav" aria-label="ATHAR">
+  <div class="athar-id">
+    <span class="mark" aria-hidden="true">A</span>
+    <span class="word">ATHAR LAB</span>
+  </div>
+  <span class="proto-tag" aria-label="ATHAR Industry Showcase, version 2. All four projects are ATHAR Lab self-initiated concept work, not commissioned client work.">Industry Showcase — v2 <span class="concept">· Concept Projects</span></span>
+</nav>
+
+<div aria-live="polite" class="sr-only" id="liveRegion"></div>
+
+<div id="transitionScrim" aria-hidden="true"></div>
+
+<main class="stage">
+
+  <section class="chapter-layer" id="formaLayer" data-chapter="forma" aria-label="FORMA Living chapter">
+    <div class="chapter-bg"><img src="assets/forma-interior.jpg" alt="" loading="eager"></div>
+    <div class="chapter-wash" aria-hidden="true"></div>
+    <div class="chapter-content">
+      <div class="ch-panel">
+        <span class="ch-index">01 / 04</span>
+        <div class="ch-cat mask"><span class="mask-in">Residential · Interior Architecture</span></div>
+        <h1 class="ch-title">
+          <span class="mask"><span class="mask-in">FORMA</span></span>
+          <span class="mask"><span class="mask-in" style="font-style:italic;font-weight:400;color:var(--ember-hot)">Living</span></span>
+        </h1>
+        <p class="ch-value">A considered digital presence for a luxury interiors studio — pacing, material and light treated with the same patience as the work itself.</p>
+        <div class="ch-actions">
+          <a class="btn-demo" href="../../showcase/demos/forma/index.html" target="_blank" rel="noopener">Explore Interactive Demo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter-layer" id="veraLayer" data-chapter="vera" aria-label="VERA Clinic chapter">
+    <div class="chapter-bg">
+      <picture>
+        <source media="(max-width: 860px)" srcset="assets/vera-reception-mobile.jpg">
+        <img src="assets/vera-reception-desktop.jpg" alt="" loading="eager">
+      </picture>
+    </div>
+    <div class="chapter-wash" aria-hidden="true"></div>
+    <div class="chapter-content">
+      <div class="ch-panel">
+        <span class="ch-index">02 / 04</span>
+        <div class="ch-cat mask"><span class="mask-in">Healthcare · Patient Experience</span></div>
+        <h1 class="ch-title">
+          <span class="mask"><span class="mask-in">VERA</span></span>
+          <span class="mask"><span class="mask-in" style="font-style:italic;font-weight:400;color:#C96A4E">Clinic</span></span>
+        </h1>
+        <p class="ch-value">Turning first-visit anxiety into informed calm — a clinical onboarding experience built around clarity, not paperwork.</p>
+        <p class="ch-note">ATHAR Lab concept work, self-directed — not commissioned by VERA Clinic.</p>
+        <div class="ch-actions">
+          <a class="btn-demo is-outline" href="../../showcase/demos/vera-clinic/vera-clinic-final.html" target="_blank" rel="noopener">
+            <span class="btn-demo-text">View the interactive prototype</span>
+            <span class="btn-demo-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter-layer" id="ascendLayer" data-chapter="ascend" aria-label="ASCEND Academy chapter">
+    <div class="chapter-bg"><img src="assets/ascend-hub.jpg" alt="" loading="lazy"></div>
+    <div class="chapter-wash" aria-hidden="true"></div>
+    <div class="chapter-content">
+      <div class="ch-panel">
+        <span class="ch-index">03 / 04</span>
+        <div class="ch-cat mask"><span class="mask-in">Education · Career Accelerator</span></div>
+        <h1 class="ch-title">
+          <span class="mask"><span class="mask-in">ASCEND</span></span>
+          <span class="mask"><span class="mask-in" style="font-style:italic;font-weight:400;color:var(--lime)">Academy</span></span>
+        </h1>
+        <p class="ch-value">Explore four learning tracks through an interactive curriculum experience.</p>
+        <div class="ch-actions">
+          <a class="btn-demo is-outline" href="../../showcase/demos/ascend-academy/index.html" target="_blank" rel="noopener">
+            <span class="btn-demo-text">Open the program explorer</span>
+            <span class="btn-demo-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter-layer" id="meridianLayer" data-chapter="meridian" aria-label="MERIDIAN Partners chapter">
+    <div class="chapter-bg"><img src="assets/meridian-boardroom.jpg" alt="" loading="lazy"></div>
+    <div class="chapter-wash" aria-hidden="true"></div>
+    <div class="chapter-content">
+      <div class="ch-panel">
+        <span class="ch-index"><span class="idx-num">04 / 04</span><span class="idx-bar" aria-hidden="true"></span></span>
+        <div class="ch-cat mask"><span class="mask-in">Strategy · Executive Advisory</span></div>
+        <h1 class="ch-title">
+          <span class="mask"><span class="mask-in">MERIDIAN</span></span>
+          <span class="mask"><span class="mask-in" style="font-style:italic;font-weight:400;color:var(--bronze-deep)">Partners</span></span>
+        </h1>
+        <p class="ch-value">Explore an eight-stage interactive journey from business diagnosis to strategic direction.</p>
+        <div class="ch-actions">
+          <a class="btn-demo is-outline" href="../../showcase/demos/meridian-partners/index.html" target="_blank" rel="noopener">
+            <span class="btn-demo-text">View the interactive demo</span>
+            <span class="btn-demo-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="ch-nav" aria-label="Chapters">
+  <button class="ch-nav-arrow ch-nav-prev" id="backBtn" type="button" aria-label="Previous chapter" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+  </button>
+  <div class="ch-nav-index">
+    <button class="ch-nav-tick is-current" data-chapter="forma" type="button" aria-label="Chapter 1, FORMA Living" aria-current="true">01</button>
+    <button class="ch-nav-tick" data-chapter="vera" type="button" aria-label="Chapter 2, VERA Clinic">02</button>
+    <button class="ch-nav-tick" data-chapter="ascend" type="button" aria-label="Chapter 3, ASCEND Academy">03</button>
+    <button class="ch-nav-tick" data-chapter="meridian" type="button" aria-label="Chapter 4, MERIDIAN Partners">04</button>
+  </div>
+  <button class="ch-nav-arrow ch-nav-next" id="nextBtn" type="button" aria-label="Next chapter">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </button>
+</nav>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/Flip.min.js"></script>
+<script>
+(function(){
+  gsap.registerPlugin(Flip);
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var D = function(v){ return reduced ? 0.001 : v; };
+
+  var body = document.body;
+  var layers = {
+    forma: document.getElementById('formaLayer'),
+    vera: document.getElementById('veraLayer'),
+    ascend: document.getElementById('ascendLayer'),
+    meridian: document.getElementById('meridianLayer')
+  };
+  var backBtn = document.getElementById('backBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var live = document.getElementById('liveRegion');
+  var scrim = document.getElementById('transitionScrim');
+  var ORDER = ['forma','vera','ascend','meridian'];
+  var current = 'forma';
+  var animating = false;
+
+  function announce(msg){ live.textContent = msg; }
+
+  function setNav(key){
+    document.querySelectorAll('.ch-nav-tick').forEach(function(b){
+      var isCurrent = b.dataset.chapter === key;
+      b.classList.toggle('is-current', isCurrent);
+      if (isCurrent) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+  }
+
+  function maskTimeline(layer, dir){
+    var tl = gsap.timeline();
+    var masks = layer.querySelectorAll('.mask-in');
+    var value = layer.querySelector('.ch-value');
+    var note = layer.querySelector('.ch-note');
+    var actions = layer.querySelector('.ch-actions');
+    var fade = note ? [value, note, actions] : [value, actions];
+    if (dir === 'in'){
+      gsap.set(masks, { yPercent: 115 });
+      gsap.set(fade, { opacity: 0, y: 16 });
+      tl.to(masks, { yPercent: 0, duration: D(.85), ease: 'power3.out', stagger: D(.07) })
+        .to(value, { opacity: 1, y: 0, duration: D(.6), ease: 'power2.out' }, D(.28))
+        .to(note ? note : [], { opacity: 1, y: 0, duration: D(.6), ease: 'power2.out' }, D(.38))
+        .to(actions, { opacity: 1, y: 0, duration: D(.6), ease: 'power2.out' }, D(.48));
+    } else {
+      tl.to(fade, { opacity: 0, duration: D(.22), ease: 'power1.in' }, 0)
+        .to(masks, { yPercent: -115, duration: D(.38), ease: 'power2.in', stagger: D(.02) }, 0);
+    }
+    return tl;
+  }
+
+  function updateEnds(key){
+    var i = ORDER.indexOf(key);
+    backBtn.disabled = (i === 0);
+    nextBtn.disabled = (i === ORDER.length - 1);
+  }
+
+  function goTo(nextKey){
+    if (animating || nextKey === current || ORDER.indexOf(nextKey) === -1) return;
+    animating = true;
+    var forward = ORDER.indexOf(nextKey) > ORDER.indexOf(current);
+    var outLayer = layers[current];
+    var inLayer = layers[nextKey];
+
+    maskTimeline(outLayer, 'out');
+
+    var wipeFrom = forward
+      ? 'polygon(100% 0,100% 0,100% 100%,100% 100%)'
+      : 'polygon(0% 0,0% 0,0% 100%,0% 100%)';
+    var wipeTo = 'polygon(0% 0,100% 0,100% 100%,0% 100%)';
+
+    // The layer coming IN is always elevated above whichever one is
+    // currently showing, and its clip-path is always (re)set to a hidden
+    // sliver on the leading edge matching travel direction, right before
+    // it grows to full. This is what makes the wipe correct in both
+    // directions and for a jump between any two chapters (not just
+    // adjacent ones) — a static z-index-by-sequence-position only wipes
+    // correctly moving forward; reversing needs the outgoing layer's own
+    // clip to shrink, which this avoids needing entirely by just always
+    // putting the incoming layer on top.
+    //
+    // With 4 layers this alone isn't enough: any chapter that is neither
+    // outLayer nor inLayer defaults to an un-clipped (fully open) shape
+    // and sits at the same baseline z-index as outLayer. At equal
+    // z-index, later DOM order wins, so a layer declared after outLayer
+    // in the markup — e.g. MERIDIAN, last in DOM — paints OVER it in
+    // whatever portion of the screen inLayer's clip hasn't reached yet,
+    // flashing through for the first fraction of every transition that
+    // isn't MERIDIAN itself. (Confirmed by inspecting actual video
+    // frames, not just DOM state.) Fix: force every uninvolved layer to
+    // a fully collapsed, invisible clip-path before each transition, so
+    // there is nothing left for the stacking order to leak.
+    Object.keys(layers).forEach(function(key){
+      if (key !== current && key !== nextKey){
+        gsap.set(layers[key], { zIndex: 1, clipPath: 'polygon(0% 0,0% 0,0% 100%,0% 100%)' });
+      }
+    });
+
+    gsap.set(outLayer, { zIndex: 1 });
+    gsap.set(inLayer, { zIndex: 2, clipPath: wipeFrom });
+    gsap.set(inLayer.querySelector('.chapter-bg img'), { filter: 'blur(9px)' });
+
+    var tl = gsap.timeline({
+      onComplete: function(){
+        current = nextKey;
+        body.dataset.chapter = nextKey;
+        setNav(nextKey);
+        updateEnds(nextKey);
+        maskTimeline(inLayer, 'in');
+        announce(nextKey.toUpperCase() + ' chapter opened');
+        animating = false;
+      }
+    });
+
+    // shared "breath" — a brief, quiet dip in exposure right at the
+    // wipe's crossing, so the hard cut between two chapters' different
+    // palettes reads as a considered handoff rather than an abrupt flash.
+    tl.to(scrim, { opacity: .15, duration: D(.3), ease: 'power1.inOut' }, D(.55))
+      .to(scrim, { opacity: 0, duration: D(.42), ease: 'power1.inOut' }, D(.85));
+
+    var outImg = outLayer.querySelector('.chapter-bg img');
+    var inImg = inLayer.querySelector('.chapter-bg img');
+    tl.to(outImg, { scale: 1.16, duration: D(1.45), ease: 'power3.inOut' }, 0)
+      .fromTo(inImg, { scale: 1.16 }, { scale: 1.06, duration: D(1.45), ease: 'power3.inOut' }, 0)
+      .to(inImg, { filter: 'blur(0px)', duration: D(1.2), ease: 'power2.out' }, D(.2))
+      .to(inLayer, { clipPath: wipeTo, duration: D(1.3), ease: 'power4.inOut' }, D(.08));
+  }
+
+  document.querySelectorAll('.ch-nav-tick').forEach(function(b){
+    b.addEventListener('click', function(){ goTo(b.dataset.chapter); });
+  });
+  nextBtn.addEventListener('click', function(){
+    var i = ORDER.indexOf(current);
+    if (i < ORDER.length - 1) goTo(ORDER[i + 1]);
+  });
+  backBtn.addEventListener('click', function(){
+    var i = ORDER.indexOf(current);
+    if (i > 0) goTo(ORDER[i - 1]);
+  });
+
+  document.addEventListener('keydown', function(e){
+    var i = ORDER.indexOf(current);
+    if (e.key === 'ArrowRight' && i < ORDER.length - 1) goTo(ORDER[i + 1]);
+    if (e.key === 'ArrowLeft' && i > 0) goTo(ORDER[i - 1]);
+  });
+
+  // simple touch swipe for mobile
+  var touchX = null;
+  document.addEventListener('touchstart', function(e){ touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function(e){
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    var i = ORDER.indexOf(current);
+    if (Math.abs(dx) > 60){
+      if (dx < 0 && i < ORDER.length - 1) goTo(ORDER[i + 1]);
+      else if (dx > 0 && i > 0) goTo(ORDER[i - 1]);
+    }
+    touchX = null;
+  }, { passive: true });
+
+  // initial entrance — explicitly collapse every non-active layer's
+  // clip-path up front too (same invariant goTo() enforces before every
+  // transition), rather than relying on their default un-clipped shape
+  // plus z-index alone to keep them hidden at rest.
+  Object.keys(layers).forEach(function(key){
+    if (key !== current) gsap.set(layers[key], { zIndex: 1, clipPath: 'polygon(0% 0,0% 0,0% 100%,0% 100%)' });
+  });
+  gsap.set(layers[current], { zIndex: 2 });
+  updateEnds(current);
+  maskTimeline(layers.forma, 'in');
+})();
+</script>
+</body>
+</html>
