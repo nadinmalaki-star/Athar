@@ -18,7 +18,6 @@ const SCENES = [
   // until then scenes run only in local debug mode (diagnostic primitive).
   { name: 'hero',           selector: '.hero',          module: './scenes/hero.js',           tiers: 'ABC', productionReady: false },
   { name: 'understanding',  selector: '.u-optics-wrap', module: './scenes/understanding.js',  tiers: 'ABC', productionReady: false },
-  { name: 'build',          selector: '.build-flow',    module: './scenes/build.js',          tiers: 'ABC', productionReady: false },
   { name: 'process-states', selector: '.t-system',      module: './scenes/process-states.js', tiers: 'AB',  productionReady: false }, // Tier C keeps the SVG
   { name: 'threshold',      selector: '#contact',       module: './scenes/threshold.js',      tiers: 'ABC', productionReady: false },
 ];
