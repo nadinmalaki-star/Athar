@@ -1186,8 +1186,8 @@ html[lang="ar"] .u-statement .stagger-line:nth-child(3){ line-height:1.9; }
 :root{ --mk:52px; }
 @media (max-width:600px){ :root{ --mk:44px; } }
 @media (max-width:360px){ :root{ --mk:40px; } }
-.brand-logo-header, .brand-mark-host{ display:block; height:var(--mk); width:auto; aspect-ratio:617.93 / 603.61; }
-.nav-mark{ cursor:default; -webkit-tap-highlight-color:transparent; }
+.brand-logo-header, .brand-mark-host{ display:block; height:var(--mk); width:calc(var(--mk) * 617.93 / 603.61); flex:none; }   /* explicit width: Safari stretched the auto-width host across the header */
+.nav-mark{ cursor:default; -webkit-tap-highlight-color:transparent; background:none; padding:0; margin:0; }   /* the mark carries its own #050505 field: no extra guard box */
 .ft-logo.ft-logo-2026{ height:200px; width:auto; }
 @media (max-width:600px){ .ft-logo.ft-logo-2026{ height:150px; } }
 </style>
