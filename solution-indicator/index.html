@@ -91,7 +91,8 @@ button{font-family:inherit; cursor:pointer;}
 @media (max-width:420px){ .back-to-site{ font-size:9px; padding:5px 10px; } }
 .lang-switch button.active{background:var(--ember); color:#fff; opacity:1;}
 
-.brand-fixed{position:fixed; top:18px; inset-inline-start:18px; z-index:50; height:40px; width:auto;}   /* ATHAR compact mark (Asset 21, unaltered) */
+.brand-fixed{position:fixed; top:18px; inset-inline-start:18px; z-index:50; height:76px; width:auto;}   /* ATHAR compact mark (Asset 21, unaltered): 76px desktop / 62px phones, as the main site */
+@media (max-width:600px){ .brand-fixed{ height:62px; } }
 .brand-logo-intro{display:block; height:104px; width:auto; margin:0 auto 22px; position:relative; z-index:1;}   /* ATHAR full logo (Asset 19, unaltered) */
 @media (max-width:600px){ .brand-logo-intro{ height:72px; } }   /* clears the fixed language / back controls on phones */
 
@@ -226,7 +227,9 @@ button{font-family:inherit; cursor:pointer;}
 }
 
 .athar-footer{margin-top:56px; padding:36px 24px 0; border-top:1px solid var(--border-dark); text-align:center;}
-.footer-brand{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:14px;}
+.footer-brand{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:18px;}
+.footer-logo{display:block; height:140px; width:auto;}   /* ATHAR full logo (Asset 19, unaltered) */
+@media (max-width:600px){ .footer-logo{ height:120px; } }
 .footer-word{font-family:var(--font-display); font-weight:800; font-size:20px; color:var(--paper);}
 .footer-dots{display:flex; align-items:center; gap:4px;}
 .footer-dots i{display:block; border-radius:2px;}
@@ -420,8 +423,7 @@ button{font-family:inherit; cursor:pointer;}
 
       <div class="athar-footer">
         <div class="footer-brand">
-          <span class="footer-word" data-i18n="footerWord">أثر</span>
-          <span class="footer-dots"><i></i><i></i><i></i><i></i></span>
+          <img class="footer-logo" src="/images/brand/athar-logo-2026-full-dark.svg" width="852" height="851" loading="lazy" alt="Athar">
         </div>
         <div class="footer-caption">ATHAR — DIGITAL PRODUCT STUDIO</div>
         <div class="footer-tagline" data-i18n="footerTagline">مواقع · تطبيقات ويب · MVPs</div>
