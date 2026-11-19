@@ -1181,11 +1181,17 @@ html[lang="ar"] .u-statement .stagger-line:nth-child(3){ line-height:1.9; }
 </style>
 <style id="logo-system-2026">
 /* ATHAR logo system (approved 2026-11-19). Official files used exactly as supplied:
-   header = compact mark (Asset 21, dark) at 52px desktop / 44px phones (40px on very small phones);
+   header = compact mark (Asset 21, dark): the file's square at 76px desktop / 62px phones / 52px very small phones,
+   i.e. the artwork (A + figure, 86% of the square's width) at ~67 / ~55 / ~46px;
    footer = full logo (Asset 19, dark). --mk is the header mark height. */
-:root{ --mk:52px; }
-@media (max-width:600px){ :root{ --mk:44px; } }
-@media (max-width:360px){ :root{ --mk:40px; } }
+:root{ --mk:76px; }
+@media (max-width:600px){ :root{ --mk:62px; } }
+@media (max-width:360px){ :root{ --mk:52px; } }
+/* the larger brand unit: the header padding tightens so the header grows only a few px (96→104 desktop, 76→82 phones),
+   and in-page anchors clear it */
+nav{ padding-top:14px; padding-bottom:14px; }
+[id]{ scroll-margin-top:112px; }
+@media (max-width:600px){ nav{ padding-top:10px; padding-bottom:10px; } [id]{ scroll-margin-top:90px; } }
 .brand-logo-header, .brand-mark-host{ display:block; height:var(--mk); width:calc(var(--mk) * 617.93 / 603.61); flex:none; }   /* explicit width: Safari stretched the auto-width host across the header */
 .nav-mark{ cursor:default; -webkit-tap-highlight-color:transparent; background:none; padding:0; margin:0; }   /* the mark carries its own #050505 field: no extra guard box */
 .ft-logo.ft-logo-2026{ height:200px; width:auto; }
@@ -3270,7 +3276,7 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
 <script>
 // ATHAR header mark (approved 2026-11-19): one restrained interaction on the header mark only.
 // The exact Asset 21 file is loaded into a shadow root (its own styles stay scoped; nothing in the file is edited). On hover
-// or tap the orange figure redraws once (a 480ms line-draw); it never loops. Reduced motion: no animation. If anything
+// or tap the orange figure redraws once (a 650ms line-draw with a faint ember glow on the figure only); it never loops. Reduced motion: no animation. If anything
 // fails, the plain <img> simply stays.
 (function(){
   var img = document.querySelector('nav .brand-logo-header'); if (!img || !window.fetch || !document.body.attachShadow) return;
@@ -3279,15 +3285,16 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
     var host = document.createElement('span'); host.className = 'brand-mark-host'; host.setAttribute('role', 'img'); host.setAttribute('aria-label', img.alt || 'Athar');
     var root = host.attachShadow({ mode: 'open' });
     root.innerHTML = '<style>:host{display:block} svg{display:block;width:100%;height:100%}' +
-      '.mk-drawing .mk-fig{animation:mkdraw .48s cubic-bezier(.3,.6,.2,1) both}' +
-      '@keyframes mkdraw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}</style>' + src.replace(/^<\?xml[^>]*>\s*/, '');
+      '.mk-drawing .mk-fig{animation:mkdraw .65s cubic-bezier(.33,.55,.25,1) both, mkglow .65s ease-out both}' +
+      '@keyframes mkdraw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}' +
+      '@keyframes mkglow{0%{filter:none}20%,70%{filter:brightness(1.22) drop-shadow(0 0 2.2px rgba(255,90,54,.6))}100%{filter:none}}</style>' + src.replace(/^<\?xml[^>]*>\s*/, '');
     var svg = root.querySelector('svg'); if (!svg) return;
     img.replaceWith(host);
     [].forEach.call(svg.querySelectorAll('.cls-2, .cls-3'), function(p){   // the file's own orange figure strokes
       var len = Math.ceil(p.getTotalLength()); p.style.strokeDasharray = len; p.style.setProperty('--len', len); p.classList.add('mk-fig'); });
     var busy = false;
     function play(){ if (reduce.matches || busy) return; busy = true; svg.classList.add('mk-drawing');
-      setTimeout(function(){ svg.classList.remove('mk-drawing'); busy = false; }, 520); }
+      setTimeout(function(){ svg.classList.remove('mk-drawing'); busy = false; }, 700); }
     mark.addEventListener('pointerenter', function(e){ if (e.pointerType === 'mouse') play(); });
     mark.addEventListener('pointerdown', play);
   }).catch(function(){});
