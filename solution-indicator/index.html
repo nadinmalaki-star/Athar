@@ -93,6 +93,8 @@ button{font-family:inherit; cursor:pointer;}
 
 .brand-fixed{position:fixed; top:18px; inset-inline-start:18px; z-index:50; height:76px; width:auto;}   /* ATHAR compact mark (Asset 21, unaltered): 76px desktop / 62px phones, as the main site */
 @media (max-width:600px){ .brand-fixed{ height:62px; } }
+span.brand-fixed{ display:block; width:calc(76px * 617.93 / 603.61); }   /* the interactive mark (same size as the image it replaces) */
+@media (max-width:600px){ span.brand-fixed{ width:calc(62px * 617.93 / 603.61); } }
 .brand-logo-intro{display:block; height:104px; width:auto; margin:0 auto 22px; position:relative; z-index:1;}   /* ATHAR full logo (Asset 19, unaltered) */
 @media (max-width:600px){ .brand-logo-intro{ height:72px; } }   /* clears the fixed language / back controls on phones */
 
@@ -1002,6 +1004,35 @@ document.querySelectorAll('#langSwitch button').forEach(btn=>{
 });
 
 applyI18nStatic();
+</script>
+<script>
+// ATHAR header mark (same interaction as the main website): the exact Asset 21 file is loaded into a shadow root (its own
+// styles stay scoped; nothing in the file is edited) in place of the corner <img>, keeping its id, class and size. On hover
+// or tap the orange figure redraws once (a 650ms line-draw with a faint ember glow on the figure only); it never loops.
+// Reduced motion: no animation. If anything fails, the plain <img> simply stays.
+(function(){
+  var img = document.getElementById('brandFixed'); if (!img || !window.fetch || !document.body.attachShadow) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  fetch(img.getAttribute('src')).then(function(r){ return r.ok ? r.text() : Promise.reject(); }).then(function(src){
+    var host = document.createElement('span'); host.id = img.id; host.className = img.className + ' brand-mark-host';
+    host.setAttribute('role', 'img'); host.setAttribute('aria-label', img.alt || 'Athar');
+    var root = host.attachShadow({ mode: 'open' });
+    root.innerHTML = '<style>:host{display:block} svg{display:block;width:100%;height:100%}' +
+      '.mk-drawing .mk-fig{animation:mkdraw .65s cubic-bezier(.33,.55,.25,1) both, mkglow .65s ease-out both}' +
+      '@keyframes mkdraw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}' +
+      '@keyframes mkglow{0%{filter:none}20%,70%{filter:brightness(1.22) drop-shadow(0 0 2.2px rgba(255,90,54,.6))}100%{filter:none}}</style>' +
+      src.replace(/^<\?xml[^>]*>\s*/, '');
+    var svg = root.querySelector('svg'); if (!svg) return;
+    img.replaceWith(host);
+    [].forEach.call(svg.querySelectorAll('.cls-2, .cls-3'), function(p){   // the file's own orange figure strokes
+      var len = Math.ceil(p.getTotalLength()); p.style.strokeDasharray = len; p.style.setProperty('--len', len); p.classList.add('mk-fig'); });
+    var busy = false;
+    function play(){ if (reduce.matches || busy) return; busy = true; svg.classList.add('mk-drawing');
+      setTimeout(function(){ svg.classList.remove('mk-drawing'); busy = false; }, 700); }
+    host.addEventListener('pointerenter', function(e){ if (e.pointerType === 'mouse') play(); });
+    host.addEventListener('pointerdown', play);
+  }).catch(function(){});
+})();
 </script>
 </body>
 </html>
