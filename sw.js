@@ -17,18 +17,18 @@
 //     versioned paths, e.g. /signal/v1/core.js or /vendor/three/r<rev>/…
 //     A published versioned path never changes content; a change ships under
 //     a new version folder, so cache-first can never serve a stale module.
-const CACHE_NAME = 'athar-static-v2';
+const CACHE_NAME = 'athar-static-v3';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/site.webmanifest',
   '/favicon.ico',
-  '/images/athar-mark-16.png',
-  '/images/athar-mark-32.png',
-  '/images/athar-mark-48.png',
-  '/images/athar-mark-180.png',
-  '/images/athar-mark-192.png',
-  '/images/athar-mark-512.png',
+  '/images/athar-mark-2026-16.png',
+  '/images/athar-mark-2026-32.png',
+  '/images/athar-mark-2026-48.png',
+  '/images/athar-mark-2026-180.png',
+  '/images/athar-mark-2026-192.png',
+  '/images/athar-mark-2026-512.png',
 ];
 
 self.addEventListener('install', (event) => {

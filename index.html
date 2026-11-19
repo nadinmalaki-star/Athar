@@ -52,10 +52,10 @@
   "sameAs": ["https://www.linkedin.com/company/atharstudio/"]
 }
 </script>
-<link rel="icon" type="image/png" sizes="16x16" href="images/athar-mark-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="images/athar-mark-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="images/athar-mark-48.png">
-<link rel="apple-touch-icon" sizes="180x180" href="images/athar-mark-180.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/athar-mark-2026-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/athar-mark-2026-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="images/athar-mark-2026-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/athar-mark-2026-180.png">
 <link rel="manifest" href="site.webmanifest">
 <!-- THE SIGNAL: pinned, self-hosted three.js; fetched only when a cinematic
      scene is allowed to render (never for Tier S). -->
@@ -1179,6 +1179,111 @@ html[lang="ar"] .u-statement .stagger-line:nth-child(3){ line-height:1.9; }
 @media (max-width:600px){ .brand-logo-header{ height:27px; } }
 @media (max-width:360px){ .brand-logo-header{ height:21px; } }
 </style>
+<style id="logo-system-2026">
+/* ATHAR logo system (approved 2026-11-19). Official files used exactly as supplied:
+   header = compact mark (Asset 21, dark) at 52px desktop / 44px phones (40px on very small phones);
+   footer = full logo (Asset 19, dark). --mk is the header mark height. */
+:root{ --mk:52px; }
+@media (max-width:600px){ :root{ --mk:44px; } }
+@media (max-width:360px){ :root{ --mk:40px; } }
+.brand-logo-header, .brand-mark-host{ display:block; height:var(--mk); width:auto; aspect-ratio:617.93 / 603.61; }
+.nav-mark{ cursor:default; -webkit-tap-highlight-color:transparent; }
+.ft-logo.ft-logo-2026{ height:200px; width:auto; }
+@media (max-width:600px){ .ft-logo.ft-logo-2026{ height:150px; } }
+</style>
+<style id="identity-v1-preview">
+/* =====================================================================
+   BRAND & VISUAL IDENTITY (approved 2026-11-19).
+   Between Built by Athar and How Athar Thinks. An editorial identity-system board built only from ATHAR's own
+   official files (Asset 19 full logo, Asset 21 / 22 compact mark, used exactly as supplied), the colours those files
+   use, and the site's own typefaces. On --void (#050505) = the logos' own field, so they sit in the page with no box.
+   Graphite (Built by Athar) → void (this) → graphite (How Athar Thinks): hard edges, no fades.
+   ===================================================================== */
+.idn{ background:var(--void); color:var(--paper); padding:132px 0 140px; }
+#identity{ --cis:1290px; }                                   /* content-visibility size hint, as the other sections */
+@media (max-width:900px){ #identity{ --cis:2250px; } }
+.idn-head{ display:grid; grid-template-columns:minmax(0, 7fr) minmax(0, 5fr); column-gap:clamp(32px, 5vw, 96px); align-items:end; }
+.idn-label{ grid-column:1 / -1; }
+.idn-label::before{ content:''; width:28px; height:1px; background:var(--line-strong); }
+.idn-h{ font-family:var(--display); font-weight:800; font-size:clamp(34px, 3.7vw, 56px); line-height:1.06; letter-spacing:-0.015em; margin-top:30px; max-width:17ch; text-wrap:balance; }
+.idn-intro{ padding-bottom:6px; }
+.idn-desc{ font-size:16px; line-height:1.75; color:#adaca7; max-width:46ch; }
+.idn-cta{ display:inline-flex; gap:10px; margin-top:26px; font-weight:500; font-size:15px; color:var(--paper); border-bottom:1px solid rgba(245,243,237,0.25); padding-bottom:6px; transition:border-color .25s ease; }
+.idn-cta:hover{ border-color:var(--ember); }
+
+/* the board: three columns = the three capabilities, separated by hairlines (no cards) */
+.idn-board{ display:grid; grid-template-columns:minmax(0, 1.32fr) minmax(0, 1fr) minmax(0, 1fr); margin-top:72px; border-top:1px solid var(--line); }
+.idn-col{ padding:30px clamp(20px, 2.4vw, 40px) 0; display:flex; flex-direction:column; }
+.idn-col + .idn-col{ border-inline-start:1px solid var(--line); }
+.idn-col:first-child{ padding-inline-start:0; }
+.idn-col:last-child{ padding-inline-end:0; }
+.idn-k{ display:grid; grid-template-columns:30px 1fr; align-items:start; }
+.idn-k i{ font-style:normal; font-family:var(--mono); font-size:10.5px; letter-spacing:1px; color:var(--ember); padding-top:4px; }
+.idn-k b{ display:block; font-weight:500; font-size:15px; color:var(--paper); }
+.idn-k span{ display:block; margin-top:6px; font-size:13px; line-height:1.6; color:#a19f9a; max-width:36ch; }
+.idn-fig{ margin:36px 0 0; }
+.idn-cap{ font-family:var(--mono); font-size:10px; letter-spacing:1.6px; color:#8f8e89; text-transform:uppercase; margin-top:14px; }
+html[lang="ar"] .idn-cap{ font-family:var(--body); font-size:12.5px; letter-spacing:0; text-transform:none; }
+.idn-note{ margin-top:56px; font-family:var(--mono); font-size:10px; letter-spacing:1.6px; text-transform:uppercase; color:#8f8e89; text-align:end; }
+html[lang="ar"] .idn-note{ font-family:var(--body); font-size:12.5px; letter-spacing:0; text-transform:none; }
+.idn-cap b{ font-weight:400; color:var(--paper-dim); }
+
+/* 01 · the full logo, the section's brand moment */
+.idn-full{ display:block; width:100%; max-width:430px; height:auto; aspect-ratio:851.51 / 851; }
+
+/* 02 · colour and type */
+.idn-sw{ display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:10px; }
+.idn-sw li{ grid-column:span 2; }
+.idn-sw li:nth-child(n+4){ grid-column:span 3; }
+.idn-sw li{ list-style:none; }
+.idn-sw i{ display:block; height:64px; border-radius:2px; box-shadow:inset 0 0 0 1px rgba(245,243,237,0.1); }
+.idn-sw span{ display:block; font-family:var(--mono); font-size:10px; letter-spacing:1px; color:#8f8e89; margin-top:8px; }
+.idn-type{ margin-top:34px; border-top:1px solid var(--line); }
+.idn-type li{ list-style:none; display:flex; align-items:baseline; justify-content:space-between; gap:16px; padding:14px 0; border-bottom:1px solid var(--line); }
+.idn-type .s{ color:var(--paper); line-height:1.1; white-space:nowrap; }
+.idn-type .s1{ font-family:var(--display); font-weight:800; font-size:38px; }
+.idn-type .s2{ font-family:var(--body); font-weight:500; font-size:26px; }
+.idn-type .s3{ font-family:var(--mono); font-size:14px; letter-spacing:3px; }
+.idn-type .n{ font-family:var(--mono); font-size:10px; letter-spacing:1.2px; color:var(--paper-mute); text-align:end; }
+
+/* 03 · the compact mark at real sizes, and its dark / light versions */
+.idn-scale{ display:flex; align-items:flex-end; gap:22px; flex-wrap:wrap; }
+.idn-scale figure{ margin:0; }
+.idn-scale img{ display:block; width:auto; aspect-ratio:617.93 / 603.61; }
+.idn-scale figcaption{ font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--paper-mute); margin-top:8px; }
+.idn-var{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:34px; }
+.idn-var div{ display:flex; align-items:center; justify-content:center; aspect-ratio:1 / 0.82; border-radius:2px; }
+.idn-var .dk{ background:var(--void); box-shadow:inset 0 0 0 1px var(--line-strong); }
+.idn-var .lt{ background:#F3EFE7; }                         /* Asset 22's own light field, so the mark sits on it with no box */
+.idn-var img{ display:block; height:58%; width:auto; aspect-ratio:617.93 / 603.61; }
+
+/* Arabic: rebalanced, not mirrored. The Arabic headline is shorter, so it runs larger on two lines and the intro sits
+   lower beside it; the type specimen leads with Arabic; the logo files themselves are never mirrored. */
+html[lang="ar"] .idn-h{ font-size:clamp(36px, 4.2vw, 62px); line-height:1.3; letter-spacing:0; max-width:13ch; }
+html[lang="ar"] .idn-desc{ line-height:1.9; }
+html[lang="ar"] .idn-k b{ font-size:16px; }
+html[lang="ar"] .idn-k span{ font-size:13.5px; line-height:1.8; }
+html[lang="ar"] .idn-type .s2{ font-size:28px; }
+@media (min-width:901px){ html[lang="ar"] .idn-board{ grid-template-columns:minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1.05fr); } }
+
+@media (max-width:900px){
+  .idn{ padding:96px 0 104px; }
+  .idn-head{ grid-template-columns:1fr; }
+  .idn-h{ font-size:clamp(32px, 8.6vw, 44px); margin-top:22px; max-width:none; }
+  html[lang="ar"] .idn-h{ font-size:clamp(32px, 9.2vw, 46px); max-width:none; }
+  .idn-intro{ margin-top:22px; }
+  .idn-board{ grid-template-columns:1fr; margin-top:52px; }
+  .idn-col, .idn-col:first-child, .idn-col:last-child{ padding:28px 0 36px; }
+  .idn-col + .idn-col{ border-inline-start:0; border-top:1px solid var(--line); }
+  .idn-fig{ margin-top:26px; }
+  .idn-full{ max-width:340px; margin-inline:auto; }
+  .idn-type .s1{ font-size:32px; }
+  .idn-desc{ color:#b6b5b0; }
+  .idn-k span{ color:#aeada8; font-size:13.5px; }
+  .idn-note{ margin-top:8px; text-align:start; }
+  .idn-scale{ gap:18px; }
+}
+</style>
 <style id="lab-gateway-v1">
 /* ATHAR LAB GATEWAY — approved 2026-10-15 (from prototypes/lab-gateway, unchanged). One section directly above the footer, after the closing/contact area.
    Desktop: copy + CTA (left in EN, right in AR) beside one real crop of the Athar Lab hero, bleeding to the page edge and
@@ -1263,7 +1368,7 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
 
   <nav aria-label="Athar">
     <div class="nav-mark">
-      <img src="images/athar-logo-wordmark-official.png" alt="Athar" class="brand-logo-header" width="1463" height="370">
+      <img src="images/brand/athar-mark-2026-dark.svg" alt="Athar" class="brand-logo-header" width="618" height="604"><!-- the official compact mark (Asset 21), unaltered -->
     </div>
     <div class="nav-actions">
       <!-- Destinations: peers of the main site. Solution Indicator is live; Athar Lab is
@@ -2028,6 +2133,68 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
     </div>
   </section>
 
+  <!-- 4b. Brand & Visual Identity (approved 2026-11-19). ATHAR's own official identity files only
+       (Asset 19 full logo, Asset 21 / 22 compact mark), the colours those files use, and the site's own typefaces.
+       No clients, no case study: it shows what a coordinated identity system contains. -->
+  <section class="idn" id="identity" aria-labelledby="idn-h">
+    <div class="shell">
+      <div class="idn-head">
+        <div class="label idn-label"><span dir="ltr">BRAND &amp; VISUAL IDENTITY</span></div>
+        <h2 class="idn-h" id="idn-h" data-ar="هوية تخلي الناس تعرفك قبل ما تحكي." data-en="A visual identity people can recognize before you say a word.">هوية تخلي الناس تعرفك قبل ما تحكي.</h2>
+        <div class="idn-intro">
+          <p class="idn-desc" data-ar="نصمم الشعارات والهويات البصرية للمشاريع والمنتجات، ونبني نظامًا بصريًا واضحًا ومتناسقًا يشتغل عبر الموقع، السوشال ميديا، والمطبوعات." data-en="We design logos and visual identity systems for businesses and digital products, creating a clear and consistent visual presence across web, social, and print.">نصمم الشعارات والهويات البصرية للمشاريع والمنتجات، ونبني نظامًا بصريًا واضحًا ومتناسقًا يشتغل عبر الموقع، السوشال ميديا، والمطبوعات.</p>
+          <a class="idn-cta" href="#contact" data-ar="احكي معنا عن هويتك ←" data-en="Talk to us about your identity →">احكي معنا عن هويتك ←</a>
+        </div>
+      </div>
+
+      <div class="idn-board">
+        <article class="idn-col">
+          <div class="idn-k"><i>01</i><div><b data-ar="تصميم الشعار" data-en="Logo Design">تصميم الشعار</b><span data-ar="شعار ورمز بصري واضح وقابل للاستخدام عبر أحجام ومنصات مختلفة." data-en="A clear, distinctive mark built to work across sizes and platforms.">شعار ورمز بصري واضح وقابل للاستخدام عبر أحجام ومنصات مختلفة.</span></div></div>
+          <figure class="idn-fig">
+            <img class="idn-full" src="images/brand/athar-logo-2026-full-dark.svg" width="852" height="851" loading="lazy" decoding="async" alt="The full ATHAR logo">
+            <figcaption class="idn-cap" data-ar="الشعار الأساسي" data-en="Primary logo">الشعار الأساسي</figcaption>
+          </figure>
+        </article>
+
+        <article class="idn-col">
+          <div class="idn-k"><i>02</i><div><b data-ar="النظام البصري" data-en="Visual System">النظام البصري</b><span data-ar="ألوان، خطوط، عناصر رسومية، وقواعد استخدام تحافظ على اتساق الهوية." data-en="Color, typography, graphic elements, and usage rules that keep the identity consistent.">ألوان، خطوط، عناصر رسومية، وقواعد استخدام تحافظ على اتساق الهوية.</span></div></div>
+          <div class="idn-fig">
+            <ul class="idn-sw" dir="ltr" aria-label="ATHAR colours">
+              <li><i style="background:#FF5A36"></i><span>#FF5A36</span></li>
+              <li><i style="background:#D94C2D"></i><span>#D94C2D</span></li>
+              <li><i style="background:#EDE4E2"></i><span>#EDE4E2</span></li>
+              <li><i style="background:#606060"></i><span>#606060</span></li>
+              <li><i style="background:#050505"></i><span>#050505</span></li>
+            </ul>
+            <ul class="idn-type">
+              <li><span class="s s1" data-ar="أثر Aa" data-en="Aa أثر">أثر Aa</span><span class="n" dir="ltr">ALMARAI<br>DISPLAY</span></li>
+              <li><span class="s s2" data-ar="أثر Aa" data-en="Aa أثر">أثر Aa</span><span class="n" dir="ltr">IBM PLEX SANS ARABIC<br>TEXT</span></li>
+              <li><span class="s s3" dir="ltr">ATHAR — 2026</span><span class="n" dir="ltr">SPACE MONO<br>DETAIL</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="idn-col">
+          <div class="idn-k"><i>03</i><div><b data-ar="تطبيقات الهوية" data-en="Brand Applications">تطبيقات الهوية</b><span data-ar="تطبيق الهوية على المواد الرقمية، السوشال ميديا، المطبوعات والـmockups الأساسية." data-en="Applying the identity across digital materials, social media, print, and core mockups.">تطبيق الهوية على المواد الرقمية، السوشال ميديا، المطبوعات والـmockups الأساسية.</span></div></div>
+          <div class="idn-fig">
+            <div class="idn-scale" dir="ltr">
+              <figure><img src="images/brand/athar-mark-2026-dark.svg" style="height:96px" width="618" height="604" loading="lazy" decoding="async" alt="ATHAR compact mark, 96px"><figcaption>96</figcaption></figure>
+              <figure><img src="images/brand/athar-mark-2026-dark.svg" style="height:64px" width="618" height="604" loading="lazy" decoding="async" alt="ATHAR compact mark, 64px"><figcaption>64</figcaption></figure>
+              <figure><img src="images/brand/athar-mark-2026-dark.svg" style="height:52px" width="618" height="604" loading="lazy" decoding="async" alt="ATHAR compact mark, 52px"><figcaption>52</figcaption></figure>
+              <figure><img src="images/brand/athar-mark-2026-dark.svg" style="height:32px" width="618" height="604" loading="lazy" decoding="async" alt="ATHAR compact mark, 32px"><figcaption>32 PX</figcaption></figure>
+            </div>
+            <div class="idn-var">
+              <div class="dk"><img src="images/brand/athar-mark-2026-dark.svg" width="618" height="604" loading="lazy" decoding="async" alt="ATHAR compact mark for dark backgrounds"></div>
+              <div class="lt"><img src="images/brand/athar-mark-2026-light.svg" width="618" height="604" loading="lazy" decoding="async" alt="ATHAR compact mark for light backgrounds"></div>
+            </div>
+            <div class="idn-cap" data-ar="الرمز المختصر · الأحجام · نسخ داكنة وفاتحة" data-en="Compact mark · sizes · dark / light">الرمز المختصر · الأحجام · نسخ داكنة وفاتحة</div>
+          </div>
+        </article>
+      </div>
+      <p class="idn-note" data-ar="المثال المعروض: نظام الهوية البصرية الخاص بأثر." data-en="Example shown: ATHAR's own identity system.">المثال المعروض: نظام الهوية البصرية الخاص بأثر.</p>
+    </div>
+  </section>
+
   <!-- 5. How Athar thinks -->
   <section class="thinks" id="process">
     <div class="shell">
@@ -2206,7 +2373,8 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
   <footer class="ft">
     <div class="shell ft-in">
       <div class="ft-brand">
-        <img src="images/athar-logo-wordmark-official.png" alt="Athar" class="ft-logo" width="1463" height="370" loading="lazy">
+        <img src="images/brand/athar-logo-2026-full-dark.svg" alt="Athar" class="ft-logo ft-logo-2026" width="852" height="851" loading="lazy"><!-- the official full logo (Asset 19), unaltered -->
+
         <div class="ft-studio"><span dir="ltr">ATHAR — DIGITAL PRODUCT STUDIO</span></div>
         <div class="ft-cap"><span dir="ltr">Web • Mobile • Systems • Growth</span></div>
       </div>
@@ -2892,6 +3060,9 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
   //    the box is then centred in the column. The box is fixed (local units: the approved composition's
   //    screens, captions and connector lines), so the side screens can be tuned without moving the dashboard.
   var KH_MASS = 0.92, KH_CLEAR = 60, KMIN = 0.6, KH_BOX = { l:61.48, r:1074.54, t:18.32, b:788.83 };
+  // The header height KHZNTI and MAHKI were approved against (76px). Fixed, so the taller 2026 brand mark (header 96px on
+  // desktop) does not rescale either composition.
+  var APPROVED_NAV_H = 76;
   function layout(st){
     var w = st.clientWidth; if (!w) return false;
     var key = st.getAttribute('data-stage');
@@ -2903,7 +3074,7 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
       var Rm = measurer(st), bx = { l:Infinity, r:-Infinity, t:Infinity, b:-Infinity };
       [].forEach.call(st.querySelectorAll('.bb-dev, .bb-cap'), function(e){ var r = Rm(e); if (r.r <= r.l) return;
         bx.l = Math.min(bx.l, r.l); bx.r = Math.max(bx.r, r.r); bx.t = Math.min(bx.t, r.t); bx.b = Math.max(bx.b, r.b); });
-      var MK_CLEAR = 44, nv = document.querySelector('nav'), navH = nv ? nv.offsetHeight : 76, Hm = Math.ceil(bx.b + 6);
+      var MK_CLEAR = 44, navH = APPROVED_NAV_H, Hm = Math.ceil(bx.b + 6);
       var km = Math.max(KMIN, Math.min(0.96 * w / (bx.r - bx.l), (innerHeight - navH - 2 * MK_CLEAR) / (bx.b - Math.min(0, bx.t))));
       km = Math.floor(Hm * km) / Hm;
       var xm = (w - (bx.r - bx.l) * km) / 2 - bx.l * km;
@@ -2912,7 +3083,7 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
     }
     if (key !== 'kh') { st.style.setProperty('--k', (w / W).toFixed(5)); st.style.removeProperty('--x'); draw[key](st); if (rtl) rtlClear(st, w, w / W, 0); return true; }
     var L = KH_BOX.l, Rt = KH_BOX.r, T = KH_BOX.t, B = KH_BOX.b;
-    var nav = document.querySelector('nav'), navH = nav ? nav.offsetHeight : 76;
+    var navH = APPROVED_NAV_H;
     var kw = w / W * KH_MASS, kh = (innerHeight - navH - 2 * KH_CLEAR) / (B - T), k = Math.max(KMIN, Math.min(kw, kh));
     k = Math.floor(820 * k) / 820;                   // whole-pixel stage height: nothing below it lands on a sub-pixel
     st.style.setProperty('--k', k.toFixed(6)); st.setAttribute('data-fit', kw <= kh ? 'width' : 'height');
@@ -3096,5 +3267,31 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
 <!-- Section 03 cinematic journey (approved 2026-11-13): sound events, then the journey engine -->
 <script src="journey/v1/journey-audio.js"></script>
 <script src="journey/v1/journey.js"></script>
+<script>
+// ATHAR header mark (approved 2026-11-19): one restrained interaction on the header mark only.
+// The exact Asset 21 file is loaded into a shadow root (its own styles stay scoped; nothing in the file is edited). On hover
+// or tap the orange figure redraws once (a 480ms line-draw); it never loops. Reduced motion: no animation. If anything
+// fails, the plain <img> simply stays.
+(function(){
+  var img = document.querySelector('nav .brand-logo-header'); if (!img || !window.fetch || !document.body.attachShadow) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)'), mark = img.closest('.nav-mark');
+  fetch(img.getAttribute('src')).then(function(r){ return r.ok ? r.text() : Promise.reject(); }).then(function(src){
+    var host = document.createElement('span'); host.className = 'brand-mark-host'; host.setAttribute('role', 'img'); host.setAttribute('aria-label', img.alt || 'Athar');
+    var root = host.attachShadow({ mode: 'open' });
+    root.innerHTML = '<style>:host{display:block} svg{display:block;width:100%;height:100%}' +
+      '.mk-drawing .mk-fig{animation:mkdraw .48s cubic-bezier(.3,.6,.2,1) both}' +
+      '@keyframes mkdraw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}</style>' + src.replace(/^<\?xml[^>]*>\s*/, '');
+    var svg = root.querySelector('svg'); if (!svg) return;
+    img.replaceWith(host);
+    [].forEach.call(svg.querySelectorAll('.cls-2, .cls-3'), function(p){   // the file's own orange figure strokes
+      var len = Math.ceil(p.getTotalLength()); p.style.strokeDasharray = len; p.style.setProperty('--len', len); p.classList.add('mk-fig'); });
+    var busy = false;
+    function play(){ if (reduce.matches || busy) return; busy = true; svg.classList.add('mk-drawing');
+      setTimeout(function(){ svg.classList.remove('mk-drawing'); busy = false; }, 520); }
+    mark.addEventListener('pointerenter', function(e){ if (e.pointerType === 'mouse') play(); });
+    mark.addEventListener('pointerdown', play);
+  }).catch(function(){});
+})();
+</script>
 </body>
 </html>
