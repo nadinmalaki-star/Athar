@@ -91,8 +91,9 @@ button{font-family:inherit; cursor:pointer;}
 @media (max-width:420px){ .back-to-site{ font-size:9px; padding:5px 10px; } }
 .lang-switch button.active{background:var(--ember); color:#fff; opacity:1;}
 
-.brand-fixed{position:fixed; top:18px; inset-inline-start:18px; z-index:50; height:26px; width:auto;}
-.brand-logo-intro{display:block; height:40px; width:auto; margin:0 auto 22px; position:relative; z-index:1;}
+.brand-fixed{position:fixed; top:18px; inset-inline-start:18px; z-index:50; height:40px; width:auto;}   /* ATHAR compact mark (Asset 21, unaltered) */
+.brand-logo-intro{display:block; height:104px; width:auto; margin:0 auto 22px; position:relative; z-index:1;}   /* ATHAR full logo (Asset 19, unaltered) */
+@media (max-width:600px){ .brand-logo-intro{ height:72px; } }   /* clears the fixed language / back controls on phones */
 
 /* ============ INTRO ============ */
 .intro{
@@ -318,7 +319,7 @@ button{font-family:inherit; cursor:pointer;}
   <button data-lang="en">EN</button>
 </div>
 
-<img class="brand-fixed" id="brandFixed" src="/images/athar-logo-wordmark-official.png" alt="Athar">
+<img class="brand-fixed" id="brandFixed" src="/images/brand/athar-mark-2026-dark.svg" width="618" height="604" alt="Athar">
 
 <a href="/" class="back-to-site" id="backToSite" data-i18n="backToSite">الرجوع لموقع أثر</a>
 
@@ -326,7 +327,7 @@ button{font-family:inherit; cursor:pointer;}
 
   <!-- ===== INTRO ===== -->
   <section class="screen intro" id="screen-intro">
-    <img class="brand-logo-intro" id="brandLogoIntro" src="assets/logo-ar.png" alt="Athar">
+    <img class="brand-logo-intro" id="brandLogoIntro" src="/images/brand/athar-logo-2026-full-dark.svg" width="852" height="851" alt="Athar">
     <div class="intro-badge mono" data-i18n="badge">SOLUTION INDICATOR</div>
     <h1 data-i18n="introTitle">احنا منساعدك تعرف بالضبط <span>شو محتاج مشروعك الرقمي</span></h1>
     <p data-i18n="introBody">تقييم قصير وذكي بيحلل احتياجك الفعلي، وبيطلعلك توصية بالحل المناسب مع تقدير استثمار أولي — قبل حتى ما تحكي معنا.</p>
@@ -690,7 +691,6 @@ function applyI18nStatic(){
   });
   $('#screen-intro h1').innerHTML = `${I18N[LANG].introTitle_pre}<span>${I18N[LANG].introTitle_span}</span>`;
   document.getElementById('langSwitch').classList.toggle('on-light', currentScreenIsLight());
-  $('#brandLogoIntro').src = LANG==='ar' ? 'assets/logo-ar.png' : 'assets/logo-en.png';
   const backLink = document.getElementById('backToSite');
   if(backLink) backLink.href = '/?lang=' + LANG;
 }
