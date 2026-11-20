@@ -1432,6 +1432,15 @@ section.path:has(.mv-in-closing){ overflow:clip; }
 .mv-anchor{ position:absolute; top:calc(100% - 100vh); width:1px; height:1px; }
 .mv-arches{ position:relative; width:min(860px, 86vw, calc((100svh - 190px) * 1.058)); aspect-ratio:2200 / 2079; transform-origin:38.5% 36%; will-change:transform, opacity; }
 .mv-arches img{ position:absolute; inset:0; width:100%; height:100%; transform-origin:38.5% 36%; will-change:transform, opacity; }
+/* the arrival: a small label above, one line below the arches; both leave as the camera enters the arch */
+.mv-pintro{ position:absolute; inset:0; z-index:2; pointer-events:none; display:flex; flex-direction:column; justify-content:space-between;
+  padding:clamp(124px, 15vh, 146px) 0 clamp(26px, 5.5vh, 60px); opacity:0; will-change:opacity; }
+.mv-pintro .shell{ width:100%; }
+.mv-pline{ text-align:center; font-family:var(--display); font-weight:700; font-size:clamp(19px, 1.9vw, 26px); line-height:1.4; color:var(--paper); padding:0 var(--gutter); }
+html[lang="ar"] .mv-pline{ line-height:1.6; }
+.mv-in-closing .mv-arches{ width:min(820px, 86vw, calc((100svh - 300px) * 1.058)); }
+@media (max-width:600px){ .mv-pintro{ padding-bottom:20vh; } }   /* phones: the line sits right under the smaller arches */
+.mv-rm .mv-pintro{ position:relative; opacity:1; padding:0 0 40px; gap:24px; order:-1; }
 @media (max-width:600px){ .mv-portal{ height:200vh; } .mv-arches{ width:94vw; } }
 
 /* How Athar thinks — the whole story, pinned: question (sphere) → six stages → statement (leaf).
@@ -1679,6 +1688,23 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
           <span class="stagger-line" style="--d:1" data-ar-html='إحنا بنفضل نبلش <strong>بمشكلة</strong>.' data-en-html='We prefer to start with a <strong>problem</strong>.'>إحنا بنفضل نبلش <strong>بمشكلة</strong>.</span>
           <span class="stagger-line" style="--d:2" data-ar-html='بأثر، بنساعد رواد الأعمال والشركات يحوّلوا الأفكار والمشاكل الحقيقية لـ<strong>منتجات رقمية مفيدة</strong> — مبنية حوالين اللي فعلاً مهم.' data-en-html='At Athar, we help founders and businesses turn ideas and real-world problems into <strong>useful digital products</strong> — built around what actually matters.'>بأثر، بنساعد رواد الأعمال والشركات يحوّلوا الأفكار والمشاكل الحقيقية لـ<strong>منتجات رقمية مفيدة</strong> — مبنية حوالين اللي فعلاً مهم.</span>
         </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roots — the floating village (approved 2026-11-20) -->
+  <section class="mv-roots" id="roots" aria-labelledby="mv-roots-h">
+    <div class="mv-stage">
+      <div class="mv-glow"></div>
+      <div class="mv-world" aria-hidden="true">
+        <img class="mv-moon" src="images/motion/village-moon.webp" srcset="images/motion/village-moon-m.webp 1200w, images/motion/village-moon.webp 2048w" sizes="(max-width:600px) 100vw, 1120px" width="2048" height="1365" loading="lazy" decoding="async" alt="">
+        <img class="mv-dark" src="images/motion/village-island-off.webp" srcset="images/motion/village-island-off-m.webp 1200w, images/motion/village-island-off.webp 2048w" sizes="(max-width:600px) 100vw, 1120px" width="2048" height="1365" loading="lazy" decoding="async" alt="">
+        <img class="mv-lit" src="images/motion/village-island.webp" srcset="images/motion/village-island-m.webp 1200w, images/motion/village-island.webp 2048w" sizes="(max-width:600px) 100vw, 1120px" width="2048" height="1365" loading="lazy" decoding="async" alt="">
+        <img class="mv-tex" src="images/motion/village-textile.webp" srcset="images/motion/village-textile-m.webp 1200w, images/motion/village-textile.webp 2048w" sizes="(max-width:600px) 100vw, 1120px" width="2048" height="1365" loading="lazy" decoding="async" alt="">
+      </div>
+      <div class="mv-copy shell">
+        <div class="label"><span dir="ltr">ROOTS</span></div>
+        <h2 class="mv-h" id="mv-roots-h" data-ar="جذورنا هون، وشغلنا لكل مكان." data-en="Rooted in one place. Built for everywhere.">جذورنا هون، وشغلنا لكل مكان.</h2>
       </div>
     </div>
   </section>
@@ -2448,23 +2474,6 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
     </div>
   </section>
 
-  <!-- Roots — the floating village (approved 2026-11-20) -->
-  <section class="mv-roots" id="roots" aria-labelledby="mv-roots-h">
-    <div class="mv-stage">
-      <div class="mv-glow"></div>
-      <div class="mv-world" aria-hidden="true">
-        <img class="mv-moon" src="images/motion/village-moon.webp" srcset="images/motion/village-moon-m.webp 1200w, images/motion/village-moon.webp 2048w" sizes="(max-width:600px) 100vw, 1120px" width="2048" height="1365" loading="lazy" decoding="async" alt="">
-        <img class="mv-dark" src="images/motion/village-island-off.webp" srcset="images/motion/village-island-off-m.webp 1200w, images/motion/village-island-off.webp 2048w" sizes="(max-width:600px) 100vw, 1120px" width="2048" height="1365" loading="lazy" decoding="async" alt="">
-        <img class="mv-lit" src="images/motion/village-island.webp" srcset="images/motion/village-island-m.webp 1200w, images/motion/village-island.webp 2048w" sizes="(max-width:600px) 100vw, 1120px" width="2048" height="1365" loading="lazy" decoding="async" alt="">
-        <img class="mv-tex" src="images/motion/village-textile.webp" srcset="images/motion/village-textile-m.webp 1200w, images/motion/village-textile.webp 2048w" sizes="(max-width:600px) 100vw, 1120px" width="2048" height="1365" loading="lazy" decoding="async" alt="">
-      </div>
-      <div class="mv-copy shell">
-        <div class="label"><span dir="ltr">ROOTS</span></div>
-        <h2 class="mv-h" id="mv-roots-h" data-ar="جذورنا هون، وشغلنا لكل مكان." data-en="Rooted in one place. Built for everywhere.">جذورنا هون، وشغلنا لكل مكان.</h2>
-      </div>
-    </div>
-  </section>
-
   <!-- 5. How Athar thinks (approved 2026-11-20): the whole story, pinned. The closed sphere asks the question, six objects
        carry the six approved stages along one Ember line, and the leaf rises with the closing line. -->
   <section class="mvt" id="process" aria-labelledby="mvt-h">
@@ -2548,6 +2557,10 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
               </a>
             </div>
           </div>
+        </div>
+        <div class="mv-pintro">
+          <div class="shell"><div class="label"><span dir="ltr">NEXT STEP</span></div></div>
+          <p class="mv-pline" data-ar="من هون، بتعرف شو خطوتك الجاية." data-en="Find your next step here.">من هون، بتعرف شو خطوتك الجاية.</p>
         </div>
         <div class="mv-arches" aria-hidden="true">
           <img class="mv-back" src="images/motion/arches-fabric-back.webp" srcset="images/motion/arches-fabric-back-m.webp 1100w, images/motion/arches-fabric-back.webp 1800w" sizes="(max-width:600px) 94vw, 860px" width="1800" height="1701" loading="lazy" decoding="async" alt="">
@@ -3615,7 +3628,7 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
   // closing section's darkness. In the closing section (no doorway): the approved copy lands in the light.
   if (portal) {
     var pstage = portal.querySelector('.mv-pstage'), arches = portal.querySelector('.mv-arches'), back = portal.querySelector('.mv-back'),
-        stone = portal.querySelector('.mv-stone'), front = portal.querySelector('.mv-front'), light = portal.querySelector('.mv-plight'), pcopy = portal.querySelector('.mv-pcopy');
+        stone = portal.querySelector('.mv-stone'), front = portal.querySelector('.mv-front'), light = portal.querySelector('.mv-plight'), pcopy = portal.querySelector('.mv-pcopy'), pintro = portal.querySelector('.mv-pintro');
     var OX = .385, OY = .36, ZMAX = 22, hx = 0, hy = 0, dx = 0, dy = 0;
     var measure = function(){ hx = arches.offsetLeft + arches.offsetWidth * OX; hy = arches.offsetTop + arches.offsetHeight * OY; dx = pstage.clientWidth / 2 - hx; dy = pstage.clientHeight / 2 - hy; };
     measure(); addEventListener('resize', measure);
@@ -3632,6 +3645,7 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
       front.style.opacity = (smooth(.2, .9, e) * (1 - smooth(.12, .42, t))).toFixed(3);
       light.style.opacity = ((.3 * a + .7 * tt) * (inClosing ? 1 : 1 - .85 * smooth(.78, 1, t))).toFixed(3);
       light.style.transform = 'translate3d(' + px(hx + dx * tt) + ',' + px(hy + dy * tt) + ',0) translate(-50%,-50%) scale(' + (1 + tt * 2.2).toFixed(3) + ')';
+      if (pintro) pintro.style.opacity = (smooth(.35, .9, e) * (1 - smooth(0, .12, t))).toFixed(3);
       if (pcopy) { var c = smooth(.52, .86, t); pcopy.style.opacity = c.toFixed(3); pcopy.style.transform = 'translate3d(0,' + px((1 - c) * 28) + ',0)'; pcopy.style.pointerEvents = c > .9 ? 'auto' : 'none'; }
     }});
   }
