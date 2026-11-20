@@ -17,7 +17,7 @@
 (function(){
   var root = document.querySelector('.journey'); if (!root) return;
   var Q = new URLSearchParams(location.search);
-  var DEBUG = Q.get('debug') === '1', PACE = Math.min(2, Math.max(0.4, parseFloat(Q.get('pace')) || 1));
+  var DEBUG = Q.get('debug') === '1', PACE = Math.min(2, Math.max(0.4, parseFloat(Q.get('pace')) || 1.3));
   // PROTO: the isolated prototype declares itself (window.JOURNEY_PROTOTYPE); only then do the A/B switches exist. The site
   // always runs the approved presentation: framed view, no sharpening, ambience on.
   var PROTO = window.JOURNEY_PROTOTYPE === true, BASE = 'journey/v1/';
@@ -195,7 +195,7 @@
   }
 
   // ---------------------------------------------------------------- the scroll position and its two smoothers
-  var uRaw = 0, uScrub = 0, sFrom = 0, sTo = 0, sT0 = 0, SCRUB = 700;
+  var uRaw = 0, uScrub = 0, sFrom = 0, sTo = 0, sT0 = 0, SCRUB = 950;
   var qTarget = 0, qCur = 0, lastT = performance.now();
   function readScroll(){
     var vh = sticky.offsetHeight / 100, top = root.getBoundingClientRect().top;
@@ -207,7 +207,7 @@
     var r = root.getBoundingClientRect(); if (!(r.bottom > -innerHeight && r.top < innerHeight * 2.5)) return;
     var dt = Math.min(64, now - lastT); lastT = now;
     uScrub = sFrom + (sTo - sFrom) * p3o(clamp01((now - sT0) / SCRUB));
-    var a = 1 - Math.pow(1 - 0.18, dt / 16.667);
+    var a = 1 - Math.pow(1 - 0.12, dt / 16.667);   // 2026-11-20: heavier (was 0.18)
     qCur += (qTarget - qCur) * a; if (Math.abs(qTarget - qCur) < 0.0004) qCur = qTarget;
     render(uScrub);
   }

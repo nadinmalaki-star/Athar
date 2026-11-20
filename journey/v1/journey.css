@@ -3,7 +3,7 @@
 
 main > section.journey{ content-visibility:visible; contain:none; }   /* the long pinned journey must never be size-estimated */
 .journey{ position:relative; background:var(--char); border-top:1px solid var(--line);
-  height:calc(var(--jr-travel, 750) * 1svh + 100svh); }
+  height:calc(var(--jr-travel, 972) * 1svh + 100svh); }
 .jr-sticky{ position:sticky; top:0; height:100svh; overflow:hidden; }
 
 /* ---------- Stage B: the cinematic, as a FRAMED stage (JS sets its box); edges dissolve into the page colour ---------- */

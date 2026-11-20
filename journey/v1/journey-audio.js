@@ -1,10 +1,12 @@
-/* ISOLATED PROTOTYPE — event-based sound from Video 1's original audio.
+/* Section 03 journey — event-based sound from the videos' original audio.
  *
  * Each sound belongs to one visual event and plays at its own natural speed, the same way every time, however the visitor
- * scrolls. Nothing is stretched, time-warped, chased or continuously synchronised to scroll.
- *   ambience  the quiet original room tone before the drop: starts as the box appears, ends on its own, gives way to the hit
- *   impact    the original metallic landing: fires when frame 62 (the landing) is on screen
- *   light     the original light / opening sound: fires when frame 84 (the light waking) is on screen
+ * scrolls. Nothing is stretched, time-warped, chased or continuously synchronised to scroll — so the scroll pace can change
+ * (journey.js PACE) without moving any sound off its picture. The owner's four moments:
+ *   1 the light is pulled in   cards (impact.mp3) as the cards leave + the quiet room tone (ambience) as the box appears
+ *   2 the fall                 impact: the original metallic landing, when frame 62 (the landing) is on screen
+ *   3 the door opens           light: the light / opening sound on frame 84, then v2 (Video 2's quiet build) on frame 122
+ *   4 the cards come out       v2surge: Video 2's surge on frame 150, the first panel lifting off
  * Attachment: an event fires when the DISPLAYED frame first reaches its frame while moving forward. Its file holds 15 ms before
  * the sound's first sample; that lead absorbs the audio device's latency so the attack is heard as it was in the source
  * (impact 19.6 ms, light 10.4 ms after its frame begins).
@@ -18,10 +20,14 @@
   var EVENTS = [
     { id:'impact', frame:62, rearm:50, file:'v1-impact.wav', gain:1.0, lead:0.015, delay:0.0196, late:6 },   // rearm: before the lift
     { id:'light',  frame:84, rearm:74, file:'v1-light.wav',  gain:1.0, lead:0.015, delay:0.0104, late:6 },
-    // VIDEO 2 layer (restored): swell.mp3 — the original asset, byte-identical, at its original level (0.6) — is Video 2's audio
-    // 0-2.6 s; it starts on Video 2's first frame (frame 122), where it lines up with the picture (its surge lands at frames
-    // 151-152 as the composition bursts open). It never fades or touches a Video 1 sound.
-    { id:'v2', frame:122, rearm:112, file:'swell.mp3', gain:0.6, lead:0, delay:0, late:6, layer:2 }
+    // VIDEO 2 layer: Video 2's original audio (swell.mp3, 0-2.6 s, at its original level 0.6) split at its surge (1.245 s) so
+    // each half belongs to its own picture, whatever the scroll speed (2026-11-20, the owner's four moments):
+    //   v2       the quiet build (0-1.245 s): the door opening, from Video 2's first frame (122)
+    //   v2surge  the surge (from 1.245 s, with the same 15 ms lead as the other hits): the cards leaving the box — the
+    //            first panel lifts off on frame 150; it takes over from the build
+    // Neither fades or touches a Video 1 sound.
+    { id:'v2', frame:122, rearm:112, file:'v2-build.wav', gain:0.6, lead:0, delay:0, late:6, layer:2 },
+    { id:'v2surge', frame:150, rearm:140, file:'v2-surge.wav', gain:0.6, lead:0.015, delay:0.01, late:8, layer:2, replaces:'v2' }
   ];
   var AMBIENCE = { id:'ambience', from:2, until:40, rearm:1, file:'v1-ambience.wav', gain:0.45 };   // starts between frames 2-40
   // OPENING STAGE (restored from revision 1): impact.mp3 — the original asset, byte-identical (Video 1 audio 1.05-2.45 s, the
@@ -46,6 +52,7 @@
     var skip = e.lead ? Math.max(0, Math.min(e.lead, e.lead + this.latency() - e.delay)) : 0;
     if (e !== CARDS && e.layer !== 2) this.fade('cards', 0.35, 'the box takes over');   // the opening-stage sound never overlaps the box sounds
     if (this.playing[e.id]) this.fade(e.id, 0.08, 'replaced');           // never two copies of the same sound
+    if (e.replaces) this.fade(e.replaces, 0.06, 'the surge takes over');  // the build gives way to the surge
     s.buffer = b; s.connect(g); g.connect(this.dest);
     if (e === this.amb) { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(e.gain, t + 0.3); } else g.gain.setValueAtTime(e.gain, t);
     s.start(t, skip);
