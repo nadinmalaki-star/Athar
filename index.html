@@ -1563,6 +1563,70 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
 .bbm-sw-btn svg{ width:14px; height:14px; }
 [dir="rtl"] .bbm-sw-btn svg{ transform:scaleX(-1); }
 </style>
+<style id="athar-index-2026">
+/* Athar Index (2026-11-20): header button + full-screen overlay. Above the header (z 70) and the soft-cut veil (z 49). */
+.idx-btn{ display:inline-flex; align-items:center; gap:10px; padding:8px 0; background:transparent; border:0; cursor:pointer; color:var(--paper);
+  font-family:var(--mono); font-size:11px; letter-spacing:3px; text-transform:uppercase; }
+html[lang="ar"] .idx-btn{ font-family:var(--body); font-size:14px; letter-spacing:0; }
+.idx-ico{ display:grid; gap:5px; width:18px; }
+.idx-ico i{ display:block; height:1.5px; background:currentColor; transition:width .3s ease; }
+.idx-ico i:last-child{ width:62%; justify-self:end; }
+.idx-btn:hover .idx-ico i:last-child, .idx-btn:focus-visible .idx-ico i:last-child{ width:100%; }
+.idx-btn:focus-visible{ outline:1px solid var(--ember); outline-offset:4px; }
+@media (max-width:374px){ .idx-l{ display:none; } .idx-btn{ padding:10px 4px; } }
+html.ax-lock{ overflow:hidden; }
+.ax{ position:fixed; inset:0; z-index:70; display:grid; grid-template-rows:auto 1fr auto; padding:0 var(--gutter) 30px; overflow-y:auto;
+  background:var(--void); opacity:0; visibility:hidden; transition:opacity .35s ease, visibility 0s linear .35s; }
+.ax.open{ opacity:1; visibility:visible; transition:opacity .35s ease; }
+.ax-top, .ax-list, .ax-dests{ width:100%; max-width:var(--shell); margin-inline:auto; }
+.ax-top{ display:flex; align-items:center; justify-content:space-between; min-height:104px; }
+.ax-title{ font-family:var(--mono); font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--paper-mute); }
+html[lang="ar"] .ax-title{ font-family:var(--body); font-size:14px; letter-spacing:0; }
+.ax-close{ display:grid; place-items:center; width:44px; height:44px; background:transparent; color:var(--paper); border:1px solid var(--line-strong); cursor:pointer; }
+.ax-close:hover, .ax-close:focus-visible{ border-color:var(--ember); outline:none; }
+.ax-body{ width:100%; max-width:var(--shell); margin-inline:auto; align-self:center; display:grid; grid-template-columns:minmax(0, 7fr) minmax(0, 5fr);
+  gap:clamp(32px, 5vw, 90px); align-items:center; padding:2vh 0 4vh; }
+.ax-list{ list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
+.ax-list li{ border-bottom:1px solid var(--line); opacity:0; transform:translateY(12px);
+  transition:opacity .5s ease, transform .6s cubic-bezier(.22,1,.36,1); transition-delay:calc(var(--i) * 35ms + 60ms); }
+.ax.open .ax-list li{ opacity:1; transform:none; }
+.ax-list a{ display:grid; grid-template-columns:2.6em minmax(0, 1fr) auto; align-items:baseline; gap:14px; padding:clamp(10px, 1.6vh, 16px) 0;
+  text-decoration:none; color:var(--paper-dim); transition:color .25s ease; }
+.ax-list a i{ font-style:normal; font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--paper-mute); transition:color .25s ease; }
+.ax-n{ font-family:var(--display); font-weight:800; font-size:clamp(20px, min(2.1vw, 3.4vh), 30px); line-height:1.25; }
+html[lang="ar"] .ax-n{ line-height:1.5; }
+.ax-list a small{ font-family:var(--mono); font-size:10px; letter-spacing:2.5px; color:var(--paper-mute); opacity:.7; transition:opacity .25s ease; }
+.ax-list a .ax-n{ display:inline-flex; align-items:center; gap:12px; transition:transform .35s cubic-bezier(.22,1,.36,1); }
+.ax-list a:hover, .ax-list a:focus-visible, .ax-list a.on{ color:var(--paper); outline:none; }
+.ax-list a:hover i, .ax-list a:focus-visible i, .ax-list a.on i{ color:var(--ember); }
+.ax-list a:hover .ax-n, .ax-list a:focus-visible .ax-n{ transform:translateX(6px); }
+[dir="rtl"] .ax-list a:hover .ax-n, [dir="rtl"] .ax-list a:focus-visible .ax-n{ transform:translateX(-6px); }
+.ax-list a.cur .ax-n::after{ content:''; width:7px; height:7px; border-radius:50%; background:var(--ember); }
+.ax-pv{ position:relative; aspect-ratio:4 / 3.4; }
+.ax-pv::before{ content:''; position:absolute; inset:8% 6%; border-radius:50%; background:radial-gradient(closest-side, rgba(255,110,60,.12), transparent 70%); }
+.ax-pv-f{ position:absolute; inset:0; margin:0; opacity:0; transform:scale(.97); transition:opacity .45s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+.ax-pv-f.on{ opacity:1; transform:none; }
+.ax-pv-f img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+.ax-pv-f[data-pv="0"] img, .ax-pv-f[data-pv="2"] img{ object-fit:cover; border-radius:6px; inset:12% 4%; width:92%; height:76%; }
+/* identity: the full logo between the two flowers, as in the section; FAQ: no picture of its own, so a large question mark */
+.ax-pv-idn img.m{ inset:22% 27%; width:46%; height:56%; }
+.ax-pv-idn img.l{ inset:14% auto 14% 0; width:30%; height:72%; }
+.ax-pv-idn img.o{ inset:22% 0 10% auto; width:24%; height:68%; }
+/* Built by Athar: the two apps' own icons side by side, the same size */
+.ax-pv-apps{ display:flex; align-items:center; justify-content:center; gap:9%; }
+.ax-pv-apps span{ width:34%; display:grid; justify-items:center; gap:16px; }
+.ax-pv-apps img{ position:static; display:block; width:100%; height:auto; aspect-ratio:1; box-shadow:0 18px 40px rgba(0,0,0,.45); }
+.ax-pv-apps img.kh{ border-radius:22%; }
+.ax-pv-apps b{ font-family:var(--mono); font-weight:400; font-size:10px; letter-spacing:2.5px; color:var(--paper-mute); }
+.ax-pv-q{ display:grid; place-items:center; }
+.ax-pv-q span{ font-family:var(--display); font-weight:800; font-size:clamp(120px, 14vw, 220px); line-height:1; color:var(--ember); opacity:.9; }
+@media (max-width:900px){ .ax-body{ grid-template-columns:1fr; } .ax-pv{ display:none; } .ax-list a small{ display:none; } .ax-list a{ grid-template-columns:2.4em minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce){ .ax-pv-f, .ax-list a .ax-n{ transition:none; } }
+.ax-dests{ display:flex; flex-wrap:wrap; gap:14px 30px; padding-top:22px; border-top:1px solid var(--line); }
+.ax-dests a{ color:var(--paper); text-decoration:none; font-size:15px; padding-bottom:4px; border-bottom:1px solid var(--ember); }
+@media (max-width:600px){ .ax-top{ min-height:82px; } .ax-list a{ gap:14px; } }
+@media (prefers-reduced-motion: reduce){ .ax, .ax.open, .ax-list li{ transition:none; } .ax-list li{ opacity:1; transform:none; } }
+</style>
 </head>
 <body>
 
@@ -1576,15 +1640,48 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
            Integration / Route Audit decides its route. Phones: both destinations will move
            into a compact menu button when Lab is activated. See ATHAR_DESTINATIONS below. -->
       <div class="nav-dests" data-destinations="nav">
-        <a href="/solution-indicator/" class="nav-indicator-link" data-indicator-link data-dest="solution-indicator" data-ar="مؤشر الحلول" data-en="Solution Indicator">مؤشر الحلول</a>
         <template data-dest-reserved="athar-lab">
           <a class="nav-indicator-link" data-dest="athar-lab" data-en="Athar Lab">Athar Lab</a>
         </template>
       </div>
-      <div class="nav-en">ATHAR — 2026</div>
+      <button type="button" class="idx-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="athar-index"><span class="idx-ico" aria-hidden="true"><i></i><i></i></span><span class="idx-l" data-ar="فهرس أثر" data-en="Athar Index">فهرس أثر</span></button>
       <button id="langToggle" class="lang-toggle" onclick="toggleLang()">EN</button>
     </div>
   </nav>
+  <!-- Athar Index (2026-11-20): the whole page at a glance. Opens from the header; Esc / × close it; a section link
+       closes it and travels there (far jumps use the soft cut). The current section is marked. -->
+  <div class="ax" id="athar-index" role="dialog" aria-modal="true" aria-labelledby="ax-title">
+    <div class="ax-top">
+      <p class="ax-title" id="ax-title" data-ar="فهرس أثر" data-en="Athar Index">فهرس أثر</p>
+      <button type="button" class="ax-close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.6"/></svg></button>
+    </div>
+    <div class="ax-body">
+      <ol class="ax-list">
+        <li style="--i:0"><a href="#about" data-pv="0"><i>01</i><span class="ax-n" data-ar="نفهم المشكلة" data-en="Understanding">نفهم المشكلة</span><small dir="ltr">UNDERSTANDING</small></a></li>
+        <li style="--i:1"><a href="#roots" data-pv="1"><i>02</i><span class="ax-n" data-ar="جذورنا" data-en="Roots">جذورنا</span><small dir="ltr">ROOTS</small></a></li>
+        <li style="--i:2"><a href="#services" data-pv="2"><i>03</i><span class="ax-n" data-ar="شو منبني" data-en="What we build">شو منبني</span><small dir="ltr">WHAT SHOULD BE BUILT</small></a></li>
+        <li style="--i:3"><a href="#work" data-pv="3"><i>04</i><span class="ax-n" data-ar="بنيناها في أثر" data-en="Built by Athar">بنيناها في أثر</span><small dir="ltr">BUILT BY ATHAR</small></a></li>
+        <li style="--i:4"><a href="#identity" data-pv="4"><i>05</i><span class="ax-n" data-ar="الهوية البصرية" data-en="Visual identity">الهوية البصرية</span><small dir="ltr">BRAND &amp; IDENTITY</small></a></li>
+        <li style="--i:5"><a href="#process" data-pv="5"><i>06</i><span class="ax-n" data-ar="كيف بتفكّر أثر" data-en="How Athar thinks">كيف بتفكّر أثر</span><small dir="ltr">HOW ATHAR THINKS</small></a></li>
+        <li style="--i:6"><a href="#faq" data-pv="6"><i>07</i><span class="ax-n" data-ar="أسئلة شائعة" data-en="FAQ">أسئلة شائعة</span><small dir="ltr">FAQ</small></a></li>
+        <li style="--i:7"><a href="#contact" data-pv="7"><i>08</i><span class="ax-n" data-ar="احكيلنا" data-en="Contact">احكيلنا</span><small dir="ltr">NEXT STEP</small></a></li>
+      </ol>
+      <div class="ax-pv" aria-hidden="true">
+        <figure class="ax-pv-f" data-pv="0"><img data-src="images/understanding/understanding-780.webp" alt=""></figure>
+        <figure class="ax-pv-f" data-pv="1"><img data-src="images/motion/village-island-m.webp" alt=""></figure>
+        <figure class="ax-pv-f" data-pv="2"><img data-src="journey/v1/frames/m/f-0241.webp" alt=""></figure>
+        <figure class="ax-pv-f ax-pv-apps" data-pv="3"><span><img class="kh" data-src="images/motion/app-khznti.webp" alt=""><b dir="ltr">KHZNTI</b></span><span><img data-src="images/motion/app-mahki.webp" alt=""><b dir="ltr">MAHKI</b></span></figure>
+        <figure class="ax-pv-f ax-pv-idn" data-pv="4"><img class="l" data-src="images/motion/lily-hd-m.webp" alt=""><img class="m" data-src="images/brand/athar-logo-2026-full-dark.svg" alt=""><img class="o" data-src="images/motion/olive-hd-m.webp" alt=""></figure>
+        <figure class="ax-pv-f" data-pv="5"><img data-src="images/motion/think-24-m.webp" alt=""></figure>
+        <figure class="ax-pv-f ax-pv-q" data-pv="6"><span data-ar="؟" data-en="?">؟</span></figure>
+        <figure class="ax-pv-f" data-pv="7"><img data-src="images/motion/arches-fabric-back-m.webp" alt=""><img data-src="images/motion/arches-stone-m.webp" alt=""><img data-src="images/motion/arches-fabric-front-m.webp" alt=""></figure>
+      </div>
+    </div>
+    <div class="ax-dests">
+      <a href="/solution-indicator/" data-indicator-link data-ar="مؤشر الحلول ←" data-en="Solution Indicator →">مؤشر الحلول ←</a>
+      <a href="/lab/?lang=ar" data-dest="athar-lab" data-ar="مختبر أثر ←" data-en="Athar Lab →">مختبر أثر ←</a>
+    </div>
+  </div>
 
   <main>
   <!-- 1. Hero — Signal in the Noise -->
@@ -2826,7 +2923,7 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
   // step with language switches by setIndicatorLinks(). ('footer' would mount the footer group only.)
   var ATHAR_DESTINATIONS = {
     'solution-indicator': { enabled: true },
-    'athar-lab': { enabled: true, href: '/lab/', ar: 'مختبر أثر', placement: 'gateway' },
+    'athar-lab': { enabled: true, href: '/lab/', ar: 'مختبر أثر', placement: 'nav' },   // 2026-11-20: header link + the gateway above the footer
   };
   (function mountReservedDestinations(){
     var lab = ATHAR_DESTINATIONS['athar-lab'];
@@ -3810,6 +3907,62 @@ html[lang="ar"] p.mvt-big{ line-height:1.6; }
     new MutationObserver(label).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
     label(); sync();
   });
+})();
+</script>
+<script id="athar-index-2026-js">
+// Athar Index: open from the header button; Esc, × or choosing a section close it. Focus stays inside while it is open
+// and returns to the button after. The section on screen is marked. The Lab links follow the page language.
+(function(){
+  var btn = document.querySelector('.idx-btn'), ax = document.getElementById('athar-index'); if (!btn || !ax) return;
+  var close = ax.querySelector('.ax-close'), links = [].slice.call(ax.querySelectorAll('.ax-list a')), back = null;
+  function labels(){
+    var ar = document.documentElement.lang === 'ar';
+    close.setAttribute('aria-label', ar ? 'سكّر الفهرس' : 'Close the index');
+    [].forEach.call(document.querySelectorAll('[data-dest="athar-lab"]'), function(a){ a.href = '/lab/?lang=' + (ar ? 'ar' : 'en'); });
+  }
+  function mark(){
+    var line = innerHeight * .4, cur = null;
+    links.forEach(function(a){
+      var t = document.getElementById(a.getAttribute('href').slice(1)); if (!t) return;
+      var r = (t.closest('section') || t).getBoundingClientRect(); if (r.top <= line && r.bottom > line) cur = a;
+    });
+    links.forEach(function(a){ a.classList.toggle('cur', a === cur); if (a === cur) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+  }
+  function open(){
+    back = document.activeElement; mark(); labels();
+    ax.classList.add('open'); document.documentElement.classList.add('ax-lock'); btn.setAttribute('aria-expanded', 'true');
+    setTimeout(function(){ (ax.querySelector('.ax-list a.cur') || links[0]).focus({ preventScroll: true }); }, 60);
+  }
+  function shut(restore){
+    if (!ax.classList.contains('open')) return;
+    ax.classList.remove('open'); document.documentElement.classList.remove('ax-lock'); btn.setAttribute('aria-expanded', 'false');
+    if (restore && back && back.focus) back.focus({ preventScroll: true });
+  }
+  btn.addEventListener('click', open);
+  close.addEventListener('click', function(){ shut(true); });
+  ax.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') { e.preventDefault(); shut(true); return; }
+    if (e.key !== 'Tab') return;
+    var f = [].slice.call(ax.querySelectorAll('a[href], button')), i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+  });
+  links.forEach(function(a){ a.addEventListener('click', function(){ shut(false); }); });
+  // previews: loaded on the first open; the row under the pointer / focus shows its section, else the current one
+  var figs = [].slice.call(ax.querySelectorAll('.ax-pv-f')), loaded = false;
+  function show(n){ figs.forEach(function(f){ f.classList.toggle('on', f.getAttribute('data-pv') === String(n)); }); links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-pv') === String(n)); }); }
+  function rest(){ var c = ax.querySelector('.ax-list a.cur'); show(c ? c.getAttribute('data-pv') : 0); }
+  links.forEach(function(a){
+    a.addEventListener('mouseenter', function(){ show(a.getAttribute('data-pv')); });
+    a.addEventListener('focus', function(){ show(a.getAttribute('data-pv')); });
+  });
+  ax.querySelector('.ax-list').addEventListener('mouseleave', rest);
+  btn.addEventListener('click', function(){
+    if (!loaded) { loaded = true; [].forEach.call(ax.querySelectorAll('.ax-pv img[data-src]'), function(im){ im.src = im.getAttribute('data-src'); }); }
+    rest();
+  });
+  new MutationObserver(labels).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+  labels();
 })();
 </script>
 </body>
