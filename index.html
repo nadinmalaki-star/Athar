@@ -1393,6 +1393,7 @@ footer.ft{ text-align:start; padding:0; background:var(--void); border-top:1px s
 .idn-rlogo{ width:min(42svh, 390px); opacity:0; }
 .idn-rlogo img{ display:block; width:100%; height:auto; }
 @media (max-width:600px){ .idn-reveal{ height:210vh; } .idn-rf-lily{ --h:44svh; } .idn-rf-olive{ --h:38svh; } .idn-rlogo{ width:64vw; } }
+@media (min-width:601px) and (max-width:1100px) and (orientation:portrait){ .idn-rf-lily{ --h:38svh; } .idn-rf-olive{ --h:32svh; } .idn-rlogo{ width:min(52vw, 40svh); } }
 
 /* shared rise-in for the flowers */
 .mv-rise{ opacity:0; transform:translateY(60px) rotate(var(--r0, 0deg)); filter:blur(10px);
@@ -3689,7 +3690,7 @@ html[lang="ar"] .ax-n{ line-height:1.5; }
         logo = rv.querySelector('.idn-rlogo'), rlight = rv.querySelector('.idn-rlight');
     scenes.push({ el: rv, run: function(T, dt, vh){
       var r = rv.getBoundingClientRect(), p = ease('rp', clamp(-r.top / (r.height - vh)), dt), e = out3(ease('re', clamp((vh - r.top) / vh), dt));
-      var W = rstage.clientWidth, sg = H.dir === 'rtl' ? -1 : 1, phone = W < 600;
+      var W = rstage.clientWidth, sg = H.dir === 'rtl' ? -1 : 1, phone = W < 600 || W < vh * .9;   // phones and portrait tablets: the flowers part up and down
       var sp = smooth(.1, .6, p), lg = smooth(.3, .72, p), lw = lily.offsetWidth, ow = olive.offsetWidth;
       var xl = (-lw * .3) + ((phone ? -W * .27 : -(W / 2 - lw * .42)) + lw * .3) * sp, yl = (phone ? -vh * .2 : -vh * .02) * sp;
       var xo = (ow * .45) + ((phone ? W * .3 : (W / 2 - ow * .45)) - ow * .45) * sp, yo = (phone ? vh * .21 : vh * .04) * sp;
