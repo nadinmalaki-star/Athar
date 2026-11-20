@@ -17,7 +17,7 @@
 //     versioned paths, e.g. /signal/v1/core.js or /vendor/three/r<rev>/…
 //     A published versioned path never changes content; a change ships under
 //     a new version folder, so cache-first can never serve a stale module.
-const CACHE_NAME = 'athar-static-v3';
+const CACHE_NAME = 'athar-static-v4';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
