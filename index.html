@@ -1436,7 +1436,7 @@ html[lang="ar"] .mv-h{ line-height:1.3; letter-spacing:0; }
    overflow:clip trims the same way without that side effect */
 section.path:has(.mv-in-closing){ overflow:clip; }
 .mv-anchor{ position:absolute; top:calc(100% - 100vh); width:1px; height:1px; }
-.mv-arches{ position:relative; width:min(860px, 86vw, calc((100svh - 190px) * 1.058)); aspect-ratio:2200 / 2079; transform-origin:38.5% 36%; will-change:transform, opacity; }
+.mv-arches{ position:relative; width:min(860px, 86vw, calc((100svh - 190px) * 1.058)); aspect-ratio:2200 / 2079; transform-origin:38.5% 36%; will-change:transform, opacity; pointer-events:none; }   /* decorative: faded out at the end of the flight, it must not take the clicks meant for the copy under it */
 .mv-arches img{ position:absolute; inset:0; width:100%; height:100%; transform-origin:38.5% 36%; will-change:transform, opacity; }
 /* the arrival: a small label above, one line below the arches; both leave as the camera enters the arch */
 .mv-pintro{ position:absolute; inset:0; z-index:2; pointer-events:none; display:flex; flex-direction:column; justify-content:space-between;
