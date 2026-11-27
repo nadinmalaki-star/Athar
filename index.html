@@ -498,29 +498,6 @@
 <!-- Without JavaScript the online form cannot submit, so it is hidden and
      replaced by the direct-email notice in the contact section. -->
 <noscript><style>.contact-form{ display:none !important; }</style></noscript>
-<!-- HERO: the approved Hero v4 (rendered Hero, locked 2026-10-10) is the default on every host (activated 2026-10-15).
-     LOCAL REVIEW SWITCH (dev hosts only, opt-in): /?hero=v2-2c (Stage 2 2C motion prototype), /?hero=v2-2b1 (static 2B.1),
-     /?hero=v3 (realtime static checkpoint) still show the earlier review states on localhost; inert everywhere else. -->
-<script>
-(function(){
-  try {
-    var q = new URLSearchParams(location.search).get('hero');
-    var hero = /^(localhost|127\.0\.0\.1|::1|\[::1\])$/.test(location.hostname) && (q === 'v2-2c' || q === 'v2-2b1' || q === 'v3') ? q : 'v4';
-    document.documentElement.setAttribute('data-hero-v2', hero === 'v3' || hero === 'v4' ? hero : hero.slice(3));
-    if (hero === 'v4') {   // the Hero poster is the first paint: fetch it before anything else
-      // motion-capable desktop: the first frame of the production motion (the video then starts seamlessly from it);
-      // reduced motion / data saver / no WebM: the approved final resting frame
-      var c = navigator.connection, v = document.createElement('video');
-      var motion = innerWidth > 900 && !matchMedia('(prefers-reduced-motion: reduce)').matches && !(c && c.saveData) &&
-        'IntersectionObserver' in window && !!(v.canPlayType && (v.canPlayType('video/mp4; codecs="avc1.640028"') || v.canPlayType('video/webm; codecs="vp9"')));
-      if (motion) document.documentElement.setAttribute('data-hero-v4-motion', '');
-      var l = document.createElement('link'); l.rel = 'preload'; l.as = 'image';
-      l.href = '/signal/v1/assets/hero-v4/' + (innerWidth <= 900 ? 'poster_mobile_en.webp' : motion ? 'poster_start_en.webp' : 'poster_en.webp');
-      l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
-    }
-  } catch (e) {}
-})();
-</script>
 <style id="hero-v2-review">
 .hero-pin{ display:contents; }   /* layout-neutral by default: the Hero's children lay out exactly as before */
 @media (min-width:901px){
@@ -1633,6 +1610,158 @@ html[lang="ar"] .ax-n{ line-height:1.5; }
 @media (max-width:600px){ .ax-top{ min-height:82px; } .ax-list a{ gap:14px; } }
 @media (prefers-reduced-motion: reduce){ .ax, .ax.open, .ax-list li{ transition:none; } .ax-list li{ opacity:1; transform:none; } }
 </style>
+<style id="index-plus-2026">
+/* Index plus (2026-11-27): rail, preview line, circle opening, custom cursor */
+/* 1 rail */
+.ax-list{ position:relative; }
+.ax-rail{ position:absolute !important; inset-block:0; inset-inline-start:-26px; width:1px; border:0 !important; opacity:1 !important; transform:none !important; background:var(--line-strong); }
+.ax-fill{ position:absolute; inset-inline:0; top:0; height:var(--fill, 0px); background:var(--ember); transition:height .6s cubic-bezier(.22,1,.36,1) .25s; }
+.ax-dot{ position:absolute; left:50%; top:var(--fill, 0px); width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:var(--ember);
+  box-shadow:0 0 0 4px rgba(255,90,54,.18); transition:top .6s cubic-bezier(.22,1,.36,1) .25s; }
+.ax-list a.seen i{ color:var(--paper-dim); }
+@media (max-width:900px){ .ax-rail{ inset-inline-start:-12px; } }
+/* 2 the line under the preview */
+.ax-side{ display:grid; gap:18px; align-content:center; }
+.ax-line{ margin:0; text-align:center; font-family:var(--display); font-weight:700; font-size:clamp(15px, 1.25vw, 19px); line-height:1.5; color:var(--paper-dim);
+  min-height:3em; transition:opacity .3s ease; }
+html[lang="ar"] .ax-line{ line-height:1.7; }
+.ax-line.out{ opacity:0; }
+@media (max-width:900px){ .ax-side{ display:none; } }
+/* 3 the circle opening from the button */
+.ax{ opacity:1; clip-path:circle(0px at var(--ox, 90%) var(--oy, 52px)); transition:clip-path .7s cubic-bezier(.55,0,.3,1), visibility 0s linear .7s; }
+.ax.open{ opacity:1; clip-path:circle(var(--or, 160vmax) at var(--ox, 90%) var(--oy, 52px)); transition:clip-path 1.05s cubic-bezier(.35,.2,.4,1); }   /* owner 2026-11-27: it opened like lightning -> slower, gentler */
+.ax-list li{ transition-duration:.6s, .75s; transition-delay:calc(var(--i) * 55ms + 420ms); }   /* owner: .75s was lightning, 1.45s too slow -> in between */
+@media (prefers-reduced-motion: reduce){ .ax, .ax.open{ clip-path:none; transition:none; } }
+/* 4 cursor */
+.cur-dot, .cur-ring{ position:fixed; left:0; top:0; z-index:90; pointer-events:none; opacity:0; transition:opacity .25s ease; }
+.cur-on .cur-dot, .cur-on .cur-ring{ opacity:1; }
+.cur-dot{ width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%; background:var(--ember); }
+.cur-ring{ width:34px; height:34px; margin:-17px 0 0 -17px; border-radius:50%; border:1px solid rgba(245,243,237,.55); display:grid; place-items:center;
+  mix-blend-mode:difference; transition:opacity .25s ease, width .3s ease, height .3s ease, margin .3s ease, border-color .3s ease, background .3s ease; }
+.cur-ring span{ font-family:var(--mono); font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:#F5F3ED; opacity:0; transition:opacity .2s ease; white-space:nowrap; }
+html[lang="ar"] .cur-ring span{ font-family:var(--body); font-size:11px; letter-spacing:0; }
+.cur-link .cur-ring{ width:52px; height:52px; margin:-26px 0 0 -26px; border-color:var(--ember); }
+.cur-text .cur-ring{ width:18px; height:18px; margin:-9px 0 0 -9px; }
+.cur-label .cur-ring{ width:74px; height:74px; margin:-37px 0 0 -37px; border-color:rgba(245,243,237,.8); background:rgba(245,243,237,.06); }
+.cur-label .cur-ring span{ opacity:1; }
+.cur-label .cur-dot{ opacity:0; }
+html.cur-has, html.cur-has *{ cursor:none !important; }
+html.cur-has input, html.cur-has textarea, html.cur-has select{ cursor:text !important; }
+html.cur-field .cur-dot, html.cur-field .cur-ring{ opacity:0; }
+/* 5 index previews on one stage: every picture fits the same box (13% / 8% in from the edges) */
+.ax-pv-f > img{ inset:13% 8%; width:84%; height:74%; }
+.ax-pv-f[data-pv="0"] img, .ax-pv-f[data-pv="2"] img{ inset:15% 6%; width:88%; height:70%; }
+.ax-pv-f[data-pv="7"] img{ inset:15% 10%; width:80%; height:70%; }
+.ax-pv-apps span{ width:34%; }
+.ax-pv-idn img.l{ inset:14% auto 14% 2%; width:27%; height:72%; }
+.ax-pv-idn img.m{ inset:20% 27%; width:46%; height:60%; }
+.ax-pv-idn img.o{ inset:18% 3% 12% auto; width:23%; height:70%; }
+.ax-pv-qs{ display:grid; place-items:center; }
+.ax-pv-qs ol{ list-style:none; margin:0; padding:0; width:84%; border-top:1px solid var(--line); }
+.ax-pv-qs li{ display:flex; gap:14px; align-items:baseline; padding:17px 0; border-bottom:1px solid var(--line);
+  font-family:var(--display); font-weight:800; font-size:clamp(17px, 1.6vw, 24px); line-height:1.45; color:var(--paper); }
+.ax-pv-qs li i{ font-style:normal; font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:1px; color:var(--ember); }
+.ax-pv-qs li:nth-child(2){ opacity:.62; } .ax-pv-qs li:nth-child(3){ opacity:.34; }
+/* 6 words appear in sequence (like the owner's example, 2026-11-26): each word comes from nothing — a little low and blurred —
+   one after another when the text enters the screen; the line under the headline follows, the FAQ questions rise one by one */
+.sq-w{ display:inline-block; opacity:0; transform:translateY(.38em); filter:blur(9px);
+  transition:opacity .75s ease, transform 1s cubic-bezier(.22,1,.36,1), filter .85s ease; transition-delay:calc(var(--i) * 75ms); }
+.sq-sub .sq-w{ filter:none; transform:translateY(.5em); transition-duration:.7s, .9s, 0s; transition-delay:calc(var(--i) * 28ms + 280ms); }
+.sq-in .sq-w{ opacity:1; transform:none; filter:none; }
+.sq-item{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .9s cubic-bezier(.22,1,.36,1); transition-delay:calc(var(--k, 0) * 110ms); }
+.sq-item.sq-in{ opacity:1; transform:none; }
+</style>
+<style id="understanding-thread-2026">
+/* Understanding scene (thread -> glass -> one line). Without JS or with reduced motion: the last frame, still, no pin. */
+.u-scene{ --uh:min(56.25vw, 84vh); position:relative; margin:48px calc(50% - 50vw) 0; height:var(--uh); }
+.u-scene.is-live{ height:calc(var(--uh) + 124vh); }   /* 73 frames x 1.7vh: the same pace as the hero */
+.u-scene-pin{ position:sticky; top:calc((100vh - var(--uh)) / 2); top:calc((100svh - var(--uh)) / 2); height:var(--uh); overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 13%, #000 84%, transparent 100%); mask-image:linear-gradient(to bottom, transparent 0, #000 13%, #000 84%, transparent 100%); }
+.u-scene-still, .u-scene-c{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+.u-scene-c{ opacity:0; } .u-scene.has-frames .u-scene-c{ opacity:1; } .u-scene.has-frames .u-scene-still{ visibility:hidden; }
+/* phones: a taller crop that keeps the tangle, the glass and the start of the clean line */
+@media (max-width:900px){ .u-scene{ --uh:76vw; margin-top:32px; } .u-scene.is-live{ height:calc(var(--uh) + 124vh); } .u-scene-still, .u-scene-c{ object-position:20% 50%; } }
+</style>
+<style id="hero-flight-2026">
+/* hero flight. Default (no JS / reduced motion): the first frame, still, with the whole copy stacked. */
+.hf{ position:relative; background:#050505; }
+.hf-pin{ position:relative; min-height:100vh; min-height:100svh; overflow:hidden; display:flex; align-items:flex-end; }
+.hf.is-live{ height:calc(100vh + var(--hf-len, 500vh)); } .hf.is-live .hf-pin{ position:sticky; top:0; height:100vh; height:100svh; }
+.hf-frame{ position:absolute; inset:0; }
+.hf-still, .hf-c{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+.hf-c{ opacity:0; } .hf.has-frames .hf-c{ opacity:1; } .hf-still{ z-index:1; } .hf.has-frames .hf-still{ opacity:var(--hf-still, 0); } .hf:not(.hf-alt) .hf-still{ display:none; }
+/* the opening: the village's own sharp layers, placed exactly where the first frame of the footage has them */
+.hf{ --hf-fh:100vh; } @supports (height:100svh){ .hf{ --hf-fh:100svh; } }
+.hf-layers{ position:absolute; z-index:1; left:50%; top:50%; width:max(100%, calc(var(--hf-fh) * 16 / 9)); aspect-ratio:16 / 9; pointer-events:none;
+  transform:translate(-50%, -50%) translateY(var(--hf-ty, 0px)) scale(var(--hf-ts, 1)); }   /* --hf-ts / --hf-ty follow the village's small move in the footage */
+.hf-layers::before{ content:''; position:absolute; inset:-8%; opacity:var(--hf-open, 1);
+  background:#050505 radial-gradient(ellipse 31% 34.5% at 50% 50%, rgba(255,110,60,.18) 0, rgba(255,110,60,.11) 42%, rgba(255,110,60,0) 100%); }
+.hf-alt .hf-layers{ display:none; } .hf-opened .hf-layers{ visibility:hidden; }
+.hf-world{ position:absolute; left:19.027%; top:12.738%; width:60.388%; height:71.554%; transform-origin:50% 0; opacity:var(--hf-hold, 1);
+  transform:translateY(calc((1 - var(--hf-zoom, 0)) * var(--hf-ry, -2%))) scale(calc(var(--hf-rs, .78) + var(--hf-zoom, 0) * (1 - var(--hf-rs, .78)))); }   /* at rest: smaller and higher, air for the title; the first stretch of scroll zooms it to the footage's size, then it dissolves */
+.hf:not(.is-live) .hf-world{ transform:scale(.6); }   /* no motion: the whole copy is stacked under it */
+.hf-world img{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.hf-l-tex{ transform-origin:24% 68%; }
+.hf-frame::after{ content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(to top, rgba(5,5,5,.86) 0, rgba(5,5,5,.5) 22%, rgba(5,5,5,0) 48%), linear-gradient(to bottom, rgba(5,5,5,.6) 0, rgba(5,5,5,0) 18%); }
+.hf-copy{ position:relative; z-index:2; width:100%; max-width:var(--shell); margin:0 auto; padding:0 var(--gutter) clamp(84px, 13vh, 150px); display:grid; gap:18px; }
+.hf-title{ margin:0; font-family:var(--display); font-weight:800; font-size:clamp(48px, 6.6vw, 108px); line-height:1.02; letter-spacing:-.02em; color:var(--paper); }
+html[lang="ar"] .hf-title{ line-height:1.28; letter-spacing:0; }
+.hf-sub{ margin:0; font-family:var(--display); font-weight:700; font-size:clamp(24px, 3vw, 46px); line-height:1.25; color:var(--paper); max-width:22em; }
+html[lang="ar"] .hf-sub{ line-height:1.55; }
+.hf-body{ margin:0 0 30px; font-size:clamp(19px, 1.62vw, 29px); line-height:1.6; color:var(--paper); max-width:29ch; }   /* owner 2026-11-27: it read small on a full screen */
+html[lang="ar"] .hf-body{ line-height:1.75; }
+.hf-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:16px 28px; }
+.hf-btn{ padding:0 22px 0 26px; gap:16px; min-height:clamp(54px, 4.2vw, 68px); font-size:clamp(15px, 1.1vw, 19px); } .hf-arrow{ font-size:1.2em; line-height:1; }
+.hf-actions .text-link{ font-size:clamp(15px, 1.1vw, 19px); }
+.hf-cue{ display:none; }
+/* live: one caption at a time, in the same place; words come from nothing, one after another */
+.hf.is-live .hf-copy{ display:block; height:clamp(220px, 40vh, 400px); padding-bottom:0; margin-bottom:clamp(40px, 6.5vh, 76px); }
+.hf.is-live .hf-cap{ position:absolute; inset-inline:var(--gutter); bottom:0; visibility:hidden; opacity:0; transition:opacity .35s ease, visibility 0s linear .35s; }
+.hf.is-live .hf-cap.on{ visibility:visible; opacity:1; transition:opacity .2s ease; }
+.hf-w{ display:inline-block; }
+.hf.is-live .hf-w{ opacity:0; transform:translateY(.38em); filter:blur(10px); transition:opacity .8s ease, transform 1.05s cubic-bezier(.22,1,.36,1), filter .9s ease; transition-delay:0s; }
+.hf.is-live .hf-cap.on .hf-w{ opacity:1; transform:none; filter:none; transition-delay:calc(var(--i) * 85ms + 80ms); }
+.hf.is-live .hf-body .hf-w{ filter:none; transform:translateY(.5em); }
+.hf.is-live .hf-cap.on .hf-body .hf-w{ transition-delay:calc(var(--i) * 30ms + 80ms); }
+.hf.is-live .hf-actions{ opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .8s cubic-bezier(.22,1,.36,1); }
+.hf.is-live .hf-cap.on .hf-actions{ opacity:1; transform:none; transition-delay:.75s; }
+.hf.is-live .hf-cue{ display:flex; align-items:center; gap:12px; position:absolute; z-index:2; inset-inline-end:var(--gutter); bottom:clamp(40px, 6.5vh, 76px);
+  font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:var(--paper); opacity:.85; transition:opacity .4s ease; }
+html[lang="ar"] .hf.is-live .hf-cue{ font-family:var(--body); font-size:13px; letter-spacing:0; }
+.hf-cue i{ width:44px; height:1px; background:var(--ember); }
+.hf.moved .hf-cue{ opacity:0; }
+@media (max-width:900px){
+  /* phones: the flight is a square band, the copy sits under it, and the two are centred in the screen */
+  .hf{ --hf-fh:100vw; --hf-rs:.9; --hf-ry:7%; }   /* phones: the resting village is bigger and sits a little lower */
+  .hf-pin{ display:flex; flex-direction:column; justify-content:center; align-items:stretch; padding-top:56px; }
+  .hf-frame{ position:relative; inset:auto; flex:none; width:100%; aspect-ratio:1 / 1; overflow:hidden; }
+  .hf-frame::after{ background:linear-gradient(to top, rgba(5,5,5,1) 0, rgba(5,5,5,0) 22%), linear-gradient(to bottom, rgba(5,5,5,1) 0, rgba(5,5,5,0) 12%); }
+  .hf-copy{ flex:none; padding:18px var(--gutter) 40px; }
+  .hf-title{ font-size:clamp(46px, 14vw, 64px); } .hf-sub{ font-size:clamp(26px, 7.4vw, 32px); } .hf-body{ font-size:17px; margin-bottom:22px; max-width:none; }
+  .hf.is-live .hf-copy{ height:auto; min-height:clamp(170px, 26svh, 230px); margin:0; padding:0; position:relative; }
+  .hf.is-live .hf-cap{ bottom:auto; top:14px; }
+  .hf.is-live .hf-cue{ bottom:22px; }
+  .hf ~ .understanding{ padding-top:56px; }
+}
+</style>
+<style id="closing-talk-2026">
+/* "prefer to talk? scroll down" under the indicator button */
+.cl-talk{ display:inline-flex; flex-direction:column; align-items:center; gap:12px; margin-top:clamp(34px, 6vh, 64px); color:var(--paper); text-decoration:none;
+  font-size:15px; font-weight:500; line-height:1.6; opacity:.86; transition:opacity .25s ease; }
+.cl-talk:hover, .cl-talk:focus-visible{ opacity:1; }
+.cl-talk i{ position:relative; width:1px; height:38px; background:linear-gradient(to bottom, rgba(255,90,54,0), var(--ember)); animation:cl-talk-bob 1.7s ease-in-out infinite; }
+.cl-talk i::after{ content:''; position:absolute; left:50%; bottom:0; width:9px; height:9px; margin-left:-5px; border-right:1.5px solid var(--ember); border-bottom:1.5px solid var(--ember); transform:rotate(45deg); }
+@keyframes cl-talk-bob{ 0%, 100%{ transform:none; } 50%{ transform:translateY(7px); } }
+#contactForm{ scroll-margin-top:150px; }
+/* header (owner 2026-11-27): the three items sat too close on desktop, where there is room */
+@media (min-width:901px){ .nav-actions{ gap:clamp(32px, 2.9vw, 52px); } }
+/* BUG FIX (also live since d72204e): the faded-out arches still sat on top of the closing copy and swallowed every click and tap, so
+   "Try the Solution Indicator" could not be pressed. They are decorative: let pointers through. */
+.mv-arches{ pointer-events:none; }
+@media (max-width:900px){ .cl-talk{ font-size:14px; margin-top:28px; } .cl-talk i{ height:30px; } }
+@media (prefers-reduced-motion: reduce){ .cl-talk i{ animation:none; } }
+</style>
 </head>
 <body>
 
@@ -1663,24 +1792,28 @@ html[lang="ar"] .ax-n{ line-height:1.5; }
     </div>
     <div class="ax-body">
       <ol class="ax-list">
-        <li style="--i:0"><a href="#about" data-pv="0"><i>01</i><span class="ax-n" data-ar="نفهم المشكلة" data-en="Understanding">نفهم المشكلة</span><small dir="ltr">UNDERSTANDING</small></a></li>
-        <li style="--i:1"><a href="#roots" data-pv="1"><i>02</i><span class="ax-n" data-ar="جذورنا" data-en="Roots">جذورنا</span><small dir="ltr">ROOTS</small></a></li>
-        <li style="--i:2"><a href="#services" data-pv="2"><i>03</i><span class="ax-n" data-ar="شو منبني" data-en="What we build">شو منبني</span><small dir="ltr">WHAT SHOULD BE BUILT</small></a></li>
-        <li style="--i:3"><a href="#work" data-pv="3"><i>04</i><span class="ax-n" data-ar="بنيناها في أثر" data-en="Built by Athar">بنيناها في أثر</span><small dir="ltr">BUILT BY ATHAR</small></a></li>
-        <li style="--i:4"><a href="#identity" data-pv="4"><i>05</i><span class="ax-n" data-ar="الهوية البصرية" data-en="Visual identity">الهوية البصرية</span><small dir="ltr">BRAND &amp; IDENTITY</small></a></li>
-        <li style="--i:5"><a href="#process" data-pv="5"><i>06</i><span class="ax-n" data-ar="كيف بتفكّر أثر" data-en="How Athar thinks">كيف بتفكّر أثر</span><small dir="ltr">HOW ATHAR THINKS</small></a></li>
-        <li style="--i:6"><a href="#faq" data-pv="6"><i>07</i><span class="ax-n" data-ar="أسئلة شائعة" data-en="FAQ">أسئلة شائعة</span><small dir="ltr">FAQ</small></a></li>
-        <li style="--i:7"><a href="#contact" data-pv="7"><i>08</i><span class="ax-n" data-ar="احكيلنا" data-en="Contact">احكيلنا</span><small dir="ltr">NEXT STEP</small></a></li>
+        <li class="ax-rail" role="presentation" aria-hidden="true"><i class="ax-fill"></i><b class="ax-dot"></b></li>
+        <li style="--i:0"><a href="#about" data-line-ar="نفهم شو المهم فعلًا." data-line-en="We look deeper to find what actually matters." data-pv="0"><i>01</i><span class="ax-n" data-ar="نفهم المشكلة" data-en="Understanding">نفهم المشكلة</span><small dir="ltr">UNDERSTANDING</small></a></li>
+        <li style="--i:1"><a href="#roots" data-line-ar="جذورنا هون، وشغلنا لكل مكان." data-line-en="Rooted in one place. Built for everywhere." data-pv="1"><i>02</i><span class="ax-n" data-ar="جذورنا" data-en="Roots">جذورنا</span><small dir="ltr">ROOTS</small></a></li>
+        <li style="--i:2"><a href="#services" data-line-ar="الحل بيعتمد على المشكلة." data-line-en="The solution depends on the problem." data-pv="2"><i>03</i><span class="ax-n" data-ar="شو منبني" data-en="What we build">شو منبني</span><small dir="ltr">WHAT SHOULD BE BUILT</small></a></li>
+        <li style="--i:3"><a href="#work" data-line-ar="من فكرة، إلى منتج حقيقي." data-line-en="From an idea, to a real product." data-pv="3"><i>04</i><span class="ax-n" data-ar="بنيناها في أثر" data-en="Built by Athar">بنيناها في أثر</span><small dir="ltr">BUILT BY ATHAR</small></a></li>
+        <li style="--i:4"><a href="#identity" data-line-ar="هوية تخلي الناس تعرفك قبل ما تحكي." data-line-en="A visual identity people can recognize before you say a word." data-pv="4"><i>05</i><span class="ax-n" data-ar="الهوية البصرية" data-en="Visual identity">الهوية البصرية</span><small dir="ltr">BRAND &amp; IDENTITY</small></a></li>
+        <li style="--i:5"><a href="#process" data-line-ar="لما نحلّ المشكلة الصح، بيبان الأثر." data-line-en="Solve the right problem, and the impact speaks for itself." data-pv="5"><i>06</i><span class="ax-n" data-ar="كيف بتفكّر أثر" data-en="How Athar thinks">كيف بتفكّر أثر</span><small dir="ltr">HOW ATHAR THINKS</small></a></li>
+        <li style="--i:6"><a href="#faq" data-line-ar="أجوبة سريعة على أكتر الأسئلة اللي بتوصلنا." data-line-en="Quick answers to the questions we hear most." data-pv="6"><i>07</i><span class="ax-n" data-ar="أسئلة شائعة" data-en="FAQ">أسئلة شائعة</span><small dir="ltr">FAQ</small></a></li>
+        <li style="--i:7"><a href="#contact" data-line-ar="احكيلنا شو المشكلة." data-line-en="Tell us the problem." data-pv="7"><i>08</i><span class="ax-n" data-ar="احكيلنا" data-en="Contact">احكيلنا</span><small dir="ltr">NEXT STEP</small></a></li>
       </ol>
+      <div class="ax-side">
       <div class="ax-pv" aria-hidden="true">
-        <figure class="ax-pv-f" data-pv="0"><img data-src="images/understanding/understanding-780.webp" alt=""></figure>
+        <figure class="ax-pv-f" data-pv="0"><img data-src="images/understanding-thread/index-pv.webp" alt=""></figure>
         <figure class="ax-pv-f" data-pv="1"><img data-src="images/motion/village-island-m.webp" alt=""></figure>
-        <figure class="ax-pv-f" data-pv="2"><img data-src="journey/v1/frames/m/f-0241.webp" alt=""></figure>
+        <figure class="ax-pv-f" data-pv="2"><img data-src="journey/v1/frames/m/f-0150.webp" alt=""></figure>
         <figure class="ax-pv-f ax-pv-apps" data-pv="3"><span><img class="kh" data-src="images/motion/app-khznti.webp" alt=""><b dir="ltr">KHZNTI</b></span><span><img data-src="images/motion/app-mahki.webp" alt=""><b dir="ltr">MAHKI</b></span></figure>
         <figure class="ax-pv-f ax-pv-idn" data-pv="4"><img class="l" data-src="images/motion/lily-hd-m.webp" alt=""><img class="m" data-src="images/brand/athar-logo-2026-full-dark.svg" alt=""><img class="o" data-src="images/motion/olive-hd-m.webp" alt=""></figure>
-        <figure class="ax-pv-f" data-pv="5"><img data-src="images/motion/think-24-m.webp" alt=""></figure>
-        <figure class="ax-pv-f ax-pv-q" data-pv="6"><span data-ar="؟" data-en="?">؟</span></figure>
+        <figure class="ax-pv-f" data-pv="5"><img data-src="images/motion/think-23-m.webp" alt=""></figure>
+        <figure class="ax-pv-f ax-pv-qs" data-pv="6"><ol><li><i>01</i><span data-ar="قديش بياخد الوقت تسليم مشروع؟" data-en="How long does a project take?">قديش بياخد الوقت تسليم مشروع؟</span></li><li><i>02</i><span data-ar="بتشتغلوا مع عملاء برا فلسطين؟" data-en="Do you work with clients outside Palestine?">بتشتغلوا مع عملاء برا فلسطين؟</span></li><li><i>03</i><span data-ar="كيف بتحددوا السعر؟" data-en="How do you price a project?">كيف بتحددوا السعر؟</span></li></ol></figure>
         <figure class="ax-pv-f" data-pv="7"><img data-src="images/motion/arches-fabric-back-m.webp" alt=""><img data-src="images/motion/arches-stone-m.webp" alt=""><img data-src="images/motion/arches-fabric-front-m.webp" alt=""></figure>
+      </div>
+        <p class="ax-line" aria-hidden="true"></p>
       </div>
     </div>
     <div class="ax-dests">
@@ -1691,75 +1824,29 @@ html[lang="ar"] .ax-n{ line-height:1.5; }
 
   <main>
   <!-- 1. Hero — Signal in the Noise -->
-  <section class="hero" id="top">
-    <div class="hero-pin"><!-- layout-neutral wrapper (display:contents); the Stage 2 review switch turns it into the short pin -->
-    <div class="hero-guide-v" aria-hidden="true"></div>
-    <div class="hero-guide-h" aria-hidden="true"></div>
-    <div class="hero-stage" data-signal-field="hero" data-sig aria-hidden="true">
-      <div class="pl-back"></div>
-      <div class="pl-front edge"></div>
-      <div class="ticks"></div>
-      <svg data-signal-fallback class="sig sig-hero sig-fade" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <g class="frag" fill="none" stroke-width="1" vector-effect="non-scaling-stroke">
-          <path d="M9 44H13M21 63L26 62M34 18L37 17M48 55H52M71 66L75 65M83 20H86M90 58L93 59" vector-effect="non-scaling-stroke"/>
-        </g>
-        <!-- hidden → interrupted → emerging: the trace fades in from inside the
-             planes, breaks twice (unequal gaps), then runs clean toward the glass -->
-        <defs>
-          <linearGradient id="heroSignal" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
-            <stop offset="0" stop-color="#FF5A36" stop-opacity="0"/>
-            <stop offset=".08" stop-color="#FF5A36" stop-opacity=".2"/>
-            <stop offset=".3" stop-color="#FF5A36" stop-opacity=".32"/>
-            <stop offset=".5" stop-color="#FF5A36" stop-opacity=".55"/>
-            <stop offset=".92" stop-color="#FF5A36" stop-opacity=".82"/>
-          </linearGradient>
-        </defs>
-        <path class="trace" fill="none" stroke="url(#heroSignal)" stroke-width="1" d="M2 35.6L5.5 34.3L8.4 35.9L11.8 34.5L14.6 35.4L17.9 34.7" vector-effect="non-scaling-stroke"/>
-        <path class="trace" fill="none" stroke="url(#heroSignal)" stroke-width="1.15" d="M30.5 33.9L35.2 33.1L38.6 33.5L45.6 32.5" vector-effect="non-scaling-stroke"/>
-        <path class="trace" fill="none" stroke="url(#heroSignal)" stroke-width="1.3" d="M48.9 32.1L93 29.1" vector-effect="non-scaling-stroke"/>
-        <path class="trace-lit" fill="none" stroke-width="1.4" d="M58.3 31.5L66.8 30.9" vector-effect="non-scaling-stroke"/>
-      </svg>
-      <div class="pl-glass"></div>
-    </div>
-    <div class="hero-body shell">
-      <!-- Phone version of the hero Signal: its own band, so it never meets the text -->
-      <svg class="sig sig-hero-m" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <defs>
-          <linearGradient id="heroSignalM" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
-            <stop offset="0" stop-color="#FF5A36" stop-opacity="0"/>
-            <stop offset=".1" stop-color="#FF5A36" stop-opacity=".22"/>
-            <stop offset=".32" stop-color="#FF5A36" stop-opacity=".34"/>
-            <stop offset=".52" stop-color="#FF5A36" stop-opacity=".58"/>
-            <stop offset=".95" stop-color="#FF5A36" stop-opacity=".85"/>
-          </linearGradient>
-        </defs>
-        <path class="frag" fill="none" stroke-width="1" d="M21 21H24.5M55 20L58.5 19.3M84 17.5H87.5" vector-effect="non-scaling-stroke"/>
-        <path fill="none" stroke="url(#heroSignalM)" stroke-width="1" d="M1 15.8L4.6 12.6L8.4 16.3L12 13.1L15.6 15.2" vector-effect="non-scaling-stroke"/>
-        <path fill="none" stroke="url(#heroSignalM)" stroke-width="1.15" d="M29 13.6L35.4 12.1L39.8 12.9L46.5 11.5" vector-effect="non-scaling-stroke"/>
-        <path fill="none" stroke="url(#heroSignalM)" stroke-width="1.3" d="M50.5 11L98 7.6" vector-effect="non-scaling-stroke"/>
-        <path class="trace-lit" fill="none" stroke-width="1.4" d="M60.5 10.3L72 9.5" vector-effect="non-scaling-stroke"/>
-      </svg>
-      <div class="hero-eyebrow">A STUDIO THAT LEAVES A MARK</div>
-      <div class="grid">
-        <h1 class="hero-headline" data-ar-html='<span class="l1">ما تبلّش بشو بدك تبني.</span><span class="l2">بلّش بشو بدو ينحل.</span>' data-en-html='<span class="l1">Don&rsquo;t start with what you want to build.</span><span class="l2">Start with what needs to be solved.</span>'><span class="l1">ما تبلّش بشو بدك تبني.</span><span class="l2">بلّش بشو بدو ينحل.</span></h1>
-        <div class="hero-lower">
-          <p class="hero-sub lede" data-ar="بنلاقي شو المهم داخل المشكلة، وبنحوّل هالوضوح لمنتج أو نظام أو تجربة رقمية مناسبة." data-en="We find what matters inside the problem, then turn that clarity into the right digital product, system or experience.">بنلاقي شو المهم داخل المشكلة، وبنحوّل هالوضوح لمنتج أو نظام أو تجربة رقمية مناسبة.</p>
-          <div class="hero-actions">
-            <a href="#contact" class="btn btn-primary">
-              <span data-ar="ابدأ من المشكلة" data-en="Start with the problem">ابدأ من المشكلة</span>
-              <span class="btn-arrow" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h13M13 6l6 6-6 6" stroke="#F5F3ED" stroke-width="2.4" stroke-linecap="square"/></svg></span>
-            </a>
-            <a href="#work" class="text-link" data-ar="شوف شو بنينا" data-en="See what we&rsquo;ve built">شوف شو بنينا</a>
+  <section class="hf" id="top" aria-labelledby="hf-title">
+    <div class="hf-pin">
+      <div class="hf-frame" aria-hidden="true">
+        <img class="hf-still" src="images/hero-thread/d/f-001.webp" width="1920" height="1080" decoding="async" alt="">
+        <canvas class="hf-c" width="1920" height="1080"></canvas>
+        <div class="hf-layers"><div class="hf-world">
+          <img class="hf-l-moon" src="images/motion/village-moon.webp" srcset="images/motion/village-moon-m.webp 1200w, images/motion/village-moon.webp 2048w" sizes="(max-width:900px) 82vw, 100vw" width="2048" height="1365" decoding="async" alt="">
+          <img class="hf-l-isle" src="images/motion/village-island.webp" srcset="images/motion/village-island-m.webp 1200w, images/motion/village-island.webp 2048w" sizes="(max-width:900px) 82vw, 100vw" width="2048" height="1365" fetchpriority="high" decoding="async" alt="">
+          <img class="hf-l-tex" src="images/motion/village-textile.webp" srcset="images/motion/village-textile-m.webp 1200w, images/motion/village-textile.webp 2048w" sizes="(max-width:900px) 82vw, 100vw" width="2048" height="1365" decoding="async" alt="">
+        </div></div>
+      </div>
+      <div class="hf-copy">
+        <h1 class="hf-cap hf-title on" id="hf-title" data-cap="0" data-ar="إلحق الأثر." data-en="Follow the trace.">إلحق الأثر.</h1>
+        <p class="hf-cap hf-sub" data-cap="1" data-ar="من خيط ضو… لأثر بيضل." data-en="From a thread of light to a mark that stays.">من خيط ضو… لأثر بيضل.</p>
+        <div class="hf-cap hf-end" data-cap="2">
+          <p class="hf-body" data-ar="بنحوّل الأفكار لهويات، مواقع، ومنتجات رقمية — مصمّمة بوضوح، ومبنيّة لتترك أثر." data-en="We turn ideas into identities, websites, and digital products — designed with clarity and built to leave a mark.">بنحوّل الأفكار لهويات، مواقع، ومنتجات رقمية — مصمّمة بوضوح، ومبنيّة لتترك أثر.</p>
+          <div class="hf-actions">
+            <a href="#about" class="btn btn-primary hf-btn"><span data-ar="شوف كيف بنشتغل" data-en="See how we work">شوف كيف بنشتغل</span><span class="hf-arrow" aria-hidden="true">↓</span></a>
+            <a href="#contact" class="text-link" data-ar="احكيلنا عن مشروعك" data-en="Tell us about your project">احكيلنا عن مشروعك</a>
           </div>
         </div>
       </div>
-    </div>
-    <div class="hero-foot">
-      <div class="shell">
-        <span>ATHAR — DIGITAL PRODUCT STUDIO</span>
-        <span class="scroll-cue"><span data-ar="مرر للأسفل" data-en="Scroll down">مرر للأسفل</span><span class="line"></span></span>
-      </div>
-    </div>
+      <div class="hf-cue" aria-hidden="true"><span data-ar="مرر للأسفل" data-en="Scroll down">مرر للأسفل</span><i></i></div>
     </div>
   </section>
 
@@ -1775,12 +1862,11 @@ html[lang="ar"] .ax-n{ line-height:1.5; }
       <!-- Understanding V2 (approved): noise enters from the left, passes three clear resin panels and leaves as one calm
            Ember line. Offline Cycles render (blender-understanding/build_understanding_ref.py); no WebGL, no text in the
            image. Decorative: the section text carries the meaning. Mobile uses the same visual, full width. -->
-      <div class="u-visual reveal" aria-hidden="true">
-        <picture>
-          <!-- phones: a tighter crop of the same render, so the panels and the noise-to-clarity transition read at 390px -->
-          <source media="(max-width:900px)" srcset="images/understanding/understanding-m-780.webp 780w, images/understanding/understanding-m-1170.webp 1170w" sizes="100vw" width="2074" height="861">
-          <img src="images/understanding/understanding-1440.webp" srcset="images/understanding/understanding-780.webp 780w, images/understanding/understanding-1440.webp 1440w, images/understanding/understanding-2880.webp 2880w" sizes="100vw" width="2880" height="1230" loading="lazy" decoding="async" alt="">
-        </picture>
+      <div class="u-scene" aria-hidden="true">
+        <div class="u-scene-pin">
+          <img class="u-scene-still" src="images/understanding-thread/d/f-073.webp" width="1920" height="1080" loading="lazy" decoding="async" alt="">
+          <canvas class="u-scene-c" width="1920" height="1080"></canvas>
+        </div>
       </div>
     </div>
     <div class="u-clarity">
@@ -2659,6 +2745,7 @@ html[lang="ar"] .ax-n{ line-height:1.5; }
                 <span class="cl-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg></span>
               </a>
             </div>
+            <a class="cl-talk" href="#contactForm"><span data-ar="بتفضّل تحكي معنا مباشرة؟ انزل لتحت" data-en="Prefer to talk directly? Scroll down">بتفضّل تحكي معنا مباشرة؟ انزل لتحت</span><i aria-hidden="true"></i></a>
           </div>
         </div>
         <div class="mv-pintro">
@@ -3969,6 +4056,274 @@ html[lang="ar"] .ax-n{ line-height:1.5; }
   });
   new MutationObserver(labels).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   labels();
+})();
+</script>
+<script id="index-plus-2026-js">
+// Index plus (2026-11-27): 1-3 extend the Athar Index; 4 is the custom cursor.
+(function(){
+  var H = document.documentElement, ax = document.getElementById('athar-index'), btn = document.querySelector('.idx-btn');
+  if (ax && btn) {
+    var list = ax.querySelector('.ax-list'), rows = [].slice.call(list.querySelectorAll('li:not(.ax-rail)')), links = rows.map(function(li){ return li.querySelector('a'); });
+    var rail = list.querySelector('.ax-rail'), line = ax.querySelector('.ax-line');
+    // 3 — the circle grows from the button (set before the index's own click handler opens it)
+    btn.addEventListener('click', function(){
+      var r = btn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      ax.style.setProperty('--ox', x + 'px'); ax.style.setProperty('--oy', y + 'px');
+      ax.style.setProperty('--or', Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 'px');
+      place();
+    }, true);
+    // 1 — "you are here": fill the rail to the visitor's place in the page, mark the sections already passed
+    function place(){
+      var mid = innerHeight * .4, idx = -1, f = 0;
+      links.forEach(function(a, i){
+        var t = document.getElementById(a.getAttribute('href').slice(1)); if (!t) return;
+        var r = (t.closest('section') || t).getBoundingClientRect();
+        if (r.top <= mid) { idx = i; f = Math.min(1, (mid - r.top) / Math.max(1, r.height)); }
+      });
+      links.forEach(function(a, i){ a.classList.toggle('seen', i < idx); });
+      requestAnimationFrame(function(){
+        var y = idx < 0 ? 0 : rows[idx].offsetTop + f * rows[idx].offsetHeight;
+        rail.style.setProperty('--fill', '0px');
+        requestAnimationFrame(function(){ rail.style.setProperty('--fill', y.toFixed(1) + 'px'); });
+      });
+    }
+    // 2 — the headline of the row being looked at, under the preview
+    var shown = null;
+    function say(a){
+      if (!a || a === shown) return; shown = a; var ar = H.lang === 'ar';
+      line.classList.add('out');
+      setTimeout(function(){ line.textContent = a.getAttribute(ar ? 'data-line-ar' : 'data-line-en'); line.classList.remove('out'); }, 160);
+    }
+    links.forEach(function(a){ a.addEventListener('mouseenter', function(){ say(a); }); a.addEventListener('focus', function(){ say(a); }); });
+    list.addEventListener('mouseleave', function(){ say(ax.querySelector('.ax-list a.cur') || links[0]); });
+    btn.addEventListener('click', function(){ shown = null; setTimeout(function(){ say(ax.querySelector('.ax-list a.cur') || links[0]); }, 80); });
+  }
+
+  // 6 — words appear one after another when the text enters the screen (once). Text only: the scenes are untouched.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) (function(){
+    var HEAD = '#about .u-display, #roots .mv-h, #services #jr-h, #work .bb-h2, #work .bbm-h2, #identity .idn-h, #process .mvt-h, #lab .lab-gate-title';
+    var SUB = '#about .u-intro, #work .bb-line, #work .bbm-line, #identity .idn-desc, #lab .lab-gate-body';
+    var ITEM = '#faq .faq-item';
+    var busy = false;
+    function split(el){
+      busy = true; var n = 0, walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
+      while (walk.nextNode()) if (walk.currentNode.nodeValue.trim() && !walk.currentNode.parentNode.classList.contains('sq-w')) nodes.push(walk.currentNode);
+      nodes.forEach(function(t){
+        var f = document.createDocumentFragment();
+        t.nodeValue.split(/(\s+)/).forEach(function(w){
+          if (!w) return; if (/^\s+$/.test(w)) { f.appendChild(document.createTextNode(w)); return; }
+          var sp = document.createElement('span'); sp.className = 'sq-w'; sp.style.setProperty('--i', n++); sp.textContent = w; f.appendChild(sp);
+        });
+        t.parentNode.replaceChild(f, t);
+      });
+      busy = false;
+    }
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('sq-in'); io.unobserve(e.target); } }); },
+      { rootMargin: '0px 0px -12% 0px' });
+    function add(sel, kind){
+      [].forEach.call(document.querySelectorAll(sel), function(el, k){
+        if (kind !== 'item') { split(el); new MutationObserver(function(){ if (!busy) split(el); }).observe(el, { childList: true }); }
+        else el.style.setProperty('--k', k);
+        if (kind === 'sub') el.classList.add('sq-sub'); if (kind === 'item') el.classList.add('sq-item');
+        io.observe(el);
+      });
+    }
+    add(HEAD, 'head'); add(SUB, 'sub'); add(ITEM, 'item');
+  })();
+
+  // 4 — the cursor: fine pointers only, never with reduced motion; native cursor in form fields
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var dot = document.createElement('div'), ring = document.createElement('div'), lab = document.createElement('span');
+  dot.className = 'cur-dot'; ring.className = 'cur-ring'; ring.appendChild(lab); dot.setAttribute('aria-hidden', 'true'); ring.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(ring); document.body.appendChild(dot); H.classList.add('cur-has');
+  var LABELS = [  // [selector, ar, en]
+    ['.mv-portal', 'فوت', 'Enter'], ['.idn-gal', 'انزل', 'Scroll'], ['#work img, #work .bb-scr, #work .bbm-scr', 'شوف', 'View'],
+    ['.mv-world', 'جذورنا', 'Roots'], ['.ax-pv', 'شوف', 'View']
+  ];
+  var mx = -100, my = -100, rx = -100, ry = -100, raf = 0;
+  function loop(){ rx += (mx - rx) * .18; ry += (my - ry) * .18;
+    ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+    raf = Math.abs(mx - rx) + Math.abs(my - ry) > .3 ? requestAnimationFrame(loop) : 0; }
+  addEventListener('pointermove', function(e){
+    if (e.pointerType !== 'mouse') return;
+    mx = e.clientX; my = e.clientY; dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
+    H.classList.add('cur-on'); if (!raf) raf = requestAnimationFrame(loop);
+  }, { passive: true });
+  document.addEventListener('mouseleave', function(){ H.classList.remove('cur-on'); });
+  document.addEventListener('pointerover', function(e){
+    var t = e.target, ar = H.lang === 'ar', label = null;
+    var field = t.closest && t.closest('input, textarea, select');
+    H.classList.toggle('cur-field', !!field);
+    for (var i = 0; i < LABELS.length && !field; i++) if (t.closest(LABELS[i][0]) && !t.closest('a, button')) { label = ar ? LABELS[i][1] : LABELS[i][2]; break; }
+    var link = !field && !label && t.closest('a, button, [role="button"], summary, label');
+    var text = !field && !label && !link && t.closest('p, h1, h2, h3, li, blockquote');
+    H.classList.toggle('cur-label', !!label); H.classList.toggle('cur-link', !!link); H.classList.toggle('cur-text', !!text);
+    lab.textContent = label || '';
+  });
+})();
+</script>
+<script id="understanding-thread-2026-js">
+// Understanding scene — frames follow the scroll; they load when the section is near.
+(function(){
+  var sc = document.querySelector('.u-scene'); if (!sc || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var N = 73, mob = matchMedia('(max-width:900px)').matches, base = 'images/understanding-thread/d/f-';
+  var c = sc.querySelector('canvas'), ctx = c.getContext('2d'), imgs = new Array(N), started = false, want = 0, shown = -1, tick = 0;
+  sc.classList.add('is-live');
+  function draw(){
+    for (var i = want; i >= 0; i--) if (imgs[i] && imgs[i].complete && imgs[i].naturalWidth) {
+      if (i !== shown) { ctx.drawImage(imgs[i], 0, 0, c.width, c.height); shown = i; sc.classList.add('has-frames'); }
+      return;
+    }
+  }
+  function load(){
+    if (started) return; started = true;
+    for (var i = 0; i < N; i++) (function(i){ var im = new Image(); im.decoding = 'async'; im.onload = function(){ if (i <= want) draw(); };
+      im.src = base + ('00' + (i + 1)).slice(-3) + '.webp'; imgs[i] = im; })(i);
+  }
+  function frame(){
+    tick = 0; var vh = innerHeight, r = sc.getBoundingClientRect(), pin = sc.firstElementChild.offsetHeight, stick = (vh - pin) / 2, lead = vh * .28;
+    var p = Math.max(0, Math.min(1, (stick - r.top + lead) / (r.height - pin + lead)));
+    goal = p * (N - 1); var nowT = performance.now(), K = lastT ? Math.max(.25, Math.min(3, (nowT - lastT) / 16.67)) : 1; lastT = nowT;
+    pos += (goal - pos) * Math.min(1, .14 * K); if (Math.abs(goal - pos) < .05) pos = goal;   // the same eased follow as the hero
+    want = Math.round(pos); if (started) draw(); if (pos !== goal) tick = requestAnimationFrame(frame);
+  }
+  var goal = 0, pos = 0, lastT = 0;
+  function ask(){ if (!tick) { lastT = 0; tick = requestAnimationFrame(frame); } }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(es, o){ if (es[0].isIntersecting) { load(); o.disconnect(); frame(); } }, { rootMargin: '150% 0px' }).observe(sc);
+  else load();
+  addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); frame();
+})();
+</script>
+<script id="hero-flight-2026-js">
+// hero flight — frames follow the scroll (eased); the blurred stretches of the footage play through as motion;
+// captions switch by frame; words appear in sequence.
+(function(){
+  var H = document.documentElement, hf = document.querySelector('.hf');
+  if (!hf) return;
+  var q = location.search, N = 308, START = /[?&]start=dusk/.test(q) ? 45 : /[?&]start=thread/.test(q) ? 79 : /[?&]start=still/.test(q) ? 121 : 0, LAST = N - 1, useStill = START === 121, useLayers = START === 0;
+  var SCRUB = useLayers && !/[?&]mode=stops/.test(q), PACE = 1.7;   // SCRUB: the flight follows the hand everywhere; PACE: vh of scroll per frame, shared with the Understanding scene
+  var K4 = false;   // one frame set: built from the 4K masters, weight level B
+  var mob = matchMedia('(max-width:900px)').matches, base = 'images/hero-thread/' + (mob ? 'm' : 'd') + '/f-';
+  function name(i){ return base + ('00' + (i + 1)).slice(-3) + '.webp'; }
+  var st = hf.querySelector('.hf-still'); if (useStill) { st.srcset = 'images/hero-thread/start-1280.webp 1280w, images/hero-thread/start-1920.webp 1920w, images/hero-thread/start-2688.webp 2688w'; st.src = 'images/hero-thread/start-1920.webp'; } else if (!useLayers) { st.src = name(START); } if (!useLayers) hf.classList.add('hf-alt');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var c = hf.querySelector('canvas'), ctx = c.getContext('2d'), imgs = new Array(N), want = START, cur = START, shown = -1, raf = 0, lastP = 0, dir = 1;
+  if (mob) { c.width = 1080; c.height = 1080; }   // phones: square crops at full resolution
+  // REST STOPS = the frames measured sharpest (edge energy per frame, 2026-11-27, >= ~88% of each scene's peak):
+  //   village layers 0-20 | olives 123-131 | arch 200-211 and 214-221 (212-213 are the S2/S3 crossfade, softer) | glass 294-307
+  // blurred stretches (frame numbers, 0-based): the pan from the olives to the arch, the pass through the arch
+  var ZONES = SCRUB ? [] : useLayers ? [[20, 123, .7], [131, 200, .55], [211, 214, .5], [221, 294, .6]] : [[115, 123, .5], [145, 179, .5], [236, 277, .5]];   // [from, to, frames per tick]: stretches that play through; the scroll rests only between them, on the sharp frames
+  function zoneOf(f){ for (var z = 0; z < ZONES.length; z++) if (f > ZONES[z][0] && f < ZONES[z][1]) return ZONES[z]; return null; }
+  // scroll -> frame: a blurred frame takes a fifth of the scroll a sharp one does
+  var CUM = [], total = 0;
+  // follows-the-hand weights: the join at the olives and the blurred pan pass quickly, the clearest stretches linger a little
+  function unit(f){ return (f >= 116 && f <= 122) ? .4 : (f >= 123 && f <= 131) ? 2 : (f >= 146 && f <= 178) ? .35 : (f >= 200 && f <= 221) ? 1.6 : f >= 294 ? 2 : 1; }
+  for (var f = START; f <= LAST; f++) { total += SCRUB ? unit(f) : zoneOf(f) ? .2 : (useStill && f < 146) ? 2 : !useLayers ? 1 : (f >= 123 && f <= 131) ? 5 : (f >= 200 && f <= 221) ? 2 : f >= 294 ? 3 : 1; CUM.push(total); }   // the sharp stops are short, so they get more of the scroll
+  var PRE = useLayers ? 26 : 0, zoomT = PRE ? 0 : 1, zoom = zoomT;   // scroll spent on the zoom before the first frame moves
+  if (SCRUB) hf.style.setProperty('--hf-len', Math.round((total + PRE) * PACE) + 'vh');
+  function frameAt(p){ var t = p * (total + PRE) - PRE; zoomT = PRE ? Math.max(0, Math.min(1, (t + PRE) / PRE)) : 1; if (t < 0) t = 0; var lo = 0, hi = CUM.length - 1; while (lo < hi) { var mid = (lo + hi) >> 1; if (CUM[mid] < t) lo = mid + 1; else hi = mid; } return START + lo; }
+  // captions by frame: the title while the thread draws between the olives, the line at the arch, the rest at the glass
+  var CAPS = SCRUB ? [[-1, mob ? 60 : 3], [100, 232], [286, 9999]] : useLayers ? [[-1, mob ? 60 : 3], [112, 221], [291, 9999]] : [[-1, 143], [181, 234], [283, 9999]], caps = [].slice.call(hf.querySelectorAll('.hf-cap')), busy = false, WS = new RegExp('(\\s+)'), WSO = new RegExp('^\\s+$');
+  function split(el){
+    busy = true; var n = 0, walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
+    while (walk.nextNode()) if (walk.currentNode.nodeValue.trim() && !walk.currentNode.parentNode.classList.contains('hf-w')) nodes.push(walk.currentNode);
+    nodes.forEach(function(t){ var fr = document.createDocumentFragment();
+      t.nodeValue.split(WS).forEach(function(w){ if (!w) return; if (WSO.test(w)) { fr.appendChild(document.createTextNode(w)); return; }
+        var sp = document.createElement('span'); sp.className = 'hf-w'; sp.style.setProperty('--i', n++); sp.textContent = w; fr.appendChild(sp); });
+      t.parentNode.replaceChild(fr, t); });
+    busy = false;
+  }
+  [].forEach.call(hf.querySelectorAll('.hf-title, .hf-sub, .hf-body'), function(el){ split(el); new MutationObserver(function(){ if (!busy) split(el); }).observe(el, { childList: true }); });
+  caps[0].classList.remove('on'); hf.classList.add('is-live');
+  var ready = false; requestAnimationFrame(function(){ requestAnimationFrame(function(){ ready = true; ask(); }); });   // the title writes itself in on load
+  function draw(i){
+    for (var k = i; k >= START; k--) if (imgs[k] && imgs[k].complete && imgs[k].naturalWidth) {
+      if (k !== shown) { ctx.drawImage(imgs[k], 0, 0, c.width, c.height); shown = k; hf.dataset.f = k; hf.classList.add('has-frames'); } return; }
+  }
+  var next = START, live = 0;
+  // weight (owner's choice, level B + fewer frames in the moves): inside a stretch that plays through, only every second frame is loaded;
+  // draw() falls back to the frame before, and nobody can rest there
+  function skip(i){ if (K4) return false;   // the 4K-based set is shown whole: every frame, no weight reduction (owner wants to see it as it is first)
+    if (SCRUB) return i > 146 && i < 178 && ((i - 146) % 2 === 1);   // follows-the-hand: only the blurred pan is thinned
+    if (!useLayers) return false; var z = zoneOf(i); return !!z && ((i - z[0]) % 2 === 1); }
+  // data saver / very slow connections: only the frames just ahead of the visitor are fetched, never the whole flight
+  var conn = navigator.connection, lean = !!(conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '')));
+  function pump(){ while (next < N && skip(next)) next++; while (live < 6 && next < N && (!lean || next <= Math.round(cur) + 70)) (function(i){ live++; var im = new Image(); im.decoding = 'async';
+    im.onload = im.onerror = function(){ live--; if (i <= Math.round(cur)) draw(Math.round(cur)); pump(); };
+    im.src = name(i); imgs[i] = im; })(next++), (function(){ while (next < N && skip(next)) next++; })(); }
+  function prog(){ var r = hf.getBoundingClientRect(), tot = r.height - innerHeight; return tot > 0 ? Math.max(0, Math.min(1, -r.top / tot)) : 0; }
+  function loop(){
+    raf = 0; var nowT = performance.now(), K = lastT ? Math.max(.25, Math.min(3, (nowT - lastT) / 16.67)) : 1; lastT = nowT;   // same speed on a 60 Hz and a 144 Hz screen
+    var p = prog(); if (p !== lastP) { dir = p > lastP ? 1 : -1; lastP = p; }
+    want = frameAt(p); var z = zoneOf(want); if (z) want = dir > 0 ? z[1] : z[0];        // never rest inside a blurred stretch
+    // the zoom and the footage never overlap (owner's recording 2026-11-27: on a quick scroll the footage started while the sharp
+    // village was still growing, and the bigger village of the footage showed behind it like a ghost): frames wait for the zoom
+    // to finish, and on the way back the zoom waits for the frames to return
+    var rawWant = want; if (useLayers && zoom < .985 && want > START) want = START;
+    // a move between two stops starts gently, runs at its pace, and SLOWS DOWN into the stop (owner 2026-11-27: it used to stop dead)
+    var d = want - cur, inZ = zoneOf(cur), cap = inZ ? inZ[2] : 4, step = d * (inZ ? .05 : .14);
+    if (inZ) { var from = d > 0 ? cur - inZ[0] : inZ[1] - cur; cap *= Math.min(1, .3 + from / 9); if (Math.abs(step) < .06) step = d > 0 ? .06 : -.06; }
+    if (step > cap) step = cap; if (step < -cap) step = -cap; step *= K;
+    if (Math.abs(d) <= Math.abs(step) || Math.abs(d) < .05) cur = want; else cur += step;
+    draw(Math.round(cur)); hf.dataset.w = Math.round(want); hf.dataset.c = cur.toFixed(1);   // for the tests: where the scroll points, and where the flight is
+    hf.style.setProperty('--hf-still', useStill ? Math.max(0, 1 - (cur - START) / 7).toFixed(2) : 0);   // the still dissolves into the footage
+    open = useLayers ? Math.max(0, 1 - (cur - START) / 7) : 0; hf.style.setProperty('--hf-open', open.toFixed(2));
+    var hold = useLayers ? Math.max(0, Math.min(1, 1 - (cur - 20) / 10)) : 0, tk = track(cur);   // the sharp village stays over the footage, then fades as the trees come in
+    hf.style.setProperty('--hf-hold', hold.toFixed(2)); hf.style.setProperty('--hf-ts', tk[0].toFixed(4)); hf.style.setProperty('--hf-ty', (tk[1] * layersEl.offsetHeight / 100).toFixed(1) + 'px');
+    LY[0].style.opacity = Math.max(0, Math.min(1, 1 - (cur - 12) / 8)).toFixed(2);   // the moon drifts differently in the footage: let it go first
+    hf.classList.toggle('hf-opened', hold <= 0); floatAsk(); if (lean && pumping) pump();
+    for (var ah = 1; ah <= 8; ah++) { var nx = imgs[Math.round(cur) + dir * ah]; if (nx && nx.complete && nx.naturalWidth && !nx._w && nx.decode) { nx._w = 1; nx.decode().then(function(){}, function(){}); (function(n){ setTimeout(function(){ n._w = 0; }, 3000); })(nx); } }   // decode the next frames ahead
+    var zt = (useLayers && cur > START + .05) ? 1 : zoomT; zoom += (zt - zoom) * Math.min(1, .11 * K); if (Math.abs(zt - zoom) < .002) zoom = zt; hf.style.setProperty('--hf-zoom', zoom.toFixed(3));
+    if (ready) caps.forEach(function(el, i){ el.classList.toggle('on', cur > CAPS[i][0] && cur <= CAPS[i][1] && !(i === 0 && useLayers && !mob && zoom > .3)); });
+    hf.classList.toggle('moved', p > .012);
+    if (cur !== rawWant || zoom !== zt) raf = requestAnimationFrame(loop);
+  }
+  var lastT = 0;
+  function ask(){ if (!raf) { lastT = 0; raf = requestAnimationFrame(loop); } }
+  // how the village sits in the first frames of the footage, measured against frame 1: [frame, scale, shift down in % of the frame height]
+  var layersEl = hf.querySelector('.hf-layers'), TR = [[0, 1, 0], [10, 1.014, 0], [20, 1.022, .4], [25, 1.024, .7], [30, 1.02, 1.1], [36, 1.014, 2]];
+  function track(f){ for (var k = 1; k < TR.length; k++) if (f <= TR[k][0]) { var a = TR[k - 1], b = TR[k], t = Math.max(0, (f - a[0]) / (b[0] - a[0])); return [a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; } return [TR[TR.length - 1][1], TR[TR.length - 1][2]]; }
+  // the opening: the village's sharp layers float gently and follow the pointer a little, until the flight starts
+  var world = hf.querySelector('.hf-world'), LY = [hf.querySelector('.hf-l-moon'), hf.querySelector('.hf-l-isle'), hf.querySelector('.hf-l-tex')], fraf = 0, open = useLayers ? 1 : 0, mx = 0, my = 0, tx = 0, ty = 0;
+  function float(now){
+    fraf = 0; if (!useLayers || open <= 0) { LY.forEach(function(l){ l.style.transform = ''; }); return; }
+    var t = now / 1000, A = world.offsetHeight * .011 * open, b = Math.sin(t * .85) * A; tx += (mx - tx) * .06; ty += (my - ty) * .06;
+    var px = tx * open, py = ty * open;
+    LY[0].style.transform = 'translate3d(' + (-px * 7).toFixed(2) + 'px,' + (Math.sin(t * .85 + 1.3) * A * .45 - py * 4).toFixed(2) + 'px,0)';
+    LY[1].style.transform = 'translate3d(' + (px * 10).toFixed(2) + 'px,' + (b + py * 6).toFixed(2) + 'px,0)';
+    LY[2].style.transform = 'translate3d(' + (px * 12).toFixed(2) + 'px,' + (b + py * 7).toFixed(2) + 'px,0) rotate(' + (Math.sin(t * 1.25) * .45 * open).toFixed(3) + 'deg)';
+    fraf = requestAnimationFrame(float);
+  }
+  function floatAsk(){ if (useLayers && !fraf && open > 0) fraf = requestAnimationFrame(float); }
+  if (useLayers && matchMedia('(hover: hover) and (pointer: fine)').matches) addEventListener('pointermove', function(e){ mx = e.clientX / innerWidth * 2 - 1; my = e.clientY / innerHeight * 2 - 1; }, { passive: true });
+  // follows-the-hand: when the scroll stops on a frame that is not clear, glide to the nearest clear one
+  var OKR = [[0, 114], [121, 132], [194, 211], [214, 225], [287, 307]], idle = 0, snapping = false, touching = false;   // 21-97 is soft but still: fine to rest on
+  function isOK(f){ for (var k = 0; k < OKR.length; k++) if (f >= OKR[k][0] && f <= OKR[k][1]) return true; return false; }
+  function yOf(f){ var i = f - START, a = i > 0 ? CUM[i - 1] : 0, u = (a + CUM[i]) / 2, r = hf.getBoundingClientRect(); return scrollY + r.top + (u + PRE) / (total + PRE) * (r.height - innerHeight); }
+  function settle(){
+    if (!SCRUB || snapping || touching) return; var p = prog(); if (p <= 0 || p >= 1) return;
+    var f = frameAt(p); if (isOK(f)) return;
+    var a = 0, b = 0; while (f + a <= LAST && !isOK(f + a)) a++; while (f - b >= START && !isOK(f - b)) b++;
+    // only a SHORT glide, and with the visitor's direction: never pull them back across a long stretch (2026-11-27: it felt stuck)
+    var fwd = f + a <= LAST, back = f - b >= START, t = -1;
+    if (dir > 0) { if (fwd && a <= 14) t = f + a; else if (back && b <= 5) t = f - b; } else { if (back && b <= 14) t = f - b; else if (fwd && a <= 5) t = f + a; }
+    if (f > 132 && f < 194) t = dir > 0 ? 194 : 132;   // the pan between the olives and the arch is the blurriest stretch: never rest inside it, go on in the visitor's direction
+    if (t < 0) return;
+    var y0 = scrollY, dy = yOf(t) - y0, T = Math.min(1200, 420 + Math.abs(dy) * .8), t0 = performance.now(); snapping = true;
+    (function go(now){ if (!snapping) return; var u = Math.min(1, (now - t0) / T), e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      scrollTo({ top: y0 + dy * e, behavior: 'instant' }); if (u < 1) requestAnimationFrame(go); else snapping = false; })(t0);
+  }
+  function stopSnap(){ snapping = false; }
+  if (SCRUB) {
+    addEventListener('scroll', function(){ if (snapping) return; clearTimeout(idle); idle = setTimeout(settle, 280); }, { passive: true });
+    addEventListener('wheel', stopSnap, { passive: true }); addEventListener('keydown', stopSnap); addEventListener('mousedown', stopSnap);
+    addEventListener('touchstart', function(){ touching = true; stopSnap(); }, { passive: true });
+    addEventListener('touchend', function(){ touching = false; clearTimeout(idle); idle = setTimeout(settle, 420); }, { passive: true });
+  }
+  // the frames start loading once the page itself has loaded (or after 1.5 s), so they never delay the first paint
+  var pumping = false; function go(){ if (!pumping) { pumping = true; pump(); } }
+  if (document.readyState === 'complete') go(); else { addEventListener('load', go); setTimeout(go, 1500); }
+  addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); ask();
 })();
 </script>
 </body>
