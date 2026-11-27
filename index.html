@@ -1856,6 +1856,20 @@ html.it-on .it.is-open{ background:none; pointer-events:none; }
 /* the footer logo larger on desktop, for the clarity of the drawing's fine lines (the file is untouched) */
 @media (min-width:901px){ .ft-logo.ft-logo-2026{ height:300px; } }
 </style>
+<style id="mark-top-2026">
+/* the header mark is large at the top of the page and compact after the first scroll (desktop) */
+@media (min-width:901px){
+  :root{ --mk:var(--mk-top, 128px); } html.nav-compact{ --mk:76px; }
+  .brand-logo-header, .brand-mark-host{ transition:height .45s cubic-bezier(.3,.6,.2,1), width .45s cubic-bezier(.3,.6,.2,1); }
+  nav{ align-items:flex-start; } nav .nav-actions{ min-height:76px; }   /* the links stay on the line of the compact mark's centre */
+}
+@media (prefers-reduced-motion: reduce){ .brand-logo-header, .brand-mark-host{ transition:none; } }
+</style>
+<script id="mark-top-2026-js">
+(function(){ var H = document.documentElement, on = null;
+  function f(){ var c = (window.pageYOffset || 0) > 60; if (c !== on) { on = c; H.classList.toggle('nav-compact', c); } }
+  addEventListener('scroll', f, { passive: true }); f(); })();
+</script>
 <style id="hero-btn-2026">
 /* the hero button as a glass pill (owner's choice, 2026-11-27) */
 .hf-btn{ padding:0; padding-inline:28px 8px; gap:18px; background:rgba(245,243,237,.07); color:var(--paper); border:1px solid rgba(245,243,237,.3); border-radius:999px;
@@ -3890,29 +3904,39 @@ html.it-on .it.is-open{ background:none; pointer-events:none; }
 <script src="journey/v1/journey.js"></script>
 <script>
 // ATHAR header mark (approved 2026-11-19): one restrained interaction on the header mark only.
-// The exact Asset 21 file is loaded into a shadow root (its own styles stay scoped; nothing in the file is edited). On hover
-// or tap the orange figure redraws once (a 650ms line-draw with a faint ember glow on the figure only); it never loops. Reduced motion: no animation. If anything
-// fails, the plain <img> simply stays.
+// The official file is loaded into a shadow root exactly as it is (its own styles stay scoped; nothing in the file is edited): from 601px
+// up the owner's small-size drawing of the mark (2026-11-27), on phones the original mark. On hover or tap the orange figure redraws once
+// (a 650ms line-draw with a faint ember glow on the figure only); it never loops. Reduced motion: no animation. If anything fails, the
+// plain <img> simply stays.
 (function(){
   var img = document.querySelector('nav .brand-logo-header'); if (!img || !window.fetch || !document.body.attachShadow) return;
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)'), mark = img.closest('.nav-mark');
-  fetch(img.getAttribute('src')).then(function(r){ return r.ok ? r.text() : Promise.reject(); }).then(function(src){
-    var host = document.createElement('span'); host.className = 'brand-mark-host'; host.setAttribute('role', 'img'); host.setAttribute('aria-label', img.alt || 'Athar');
-    var root = host.attachShadow({ mode: 'open' });
-    root.innerHTML = '<style>:host{display:block} svg{display:block;width:100%;height:100%}' +
-      '.mk-drawing .mk-fig{animation:mkdraw .65s cubic-bezier(.33,.55,.25,1) both, mkglow .65s ease-out both}' +
-      '@keyframes mkdraw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}' +
-      '@keyframes mkglow{0%{filter:none}20%,70%{filter:brightness(1.22) drop-shadow(0 0 2.2px rgba(255,90,54,.6))}100%{filter:none}}</style>' + src.replace(/^<\?xml[^>]*>\s*/, '');
-    var svg = root.querySelector('svg'); if (!svg) return;
-    img.replaceWith(host);
-    [].forEach.call(svg.querySelectorAll('.cls-2, .cls-3'), function(p){   // the file's own orange figure strokes
-      var len = Math.ceil(p.getTotalLength()); p.style.strokeDasharray = len; p.style.setProperty('--len', len); p.classList.add('mk-fig'); });
-    var busy = false;
-    function play(){ if (reduce.matches || busy) return; busy = true; svg.classList.add('mk-drawing');
-      setTimeout(function(){ svg.classList.remove('mk-drawing'); busy = false; }, 700); }
-    mark.addEventListener('pointerenter', function(e){ if (e.pointerType === 'mouse') play(); });
-    mark.addEventListener('pointerdown', play);
-  }).catch(function(){});
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)'), mark = img.closest('.nav-mark'), wide = matchMedia('(min-width:601px)');
+  var BIG = img.getAttribute('src'), SMALL = 'images/brand/athar-mark-2026-dark-small.svg', host = null, root = null, svg = null, shown = '', busy = false;
+  function file(){ return wide.matches ? SMALL : BIG; }
+  function play(){ if (reduce.matches || busy || !svg) return; busy = true; var s = svg; s.classList.add('mk-drawing');
+    setTimeout(function(){ s.classList.remove('mk-drawing'); busy = false; }, 700); }
+  function mount(){
+    var want = file(); if (want === shown) return;
+    fetch(want).then(function(r){ return r.ok ? r.text() : Promise.reject(); }).then(function(src){
+      if (want !== file() || want === shown) return;   // the window crossed the phone width while the file was on its way
+      var box = document.createElement('div'); box.innerHTML = src.replace(/^<\?xml[^>]*>\s*/, ''); if (!box.querySelector('svg')) return;
+      if (!host) {
+        host = document.createElement('span'); host.className = 'brand-mark-host'; host.setAttribute('role', 'img'); host.setAttribute('aria-label', img.alt || 'Athar');
+        root = host.attachShadow({ mode: 'open' }); img.replaceWith(host);
+        mark.addEventListener('pointerenter', function(e){ if (e.pointerType === 'mouse') play(); });
+        mark.addEventListener('pointerdown', play);
+      }
+      root.innerHTML = '<style>:host{display:block} svg{display:block;width:100%;height:100%}' +
+        '.mk-drawing .mk-fig{animation:mkdraw .65s cubic-bezier(.33,.55,.25,1) both, mkglow .65s ease-out both}' +
+        '@keyframes mkdraw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}' +
+        '@keyframes mkglow{0%{filter:none}20%,70%{filter:brightness(1.22) drop-shadow(0 0 2.2px rgba(255,90,54,.6))}100%{filter:none}}</style>' + box.innerHTML;
+      svg = root.querySelector('svg'); shown = want;
+      [].forEach.call(svg.querySelectorAll('path'), function(p){   // the file's own orange figure lines: the paths drawn as a line only (no fill)
+        if (getComputedStyle(p).fill !== 'none') return;
+        var len = Math.ceil(p.getTotalLength()); p.style.strokeDasharray = len; p.style.setProperty('--len', len); p.classList.add('mk-fig'); });
+    }).catch(function(){});
+  }
+  mount(); if (wide.addEventListener) wide.addEventListener('change', mount); else if (wide.addListener) wide.addListener(mount);
 })();
 </script>
 <script id="motion-scenes-2026-js">
