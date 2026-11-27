@@ -1852,6 +1852,10 @@ html.it-on .it.is-open{ background:none; pointer-events:none; }
   try { history.scrollRestoration = 'manual'; } catch (e) {}
 })();
 </script>
+<style id="logo-size-2026">
+/* the footer logo larger on desktop, for the clarity of the drawing's fine lines (the file is untouched) */
+@media (min-width:901px){ .ft-logo.ft-logo-2026{ height:300px; } }
+</style>
 <style id="hero-btn-2026">
 /* the hero button as a glass pill (owner's choice, 2026-11-27) */
 .hf-btn{ padding:0; padding-inline:28px 8px; gap:18px; background:rgba(245,243,237,.07); color:var(--paper); border:1px solid rgba(245,243,237,.3); border-radius:999px;
@@ -3952,7 +3956,7 @@ html.it-on .it.is-open{ background:none; pointer-events:none; }
         logo = rv.querySelector('.idn-rlogo'), rlight = rv.querySelector('.idn-rlight');
     scenes.push({ el: rv, run: function(T, dt, vh){
       var r = rv.getBoundingClientRect(), p = ease('rp', clamp(-r.top / (r.height - vh)), dt), e = out3(ease('re', clamp((vh - r.top) / vh), dt));
-      var W = rstage.clientWidth, sg = H.dir === 'rtl' ? -1 : 1, phone = W < 600 || W < vh * .9;   // phones and portrait tablets: the flowers part up and down
+      var W = rstage.clientWidth, phone = W < 600 || W < vh * .9, sg = (H.dir === 'rtl' && !phone) ? -1 : 1;   // phones and portrait tablets: the flowers part up and down, the same way in both languages
       var sp = smooth(.1, .6, p), lg = smooth(.3, .72, p), lw = lily.offsetWidth, ow = olive.offsetWidth;
       var xl = (-lw * .3) + ((phone ? -W * .27 : -(W / 2 - lw * .42)) + lw * .3) * sp, yl = (phone ? -vh * .2 : -vh * .02) * sp;
       var xo = (ow * .45) + ((phone ? W * .3 : (W / 2 - ow * .45)) - ow * .45) * sp, yo = (phone ? vh * .21 : vh * .04) * sp;
